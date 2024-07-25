@@ -2,12 +2,14 @@
 
 namespace Marsion
 {
-    public interface ICardView : IFsmHandler
+    public interface ICardView : IFsmHandler, ICardViewTransformMotion
     {
         #region Properties
 
+        MonoBehaviour MonoBehaviour { get; }
         CardViewFsm FSM { get; }
         Transform Transform { get; }
+        Collider Collider { get; }
         IMouseInput Input { get; }
 
         #endregion
@@ -15,6 +17,8 @@ namespace Marsion
         #region Operations
 
         void Enable();
+
+        void Draw();
 
         #endregion
     }

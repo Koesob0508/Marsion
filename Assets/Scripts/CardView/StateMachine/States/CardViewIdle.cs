@@ -7,7 +7,7 @@ namespace Marsion
     {
         Vector3 DefaultSize { get; }
 
-        public CardViewIdle(ICardView handler, BaseStateMachine fsm) : base(handler, fsm)
+        public CardViewIdle(ICardView handler, BaseStateMachine fsm, CardViewParameters parameters) : base(handler, fsm, parameters)
         {
             DefaultSize = Handler.Transform.localScale;
         }
@@ -19,12 +19,25 @@ namespace Marsion
             Handler.Input.OnPointerEnter -= OnPointerEnter;
             Handler.Input.OnPointerEnter += OnPointerEnter;
 
+            if (Handler.Position.IsOperating)
+            {
+                Handler.Collider.enabled = false;
+                Handler.Position.OnFinishMotion -= OnCollider;
+                Handler.Position.OnFinishMotion += OnCollider;
+            }
+            else
+            {
+                OnCollider();
+            }
+
             Handler.Transform.localScale = DefaultSize;
         }
 
         public override void OnExitState()
         {
             Handler.Input.OnPointerEnter -= OnPointerEnter;
+
+            Handler.Position.OnFinishMotion -= OnCollider;
         }
 
         #endregion
@@ -41,5 +54,10 @@ namespace Marsion
         }
 
         #endregion
+
+        private void OnCollider()
+        {
+            Handler.Collider.enabled = true;
+        }
     }
 }

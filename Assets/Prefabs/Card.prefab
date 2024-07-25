@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34c3055acc3c2f149972a14377218946, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Parameters: {fileID: 11400000, guid: 63cad272d2c6157489890d5427da8e29, type: 2}
 --- !u!65 &1265013662195173425
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -62,7 +63,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

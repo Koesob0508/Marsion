@@ -94,9 +94,10 @@ namespace Marsion
             state.OnExitState();
 
             if (!isSilent)
+            {
                 Current?.OnEnterState();
-
-            Managers.Logger.Log<BaseStateMachine>($"Current State : ", "purple", Current.GetType());
+                Managers.Logger.Log<BaseStateMachine>($"Current State : ", "purple", Current.GetType());
+            }
         }
 
         public virtual void Clear()

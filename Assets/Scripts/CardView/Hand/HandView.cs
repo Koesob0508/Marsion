@@ -45,7 +45,7 @@ namespace Marsion
             OnPileChanged?.Invoke(Cards.ToArray());
 
             card.Transform.SetParent(transform);
-            card.Enable();
+            card.Draw();
         }
 
         public  void RemoveCard(ICardView card)

@@ -75,7 +75,7 @@ namespace Marsion
                 Vector3 cardUp = GetCurveNormal(curveStart, Vector3.zero, curveEnd, t);
                 Quaternion cardRot = Quaternion.LookRotation(Vector3.forward, cardUp);
 
-                card.Transform.position = cardPos;
+                card.MoveToWithZ(cardPos, 10f);
                 card.Transform.rotation = cardRot;
             }
         }

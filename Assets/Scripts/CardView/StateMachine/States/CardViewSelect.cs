@@ -12,9 +12,7 @@ namespace Marsion
 
         #endregion
 
-        public CardViewSelect(ICardView handler, BaseStateMachine fsm) : base(handler, fsm)
-        {
-        }
+        public CardViewSelect(ICardView handler, BaseStateMachine fsm, CardViewParameters parameters) : base(handler, fsm, parameters) { }
 
         #region State Operations
 

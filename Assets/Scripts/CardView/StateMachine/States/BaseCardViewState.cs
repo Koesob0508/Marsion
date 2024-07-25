@@ -7,15 +7,17 @@
         public bool IsInitialized { get; }
         protected ICardView Handler { get; }
         protected BaseStateMachine FSM { get; }
+        protected CardViewParameters Parameters { get; }
 
         #endregion
 
         #region Constructor
 
-        protected BaseCardViewState(ICardView handler, BaseStateMachine fsm)
+        protected BaseCardViewState(ICardView handler, BaseStateMachine fsm, CardViewParameters parameters)
         {
             Handler = handler;
             FSM = fsm;
+            Parameters = parameters;
 
             IsInitialized = true;
         }

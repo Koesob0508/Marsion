@@ -9,9 +9,7 @@ namespace Marsion
 
         #endregion
 
-        public CardViewHover(ICardView handler, BaseStateMachine fsm) : base(handler, fsm)
-        {
-        }
+        public CardViewHover(ICardView handler, BaseStateMachine fsm, CardViewParameters parameters) : base(handler, fsm, parameters) { }
 
         #region State Operations
 
@@ -78,22 +76,24 @@ namespace Marsion
         private void SetScale()
         {
             var currentScale = Handler.Transform.localScale;
-            var finalScale = currentScale * 2;
+            var finalScale = currentScale * Parameters.HoverScale;
 
             Handler.Transform.localScale = finalScale;
         }
 
         private void SetPosition()
         {
-            var finalPosition = Handler.Transform.position + new Vector3(0, 0f, -2f);
+            var finalPosition = Handler.Transform.position + new Vector3(0, Parameters.HoverHeight, -2f);
 
-            Handler.Transform.position = finalPosition;
+            Handler.MoveToWithZ(finalPosition, Parameters.HoverSpeed);
         }
 
         private void SetRotation()
         {
+            Handler.Rotation.StopMotion();
             Handler.Transform.rotation = Quaternion.identity;
         }
+
         #endregion
     }
 }
