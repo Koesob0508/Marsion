@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using NUnit.Framework;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,7 +8,16 @@ namespace Marsion.Server
     public class ServerManager : NetworkBehaviour
     {
         public bool IsConnected { get; private set; }
-        public UnityAction OnConnect;
+
+        public DeckSO p1Deck;
+        public DeckSO p2Deck;
+
+
+        #region UnityActions
+
+        public UnityAction OnHostConnected;
+
+        #endregion
 
         private GameFlow Flow;
         public GameManager Game { get; private set; }
@@ -37,6 +47,13 @@ namespace Marsion.Server
             }
         }
 
+        public void ConnectHost()
+        {
+            InitServerManager();
+
+            OnHostConnected?.Invoke();
+        }
+
         [ServerRpc]
         private void CheckConnectionServerRpc()
         {
@@ -44,7 +61,10 @@ namespace Marsion.Server
             {
                 Managers.Logger.Log<ServerManager>($"Ready to start");
 
-                InitServerManager();
+                Flow.SetFirstPlayerDeck(p1Deck);
+                Flow.SetSecondPlayerDeck(p2Deck);
+                Flow.SetCurrentPlayer();
+                Flow.InitialDeckShuffle();
                 Flow.StartGame();
             }
         }
