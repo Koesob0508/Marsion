@@ -27,6 +27,28 @@ namespace Marsion
 
         }
 
+        public void LogWarning<T>(object log, string colorName = "black", Type param = null)
+        {
+            if (AreLogsEnabled)
+            {
+                var context = GetTypeName(typeof(T));
+                log = string.Format("[" + context + OpenColor + log + CloseColor + GetTypeName(param), colorName);
+                Debug.LogWarning(log);
+            }
+
+        }
+
+        public void LogError<T>(object log, string colorName = "black", Type param = null)
+        {
+            if (AreLogsEnabled)
+            {
+                var context = GetTypeName(typeof(T));
+                log = string.Format("[" + context + OpenColor + log + CloseColor + GetTypeName(param), colorName);
+                Debug.LogError(log);
+            }
+
+        }
+
         #endregion
 
         #region Util
