@@ -14,17 +14,11 @@ namespace Marsion.Server
 
         public void Init()
         {
-            Debug.Log("InitServerRpc");
-
             if (Managers.Network != null)
             {
                 Managers.Network.OnClientConnectedCallback -= OnClientConnected;
                 Managers.Network.OnClientConnectedCallback += OnClientConnected;
             }
-
-            Flow = new GameFlow();
-
-            Flow.onGameStart += OnGameStart;
         }
 
         public void Clear()
@@ -49,20 +43,24 @@ namespace Marsion.Server
             if (AreAllPlayersConnected())
             {
                 Managers.Logger.Log<ServerManager>($"Ready to start");
+
+                InitServerManager();
                 Flow.StartGame();
             }
         }
 
         private void OnGameStart()
         {
-            Debug.Log("OnGameStart");
             Managers.Client.GameStartClientRpc();
         }
 
-        private void InitServerManagers()
+        private void InitServerManager()
         {
-            Game = new GameManager();
-            Game.Init();
+            Flow = new GameFlow();
+            Flow.onGameStart += OnGameStart;
+
+            //Game = new GameManager();
+            //Game.Init();
         }
 
         private bool AreAllPlayersConnected()
