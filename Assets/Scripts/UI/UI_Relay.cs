@@ -19,13 +19,13 @@ namespace Marsion
 
         public void Start()
         {
-            Managers.Server.OnConnect -= HidePanel;
-            Managers.Server.OnConnect += HidePanel;
+            Managers.Client.OnStartGame -= HidePanel;
+            Managers.Client.OnStartGame += HidePanel;
         }
 
         public void OnDisable()
         {
-            Managers.Server.OnConnect -= HidePanel;
+            Managers.Client.OnStartGame -= HidePanel;
         }
 
         public async void OnClickHost()
@@ -43,10 +43,10 @@ namespace Marsion
 
             if (result)
             {
-                Managers.Logger.LogWarning<UI_Relay>("Connection succeed.");
+                Managers.Logger.Log<UI_Relay>("Connection succeed.");
             }
             else
-                Managers.Logger.LogWarning<UI_Relay>("Connection failed.");
+                Managers.Logger.Log<UI_Relay>("Connection failed.");
         }
 
         private void HidePanel()

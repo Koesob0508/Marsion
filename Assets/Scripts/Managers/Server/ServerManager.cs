@@ -8,11 +8,12 @@ namespace Marsion.Server
     {
         public bool IsConnected { get; private set; }
         public UnityAction OnConnect;
+
+        private GameFlow Flow;
         public GameManager Game { get; private set; }
 
         public void Init()
         {
-
             if (Managers.Network != null)
             {
                 Managers.Network.OnClientConnectedCallback -= OnClientConnected;
@@ -30,27 +31,36 @@ namespace Marsion.Server
 
         private void OnClientConnected(ulong clinetId)
         {
-            if(Managers.Network.IsHost)
+            if (Managers.Network.IsHost)
             {
-                Managers.Logger.Log<ServerManager>("Host");
-
-                InitServerManagers();
-
-                if (AreAllPlayersConnected())
-                    Game.StartServerRpc();
-                
-            }
-            else if (Managers.Network.IsClient)
-            {
-                if (AreAllPlayersConnected())
-                    Managers.Logger.Log<ServerManager>("Client");
+                CheckConnectionServerRpc();
             }
         }
 
-        private void InitServerManagers()
+        [ServerRpc]
+        private void CheckConnectionServerRpc()
         {
-            Game = new GameManager();
-            Game.Init();
+            if (AreAllPlayersConnected())
+            {
+                Managers.Logger.Log<ServerManager>($"Ready to start");
+
+                InitServerManager();
+                Flow.StartGame();
+            }
+        }
+
+        private void OnGameStart()
+        {
+            Managers.Client.GameStartClientRpc();
+        }
+
+        private void InitServerManager()
+        {
+            Flow = new GameFlow();
+            Flow.onGameStart += OnGameStart;
+
+            //Game = new GameManager();
+            //Game.Init();
         }
 
         private bool AreAllPlayersConnected()
