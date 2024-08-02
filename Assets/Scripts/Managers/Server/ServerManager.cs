@@ -1,8 +1,10 @@
-﻿using UnityEngine.Events;
+﻿using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.Events;
 
 namespace Marsion.Server
 {
-    public class ServerManager
+    public class ServerManager : NetworkBehaviour
     {
         public bool IsConnected { get; private set; }
         public UnityAction OnConnect;
@@ -40,7 +42,8 @@ namespace Marsion.Server
             }
             else if (Managers.Network.IsClient)
             {
-                Managers.Logger.Log<ServerManager>("Client");
+                if (AreAllPlayersConnected())
+                    Managers.Logger.Log<ServerManager>("Client");
             }
         }
 

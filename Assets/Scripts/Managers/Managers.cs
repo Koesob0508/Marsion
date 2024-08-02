@@ -5,15 +5,15 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class Managers : NetworkBehaviour
+    public class Managers : MonoBehaviour
     {
-        private static Managers s_instance;
+        static Managers s_instance;
         public static Managers Instance { get { Init(); return s_instance; } }
 
-        private ServerManager _server = new ServerManager();
-        private ClientManager _client = new ClientManager();
+        [SerializeField] ServerManager _server;
+        [SerializeField] ClientManager _client;
 
-        private Logger _logger = new Logger();
+        Logger _logger = new Logger();
 
         public static NetworkManager Network { get { return NetworkManager.Singleton; } }
 

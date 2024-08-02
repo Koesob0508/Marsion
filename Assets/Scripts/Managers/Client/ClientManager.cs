@@ -1,8 +1,9 @@
 ﻿using Unity.Netcode;
+using UnityEngine;
 
 namespace Marsion.Client
 {
-    public class ClientManager
+    public class ClientManager : NetworkBehaviour
     {
         public InputManager Input { get; private set; }
 
