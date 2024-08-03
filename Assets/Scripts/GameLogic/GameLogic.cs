@@ -2,30 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine.Events;
 
-namespace Marsion.Server
+namespace Marsion
 {
-    public class GameFlow
+    public class GameLogic
     {
         private Player currentPlayer;
         private Player player1;
         private Player player2;
 
+        private GameData gameData;
+
         #region UnityActions
 
         public UnityAction onGameStart;
+        public UnityAction onCardDrawn;
 
         #endregion
 
-        public void SetFirstPlayerDeck(DeckSO deck)
+        public GameLogic(GameData _gameData)
         {
-            player1 = new Player();
-            SetPlayerDeck(player1, deck);
+            gameData = _gameData;
         }
 
-        public void SetSecondPlayerDeck(DeckSO deck)
+        public void SetBothPlayerDeck(DeckSO deck1, DeckSO deck2)
         {
-            player2 = new Player();
-            SetPlayerDeck(player2, deck);
+            SetPlayerDeck(gameData.players[0], deck1);
+            SetPlayerDeck(gameData.players[1], deck2);
         }
 
         private void SetPlayerDeck(Player player, DeckSO deck)
@@ -55,12 +57,17 @@ namespace Marsion.Server
 
         public void StartGame()
         {
-            onGameStart?.Invoke();
+            // 카드 뽑기
 
-            // 두 명의 플레이어에 대해서,
-            // 덱을 일단 셔플해줘야겠죠. 다만 지금 당장은 셔플은 생각하지 말자...
-            Managers.Logger.Log<GameFlow>(player1.LogDeck());
-            Managers.Logger.Log<GameFlow>(player2.LogDeck());
+            DrawCard(player1, 5);
+            DrawCard(player2, 5);
+
+            Managers.Logger.Log<GameLogic>(player1.LogPile(player1.hand));
+            Managers.Logger.Log<GameLogic>(player2.LogPile(player2.hand));
+
+            // 확실히 블랙보드가 하나 있어서, 그 
+
+            onGameStart?.Invoke();
         }
 
         public void ShuffleDeck(List<Card> deck)
@@ -75,6 +82,21 @@ namespace Marsion.Server
                 deck[k] = deck[n];
                 deck[n] = value;
             }
+        }
+
+        public void DrawCard(Player player, int count = 1)
+        {
+            for(int i = 0; i < count; i++)
+            {
+                if(player.deck.Count > 0 && player.hand.Count < 10)
+                {
+                    Card card = player.deck[0];
+                    player.deck.RemoveAt(0);
+                    player.hand.Add(card);
+                }
+            }
+
+            onCardDrawn?.Invoke();
         }
     }
 }

@@ -19,8 +19,8 @@ namespace Marsion.Server
 
         #endregion
 
-        private GameFlow Flow;
-        public GameManager Game { get; private set; }
+        private GameData GameData;
+        private GameLogic Logic;
 
         public void Init()
         {
@@ -38,6 +38,13 @@ namespace Marsion.Server
                 Managers.Network.OnClientConnectedCallback -= OnClientConnected;
             }
         }
+        private void InitServerManager()
+        {
+            int playerCount = 2;
+            GameData = new GameData(playerCount);
+            Logic = new GameLogic(GameData);
+            Logic.onGameStart += OnGameStart;
+        }
 
         private void OnClientConnected(ulong clinetId)
         {
@@ -53,6 +60,7 @@ namespace Marsion.Server
 
             OnHostConnected?.Invoke();
         }
+        
 
         [ServerRpc]
         private void CheckConnectionServerRpc()
@@ -61,11 +69,10 @@ namespace Marsion.Server
             {
                 Managers.Logger.Log<ServerManager>($"Ready to start");
 
-                Flow.SetFirstPlayerDeck(p1Deck);
-                Flow.SetSecondPlayerDeck(p2Deck);
-                Flow.SetCurrentPlayer();
-                Flow.InitialDeckShuffle();
-                Flow.StartGame();
+                Logic.SetBothPlayerDeck(p1Deck, p2Deck);
+                Logic.SetCurrentPlayer();
+                Logic.InitialDeckShuffle();
+                Logic.StartGame();
             }
         }
 
@@ -74,14 +81,7 @@ namespace Marsion.Server
             Managers.Client.GameStartClientRpc();
         }
 
-        private void InitServerManager()
-        {
-            Flow = new GameFlow();
-            Flow.onGameStart += OnGameStart;
-
-            //Game = new GameManager();
-            //Game.Init();
-        }
+        
 
         private bool AreAllPlayersConnected()
         {
