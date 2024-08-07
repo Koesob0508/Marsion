@@ -1,15 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Marsion
 {
-    public enum Suit
-    {
-        Spade,
-        Heart,
-        Diamond,
-        Club
-    }
-
     [CreateAssetMenu(fileName = "CardSO", menuName = "Marsion/CardSO")]
     public class CardSO : ScriptableObject
     {

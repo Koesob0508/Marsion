@@ -1,12 +1,16 @@
-﻿using NUnit.Framework.Interfaces;
+﻿using Marsion;
+using NUnit.Framework.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace Marsion
 {
+    [Serializable]
     public class Player
     {
-        public List<Card> deck = new List<Card>();
-        public List<Card> hand = new List<Card>();
+        public List<Card> Deck = new List<Card>();
+        public List<Card> Hand = new List<Card>();
+        public List<Card> Field = new List<Card>();
 
         public string LogPile(List<Card> pile)
         {

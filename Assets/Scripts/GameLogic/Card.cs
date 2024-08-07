@@ -1,5 +1,17 @@
-﻿namespace Marsion
+﻿using System;
+
+namespace Marsion
 {
+    [Serializable]
+    public enum Suit
+    {
+        Spade,
+        Heart,
+        Diamond,
+        Club
+    }
+
+    [Serializable]
     public class Card
     {
         //public int ID;

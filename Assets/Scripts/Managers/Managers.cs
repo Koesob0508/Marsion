@@ -28,11 +28,6 @@ namespace Marsion
             Init();
         }
 
-        private void Update()
-        {
-            Client.Update();
-        }
-
         private static void Init()
         {
             if (s_instance == null)
@@ -48,8 +43,8 @@ namespace Marsion
                 DontDestroyOnLoad(obj);
                 s_instance = obj.GetComponent<Managers>();
 
-                Server.Init();
-                Client.Init();
+                s_instance._server.Init();
+                s_instance._client.Init();
             }
         }
 

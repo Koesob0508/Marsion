@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Marsion;
+using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
@@ -6,16 +7,14 @@ namespace Marsion
 {
     public class GameLogic
     {
-        private Player currentPlayer;
-        private Player player1;
-        private Player player2;
-
         private GameData gameData;
 
         #region UnityActions
 
-        public UnityAction onGameStart;
-        public UnityAction onCardDrawn;
+        public UnityAction OnGameStart;
+        public UnityAction OnUpdate;
+        public UnityAction OnCardDrawn;
+        public UnityAction OnCardPlayed;
 
         #endregion
 
@@ -24,50 +23,28 @@ namespace Marsion
             gameData = _gameData;
         }
 
-        public void SetBothPlayerDeck(DeckSO deck1, DeckSO deck2)
+        public GameData GetGameData()
         {
-            SetPlayerDeck(gameData.players[0], deck1);
-            SetPlayerDeck(gameData.players[1], deck2);
+            return gameData;
         }
 
-        private void SetPlayerDeck(Player player, DeckSO deck)
+        private void UpdateData()
         {
-            player.deck.Clear();
-
-            foreach (CardSO cardSO in deck.cards)
-            {
-                if (cardSO != null)
-                {
-                    Card card = new Card(cardSO);
-                    player.deck.Add(card);
-                }
-            }
-        }
-
-        public void SetCurrentPlayer()
-        {
-            currentPlayer = player1;
-        }
-
-        public void InitialDeckShuffle()
-        {
-            ShuffleDeck(player1.deck);
-            ShuffleDeck(player2.deck);
+            OnUpdate?.Invoke();
         }
 
         public void StartGame()
         {
-            // 카드 뽑기
+            foreach (var player in gameData.Players)
+            {
+                ShuffleDeck(player.Deck);
+                Managers.Logger.Log<GameLogic>("Draw");
+                DrawCard(player, 5);
+            }
 
-            DrawCard(player1, 5);
-            DrawCard(player2, 5);
-
-            Managers.Logger.Log<GameLogic>(player1.LogPile(player1.hand));
-            Managers.Logger.Log<GameLogic>(player2.LogPile(player2.hand));
-
-            // 확실히 블랙보드가 하나 있어서, 그 
-
-            onGameStart?.Invoke();
+            Managers.Logger.Log<GameLogic>("Game Start");
+            UpdateData();
+            OnGameStart?.Invoke();
         }
 
         public void ShuffleDeck(List<Card> deck)
@@ -88,15 +65,25 @@ namespace Marsion
         {
             for(int i = 0; i < count; i++)
             {
-                if(player.deck.Count > 0 && player.hand.Count < 10)
+                if(player.Deck.Count > 0 && player.Hand.Count < 10)
                 {
-                    Card card = player.deck[0];
-                    player.deck.RemoveAt(0);
-                    player.hand.Add(card);
+                    Card card = player.Deck[0];
+                    player.Deck.RemoveAt(0);
+                    player.Hand.Add(card);
                 }
             }
 
-            onCardDrawn?.Invoke();
+            UpdateData();
+            OnCardDrawn?.Invoke();
+        }
+
+        public void PlayCard(ulong clientID, Card card)
+        {
+            gameData.Players[clientID].Hand.Remove(card);
+            gameData.Players[clientID].Field.Add(card);
+
+            UpdateData();
+            OnCardPlayed?.Invoke();
         }
     }
 }
