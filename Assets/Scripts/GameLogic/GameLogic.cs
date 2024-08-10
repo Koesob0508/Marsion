@@ -11,9 +11,9 @@ namespace Marsion
 
         #region UnityActions
 
-        public UnityAction OnGameStart;
-        public UnityAction OnUpdate;
-        public UnityAction OnCardDrawn;
+        public UnityAction OnGameStarted;
+        public UnityAction OnUpdated;
+        public UnityAction<Player, int> OnCardDrawn;
         public UnityAction OnCardPlayed;
 
         #endregion
@@ -30,7 +30,7 @@ namespace Marsion
 
         private void UpdateData()
         {
-            OnUpdate?.Invoke();
+            OnUpdated?.Invoke();
         }
 
         public void StartGame()
@@ -44,7 +44,7 @@ namespace Marsion
 
             Managers.Logger.Log<GameLogic>("Game Start");
             UpdateData();
-            OnGameStart?.Invoke();
+            OnGameStarted?.Invoke();
         }
 
         public void ShuffleDeck(List<Card> deck)
@@ -74,13 +74,13 @@ namespace Marsion
             }
 
             UpdateData();
-            OnCardDrawn?.Invoke();
+            OnCardDrawn?.Invoke(player, count);
         }
 
-        public void PlayCard(ulong clientID, Card card)
+        public void PlayCard(Player player, Card card)
         {
-            gameData.Players[clientID].Hand.Remove(card);
-            gameData.Players[clientID].Field.Add(card);
+            player.Hand.Remove(card);
+            player.Field.Add(card);
 
             UpdateData();
             OnCardPlayed?.Invoke();

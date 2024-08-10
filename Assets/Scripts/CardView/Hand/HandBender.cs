@@ -9,7 +9,7 @@ namespace Marsion
 
         [SerializeField]
         [Tooltip("Controls the curve that the hand uses.")]
-        private Vector3 curveStart = new Vector3(-2f, -0.7f, 0f), curveEnd = new Vector3(2f, -0.7f, 0f);
+        private Vector3 CurveStart = new Vector3(-2f, -0.7f, 0f), CurveEnd = new Vector3(2f, -0.7f, 0f);
 
         #region UnityCallbacks
 
@@ -32,16 +32,20 @@ namespace Marsion
             // 그릴 선의 색상을 파란색으로 설정합니다.
             GL.Color(Color.blue);
 
-            DrawSphere(curveStart, 0.03f);
-            DrawSphere(curveEnd, 0.03f);
+            DrawSphere(CurveStart, 0.03f);
+            DrawSphere(CurveEnd, 0.03f);
 
-            Vector3 p1 = curveStart;
+            Vector3 p1 = CurveStart;
             for (int i = 0; i < 19; i++)
             {
                 float t = (i + 1) / 19f;
-                Vector3 p2 = GetCurvePoint(curveStart, Vector3.zero, curveEnd, t);
+                Vector3 p2 = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, t);
                 GL.Vertex(p1);
                 GL.Vertex(p2);
+
+                DrawTangentAtPoint(p2, t, 0.1f);
+                DrawNormalAtPoint(p2, t, 0.1f); // 여기서 0.1f는 Normal 선의 길이
+
                 p1 = p2;
             }
 
@@ -62,21 +66,37 @@ namespace Marsion
             if (cards == null)
                 throw new ArgumentNullException("Can't bend a null card list");
 
+            float[] objLerps = new float[cards.Length];
+
+            switch (cards.Length)
+            {
+                case 1: objLerps = new float[] { 0.5f }; break;
+                case 2: objLerps = new float[] { 0.27f, 0.73f }; break;
+                case 3: objLerps = new float[] { 0.1f, 0.5f, 0.9f }; break;
+                default:
+                    float interval = 1f / (cards.Length - 1);
+                    for (int i = 0; i < cards.Length; i++)
+                        objLerps[i] = interval * i;
+                    break;
+            }
+
             for (int i = 0; i < cards.Length; i++)
             {
                 ICardView card = cards[i];
 
                 if (!card.FSM.IsCurrent<CardViewIdle>()) continue;
 
-                float t = (cards.Length == 1) ? 0.5f : (float)i / (cards.Length - 1);
+                var cardPos = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, objLerps[i]);
+                var cardRot = Quaternion.identity;
 
-                Vector3 cardPos = GetCurvePoint(curveStart, Vector3.zero, curveEnd, t);
-                cardPos.z = i * -0.1f;
-                Vector3 cardUp = GetCurveNormal(curveStart, Vector3.zero, curveEnd, t);
-                Quaternion cardRot = Quaternion.LookRotation(Vector3.forward, cardUp);
+                if (cards.Length >= 4)
+                {
+                    Vector3 cardUp = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, objLerps[i], card.IsMine);
+                    cardRot = Quaternion.LookRotation(Vector3.forward, cardUp);
+                }
 
                 card.MoveToWithZ(cardPos, 10f);
-                card.Transform.rotation = cardRot;
+                card.Transform.localRotation = cardRot;
             }
         }
 
@@ -102,14 +122,17 @@ namespace Marsion
             return (oneMinusT * oneMinusT * a) + (2f * oneMinusT * t * b) + (t * t * c);
         }
 
-        private static Vector3 GetCurveNormal(Vector3 a, Vector3 b, Vector3 c, float t)
+        private static Vector3 GetCurveNormal(Vector3 a, Vector3 b, Vector3 c, float t, bool isMine)
         {
             Vector3 tangent = GetCurveTangent(a, b, c, t);
 
-            return Vector3.Cross(Vector3.forward, tangent);
+            if (isMine)
+                return Vector3.Cross(Vector3.forward, tangent);
+            else
+                return Vector3.Cross(Vector3.back, tangent);
         }
 
-        public static Vector3 GetCurveTangent(Vector3 a, Vector3 b, Vector3 c, float t)
+        private static Vector3 GetCurveTangent(Vector3 a, Vector3 b, Vector3 c, float t)
         {
             return 2f * (1f - t) * (b - a) + 2f * t * (c - b);
         }
@@ -140,6 +163,27 @@ namespace Marsion
             }
         }
 
+        private void DrawTangentAtPoint(Vector3 point, float t, float length)
+        {
+            // 곡선의 현재 점에서 Tangent 벡터를 계산합니다.
+            Vector3 tangent = GetCurveTangent(CurveStart, Vector3.zero, CurveEnd, t).normalized;
+
+            // Tangent 벡터 방향으로 선을 그립니다.
+            GL.Color(Color.green);  // Tangent 선을 녹색으로 설정
+            GL.Vertex(point);
+            GL.Vertex(point + tangent * length);
+        }
+
+        private void DrawNormalAtPoint(Vector3 point, float t, float length)
+        {
+            // 곡선의 현재 점에서 Normal 벡터를 계산합니다.
+            Vector3 normal = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, t, GetComponent<HandView>().IsMine).normalized;
+
+            // Normal 벡터 방향으로 선을 그립니다.
+            GL.Vertex(point);
+            GL.Vertex(point + normal * length);
+        }
+
         private void DrawSphere(Vector3 center, float radius)
         {
             float step = Mathf.PI * 0.1f;
@@ -166,7 +210,7 @@ namespace Marsion
 
                 float t = (float)i / 9;
 
-                Vector3 cardPos = GetCurvePoint(curveStart, Vector3.zero, curveEnd, t);
+                Vector3 cardPos = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, t);
 
 
                 DrawSphere(cardPos, 0.03f);

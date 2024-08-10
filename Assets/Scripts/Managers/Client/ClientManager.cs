@@ -1,7 +1,4 @@
-﻿using Marsion.Client;
-using Marsion;
-using Marsion.Clinet;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,12 +7,14 @@ namespace Marsion.Client
     public class ClientManager : NetworkBehaviour
     {
         private GameData gameData;
-        private ulong clientID;
+        public ulong ID;
 
         public InputManager Input { get; private set; }
+        public DeckView Deck;
 
         public UnityAction OnStartGame;
         public UnityAction OnUpdateData;
+        public UnityAction<ulong, int> OnDrawCard;
 
         public override void OnNetworkSpawn()
         {
@@ -34,6 +33,7 @@ namespace Marsion.Client
             }
 
             Input = new InputManager();
+            Deck.Init();
         }
 
         public void Update()
@@ -48,7 +48,7 @@ namespace Marsion.Client
 
         public void SetClientID(ulong clientID)
         {
-            this.clientID = Managers.Network.LocalClientId;
+            ID = Managers.Network.LocalClientId;
         }
 
         [Rpc(SendTo.ClientsAndHost)]
@@ -61,7 +61,7 @@ namespace Marsion.Client
 
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void UpdateDataClientRpc(NetworkGameData networkData)
+        public void UpdateDataRpc(NetworkGameData networkData)
         {
             Managers.Logger.Log<ClientManager>("On update game data.");
             gameData = networkData.gameData;
@@ -75,6 +75,17 @@ namespace Marsion.Client
             OnUpdateData?.Invoke();
         }
 
+        [Rpc(SendTo.ClientsAndHost)]
+        public void DrawCardRpc(ulong clientID, int count)
+        {
+            OnDrawCard?.Invoke(clientID, count);
+        }
+
+        private Player GetPlayer()
+        {
+            return gameData.Players[ID];
+        }
+
         public GameData GetGameData()
         {
             return gameData;
@@ -82,17 +93,19 @@ namespace Marsion.Client
 
         public void GetHand()
         {
-            Managers.Logger.Log<ClientManager>(gameData.Players[clientID].LogPile(gameData.Players[clientID].Hand));
+            var player = GetPlayer();
+            Managers.Logger.Log<ClientManager>(player.LogPile(player.Hand));
         }
 
         public void GetField()
         {
-            Managers.Logger.Log<ClientManager>(gameData.Players[clientID].LogPile(gameData.Players[clientID].Field));
+            var player = GetPlayer();
+            Managers.Logger.Log<ClientManager>(player.LogPile(player.Field));
         }
 
         public void PlayCard(int index)
         {
-            Managers.Server.PlayCardServerRpc(clientID, index);
+            Managers.Server.PlayCardRpc(ID, index);
         }
     }
 }

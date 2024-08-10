@@ -10,16 +10,23 @@ namespace Marsion
 
         [SerializeField] public CardViewParameters Parameters;
 
+        public bool IsMine { get; set; }
         public string Name => gameObject.name;
         public MonoBehaviour MonoBehaviour => this;
         public CardViewFsm FSM { get; private set; }
         public Transform Transform { get; set; }
         public Collider Collider { get; set; }
         public IMouseInput Input { get; private set; }
+        public Order Order { get; private set; }
+        [SerializeField] private GameObject hoverImage;
+        [SerializeField] private GameObject backImage;
+        public GameObject FrontImage { get => hoverImage; }
+        public GameObject BackImage { get => backImage; }
 
         public BaseCardViewMotion Scale { get; private set; }
         public BaseCardViewMotion Position { get; private set; }
         public BaseCardViewMotion Rotation { get; private set; }
+        
 
         #endregion
 
@@ -31,6 +38,7 @@ namespace Marsion
             Collider = GetComponent<Collider>();
 
             Input = GetComponent<IMouseInput>();
+            Order = GetComponent<Order>();
 
             Scale = new ScaleCardViewMotion(this);
             Position = new PositionCardViewMotion(this);
