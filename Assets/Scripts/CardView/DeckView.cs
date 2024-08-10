@@ -29,6 +29,7 @@ namespace Marsion
                 for (int i = 0; i < count; i++)
                 {
                     var cardObject = Instantiate(cardPrefab);
+                    cardObject.IsMine = true;
                     cardObject.FrontImage.SetActive(true);
                     cardObject.BackImage.SetActive(false);
                     cardObject.transform.position = transform.position;
@@ -41,6 +42,7 @@ namespace Marsion
                 for (int i = 0; i < count; i++)
                 {
                     var cardObject = Instantiate(cardPrefab);
+                    cardObject.IsMine = false;
                     cardObject.FrontImage.SetActive(false);
                     cardObject.BackImage.SetActive(true);
                     cardObject.transform.position = EnemyDeck.transform.position;

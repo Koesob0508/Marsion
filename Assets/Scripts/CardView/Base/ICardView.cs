@@ -6,6 +6,7 @@ namespace Marsion
     {
         #region Properties
 
+        bool IsMine { get; }
         MonoBehaviour MonoBehaviour { get; }
         CardViewFsm FSM { get; }
         Transform Transform { get; }

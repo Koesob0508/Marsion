@@ -42,6 +42,10 @@ namespace Marsion
                 Vector3 p2 = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, t);
                 GL.Vertex(p1);
                 GL.Vertex(p2);
+
+                DrawTangentAtPoint(p2, t, 0.1f);
+                DrawNormalAtPoint(p2, t, 0.1f); // 여기서 0.1f는 Normal 선의 길이
+
                 p1 = p2;
             }
 
@@ -87,7 +91,7 @@ namespace Marsion
 
                 if (cards.Length >= 4)
                 {
-                    Vector3 cardUp = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, objLerps[i]);
+                    Vector3 cardUp = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, objLerps[i], card.IsMine);
                     cardRot = Quaternion.LookRotation(Vector3.forward, cardUp);
                 }
 
@@ -118,11 +122,14 @@ namespace Marsion
             return (oneMinusT * oneMinusT * a) + (2f * oneMinusT * t * b) + (t * t * c);
         }
 
-        private static Vector3 GetCurveNormal(Vector3 a, Vector3 b, Vector3 c, float t)
+        private static Vector3 GetCurveNormal(Vector3 a, Vector3 b, Vector3 c, float t, bool isMine)
         {
             Vector3 tangent = GetCurveTangent(a, b, c, t);
 
-            return Vector3.Cross(Vector3.forward, tangent);
+            if (isMine)
+                return Vector3.Cross(Vector3.forward, tangent);
+            else
+                return Vector3.Cross(Vector3.back, tangent);
         }
 
         private static Vector3 GetCurveTangent(Vector3 a, Vector3 b, Vector3 c, float t)
@@ -154,6 +161,27 @@ namespace Marsion
                 // 깊이 쓰기를 비활성화합니다.
                 lineMaterial.SetInt("_ZWrite", 0);
             }
+        }
+
+        private void DrawTangentAtPoint(Vector3 point, float t, float length)
+        {
+            // 곡선의 현재 점에서 Tangent 벡터를 계산합니다.
+            Vector3 tangent = GetCurveTangent(CurveStart, Vector3.zero, CurveEnd, t).normalized;
+
+            // Tangent 벡터 방향으로 선을 그립니다.
+            GL.Color(Color.green);  // Tangent 선을 녹색으로 설정
+            GL.Vertex(point);
+            GL.Vertex(point + tangent * length);
+        }
+
+        private void DrawNormalAtPoint(Vector3 point, float t, float length)
+        {
+            // 곡선의 현재 점에서 Normal 벡터를 계산합니다.
+            Vector3 normal = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, t, GetComponent<HandView>().IsMine).normalized;
+
+            // Normal 벡터 방향으로 선을 그립니다.
+            GL.Vertex(point);
+            GL.Vertex(point + normal * length);
         }
 
         private void DrawSphere(Vector3 center, float radius)

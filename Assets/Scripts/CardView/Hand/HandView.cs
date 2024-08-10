@@ -6,6 +6,7 @@ namespace Marsion
 {
     public class HandView : MonoBehaviour
     {
+        public bool IsMine;
         public List<ICardView> Cards { get; protected set; }
         public Action<ICardView[]> OnPileChanged;
 

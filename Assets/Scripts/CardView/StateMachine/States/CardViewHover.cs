@@ -33,6 +33,7 @@ namespace Marsion
         public override void OnExitState()
         {
             Handler.FrontImage.transform.localPosition = Vector3.zero;
+            Handler.FrontImage.transform.localRotation = Quaternion.identity;
             Handler.Input.OnPointerExit -= OnPointerExit;
             Handler.Input.OnPointerClick -= OnPointerClick;
             Handler.Input.OnDrag -= OnDrag;

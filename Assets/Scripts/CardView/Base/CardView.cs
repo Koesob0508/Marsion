@@ -10,6 +10,7 @@ namespace Marsion
 
         [SerializeField] public CardViewParameters Parameters;
 
+        public bool IsMine { get; set; }
         public string Name => gameObject.name;
         public MonoBehaviour MonoBehaviour => this;
         public CardViewFsm FSM { get; private set; }
