@@ -13,6 +13,9 @@ namespace Marsion
         [SerializeField] ServerManager _server;
         [SerializeField] ClientManager _client;
 
+        ResourceManager _resource = new ResourceManager();
+        UIManager _ui = new UIManager();
+
         Logger _logger = new Logger();
 
         public static NetworkManager Network { get { return NetworkManager.Singleton; } }
@@ -20,6 +23,8 @@ namespace Marsion
         public static ServerManager Server { get { return Instance._server; } }
         public static ClientManager Client { get { return Instance._client; } }
 
+        public static ResourceManager Resource { get { return Instance._resource; } }
+        public static UIManager UI { get { return Instance._ui; } }
 
         public static Logger Logger { get { return Instance._logger; } }
 
@@ -50,7 +55,7 @@ namespace Marsion
 
         public static void Clear()
         {
-
+            s_instance._ui.Clear();
         }
     }
 }

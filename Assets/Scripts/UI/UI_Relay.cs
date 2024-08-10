@@ -7,17 +7,17 @@ using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using Marsion.UI;
 
 namespace Marsion
 {
-    public class UI_Relay : MonoBehaviour
+    public class UI_Relay : UI_Scene
     {
         [SerializeField] TMP_InputField inputField;
         [SerializeField] GameObject panel;
 
-        public void Start()
+        public override void Init()
         {
             Managers.Client.OnStartGame -= HidePanel;
             Managers.Client.OnStartGame += HidePanel;
