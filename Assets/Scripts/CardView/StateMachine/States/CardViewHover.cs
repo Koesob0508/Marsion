@@ -32,7 +32,7 @@ namespace Marsion
 
         public override void OnExitState()
         {
-            Handler.HoverImage.transform.localPosition = Vector3.zero;
+            Handler.FrontImage.transform.localPosition = Vector3.zero;
             Handler.Input.OnPointerExit -= OnPointerExit;
             Handler.Input.OnPointerClick -= OnPointerClick;
             Handler.Input.OnDrag -= OnDrag;
@@ -80,7 +80,7 @@ namespace Marsion
             var currentScale = Handler.Transform.localScale;
             var finalScale = currentScale * Parameters.HoverScale;
 
-            Handler.HoverImage.transform.localScale = finalScale;
+            Handler.FrontImage.transform.localScale = finalScale;
         }
 
         private void SetPosition()
@@ -88,13 +88,13 @@ namespace Marsion
             var finalPosition = Handler.Transform.position + new Vector3(0, Parameters.HoverHeight, -2f);
 
             //Handler.MoveToWithZ(finalPosition, Parameters.HoverSpeed);
-            Handler.HoverImage.transform.position = finalPosition;
+            Handler.FrontImage.transform.position = finalPosition;
         }
 
         private void SetRotation()
         {
             Handler.Rotation.StopMotion();
-            Handler.Transform.rotation = Quaternion.identity;
+            Handler.FrontImage.transform.rotation = Quaternion.identity;
         }
 
         private void SetOrder()

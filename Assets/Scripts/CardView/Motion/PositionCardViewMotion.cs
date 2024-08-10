@@ -17,7 +17,7 @@ namespace Marsion
 
         protected override bool CheckFinalState()
         {
-            var distance = TargetValue - Handler.Transform.position;
+            var distance = TargetValue - Handler.Transform.localPosition;
 
             if (!WithZ)
                 distance.z = 0;
@@ -31,22 +31,22 @@ namespace Marsion
             IsOperating = false;
 
             var targetValue = TargetValue;
-            targetValue.z = Handler.Transform.position.z;
-            Handler.Transform.position = targetValue;
+            targetValue.z = Handler.Transform.localPosition.z;
+            Handler.Transform.localPosition = targetValue;
 
             base.OnMotionEnds();
         }
 
         protected override void KeepMotion()
         {
-            var current = Handler.Transform.position;
+            var current = Handler.Transform.localPosition;
             var amount = Speed * Time.deltaTime;
             var delta = Vector3.Lerp(current, TargetValue, amount);
 
             if (!WithZ)
-                delta.z = Handler.Transform.position.z;
+                delta.z = Handler.Transform.localPosition.z;
 
-            Handler.Transform.position = delta;
+            Handler.Transform.localPosition = delta;
         }
     }
 }

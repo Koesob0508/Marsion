@@ -9,7 +9,7 @@ namespace Marsion
 
         public CardViewIdle(ICardView handler, BaseStateMachine fsm, CardViewParameters parameters) : base(handler, fsm, parameters)
         {
-            DefaultSize = Handler.HoverImage.transform.localScale;
+            DefaultSize = Handler.FrontImage.transform.localScale;
         }
 
         #region State Operations
@@ -30,7 +30,7 @@ namespace Marsion
                 OnCollider();
             }
 
-            Handler.HoverImage.transform.localScale = DefaultSize;
+            Handler.FrontImage.transform.localScale = DefaultSize;
             Handler.Order.SetMostFrontOrder(false);
         }
 

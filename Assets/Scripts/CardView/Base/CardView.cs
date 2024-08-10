@@ -18,7 +18,9 @@ namespace Marsion
         public IMouseInput Input { get; private set; }
         public Order Order { get; private set; }
         [SerializeField] private GameObject hoverImage;
-        GameObject ICardView.HoverImage { get => hoverImage; }
+        [SerializeField] private GameObject backImage;
+        public GameObject FrontImage { get => hoverImage; }
+        public GameObject BackImage { get => backImage; }
 
         public BaseCardViewMotion Scale { get; private set; }
         public BaseCardViewMotion Position { get; private set; }

@@ -12,7 +12,8 @@ namespace Marsion
         Collider Collider { get; }
         IMouseInput Input { get; }
         Order Order { get; }
-        GameObject HoverImage { get; }
+        GameObject FrontImage { get; }
+        GameObject BackImage { get; }
 
         #endregion
 

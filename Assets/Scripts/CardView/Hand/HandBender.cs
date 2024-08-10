@@ -64,14 +64,14 @@ namespace Marsion
 
             float[] objLerps = new float[cards.Length];
 
-            switch(cards.Length)
+            switch (cards.Length)
             {
                 case 1: objLerps = new float[] { 0.5f }; break;
                 case 2: objLerps = new float[] { 0.27f, 0.73f }; break;
                 case 3: objLerps = new float[] { 0.1f, 0.5f, 0.9f }; break;
                 default:
                     float interval = 1f / (cards.Length - 1);
-                    for(int i = 0; i < cards.Length; i++)
+                    for (int i = 0; i < cards.Length; i++)
                         objLerps[i] = interval * i;
                     break;
             }
@@ -83,19 +83,16 @@ namespace Marsion
                 if (!card.FSM.IsCurrent<CardViewIdle>()) continue;
 
                 var cardPos = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, objLerps[i]);
-                cardPos.z = i * -0.1f;
                 var cardRot = Quaternion.identity;
-                
-                if(cards.Length >= 4)
+
+                if (cards.Length >= 4)
                 {
                     Vector3 cardUp = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, objLerps[i]);
                     cardRot = Quaternion.LookRotation(Vector3.forward, cardUp);
                 }
 
-                cardPos += transform.position;
-
                 card.MoveToWithZ(cardPos, 10f);
-                card.Transform.rotation = cardRot;
+                card.Transform.localRotation = cardRot;
             }
         }
 
@@ -128,7 +125,7 @@ namespace Marsion
             return Vector3.Cross(Vector3.forward, tangent);
         }
 
-        public static Vector3 GetCurveTangent(Vector3 a, Vector3 b, Vector3 c, float t)
+        private static Vector3 GetCurveTangent(Vector3 a, Vector3 b, Vector3 c, float t)
         {
             return 2f * (1f - t) * (b - a) + 2f * t * (c - b);
         }
