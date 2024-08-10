@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 namespace Marsion
 {
-    [RequireComponent(typeof(Collider))]
+    //[RequireComponent(typeof(Collider))]
     public class MouseInputProvider : MonoBehaviour, IMouseInput
     {
         #region Fields and Properties

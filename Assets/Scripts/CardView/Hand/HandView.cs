@@ -7,12 +7,7 @@ namespace Marsion
     public class HandView : MonoBehaviour
     {
         public List<ICardView> Cards { get; protected set; }
-        private event Action<ICardView[]> onPileChanged = hand => { };
-        public Action<ICardView[]> OnPileChanged
-        {
-            get => onPileChanged;
-            set => onPileChanged = value;
-        }
+        public Action<ICardView[]> OnPileChanged;
 
         private HandBender Bender { get; set; }
 
@@ -41,6 +36,11 @@ namespace Marsion
                 throw new ArgumentNullException("Null is not a valid argument");
 
             Cards.Add(card);
+
+            for(int i = 0; i < Cards.Count; i++)
+            {
+                card?.Order.SetOriginOrder(i);
+            }
 
             OnPileChanged?.Invoke(Cards.ToArray());
 

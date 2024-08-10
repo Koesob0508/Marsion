@@ -3,19 +3,34 @@
 namespace Marsion
 {
     
-    public class DeckView : MonoBehaviour
+    public class DeckView : MonoBehaviour, IDeckView
     {
         public CardView cardPrefab;
         public HandView hand;
-        private int count;
+
+        public void Init()
+        {
+            Managers.Client.OnDrawCard -= DrawCard;
+            Managers.Client.OnDrawCard += DrawCard;
+        }
 
         [Button]
-        public void DrawCard()
+        public void Draw()
         {
-            var cardObject = Instantiate(cardPrefab);
-            cardObject.name = $"Card_{count}";
-            hand.AddCard(cardObject);
-            count++;
+            Managers.Server.DrawButtonRpc(Managers.Client.ID);
+        }
+
+        public void DrawCard(ulong clientID, int count)
+        {
+            if (Managers.Client.ID != clientID) return;
+
+            for(int i = 0; i < count; i++)
+            {
+                var cardObject = Instantiate(cardPrefab);
+                cardObject.transform.position = transform.position;
+                cardObject.name = $"Card_{i}";
+                hand.AddCard(cardObject);
+            }
         }
     }
 }

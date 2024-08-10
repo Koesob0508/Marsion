@@ -11,6 +11,8 @@ namespace Marsion
         Transform Transform { get; }
         Collider Collider { get; }
         IMouseInput Input { get; }
+        Order Order { get; }
+        GameObject HoverImage { get; }
 
         #endregion
 

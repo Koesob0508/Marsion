@@ -28,11 +28,15 @@ namespace Marsion.Server
                 int playerCount = 2;
                 gameData = new GameData(playerCount);
                 Logic = new GameLogic(gameData);
-                Logic.OnGameStart -= OnGameStart;
-                Logic.OnGameStart += OnGameStart;
 
-                Logic.OnUpdate -= OnUpdateData;
-                Logic.OnUpdate += OnUpdateData;
+                Logic.OnGameStarted -= OnGameStart;
+                Logic.OnGameStarted += OnGameStart;
+
+                Logic.OnUpdated -= OnUpdateData;
+                Logic.OnUpdated += OnUpdateData;
+
+                Logic.OnCardDrawn -= OnCardDraw;
+                Logic.OnCardDrawn += OnCardDraw;
             }
         }
 
@@ -56,8 +60,9 @@ namespace Marsion.Server
         [ServerRpc]
         public void ClearServerRpc()
         {
-            Logic.OnGameStart -= OnGameStart;
-            Logic.OnUpdate -= OnUpdateData;
+            Logic.OnGameStarted -= OnGameStart;
+            Logic.OnUpdated -= OnUpdateData;
+            Logic.OnCardDrawn -= OnCardDraw;
         }
 
         /// <summary>
@@ -85,17 +90,22 @@ namespace Marsion.Server
         /// </summary>
         #region Logic Flow
 
+        private void OnGameStart()
+        {
+            Managers.Client.GameStartRpc();
+        }
+
         private void OnUpdateData()
         {
             gameData = Logic.GetGameData();
             NetworkGameData networkData = new NetworkGameData();
             networkData.gameData = gameData;
-            Managers.Client.UpdateDataClientRpc(networkData);
+            Managers.Client.UpdateDataRpc(networkData);
         }
 
-        private void OnGameStart()
+        private void OnCardDraw(Player player, int count)
         {
-            Managers.Client.GameStartRpc();
+            Managers.Client.DrawCardRpc(player.ClientID, count);
         }
 
         #endregion
@@ -121,10 +131,18 @@ namespace Marsion.Server
         }
 
         [Rpc(SendTo.Server)]
-        public void PlayCardServerRpc(ulong clientID, int index)
+        public void DrawCardRpc(ulong clientID, int count = 1)
         {
-            Card card = gameData.Players[clientID].Hand[index];
-            Logic.PlayCard(clientID, card);
+            Player player = GetPlayer(clientID);
+            Logic.DrawCard(player, count);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void PlayCardRpc(ulong clientID, int index)
+        {
+            Player player = GetPlayer(clientID);
+            Card card = player.Hand[index];
+            Logic.PlayCard(player, card);
         }
 
 
@@ -145,6 +163,21 @@ namespace Marsion.Server
                     player.Deck.Add(card);
                 }
             }
+        }
+
+        private Player GetPlayer(ulong clientID)
+        {
+            return gameData.Players[clientID];
+        }
+
+        #endregion
+
+        #region Buttons
+
+        [Rpc(SendTo.Server)]
+        public void DrawButtonRpc(ulong clientID)
+        {
+            Logic.DrawCard(GetPlayer(clientID));
         }
 
         #endregion

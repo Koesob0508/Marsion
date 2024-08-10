@@ -8,9 +8,16 @@ namespace Marsion
     [Serializable]
     public class Player
     {
+        public ulong ClientID;
+
         public List<Card> Deck = new List<Card>();
         public List<Card> Hand = new List<Card>();
         public List<Card> Field = new List<Card>();
+
+        public Player(int clientID)
+        {
+            ClientID = (ulong)clientID;
+        }
 
         public string LogPile(List<Card> pile)
         {

@@ -9,7 +9,7 @@ namespace Marsion
 
         [SerializeField]
         [Tooltip("Controls the curve that the hand uses.")]
-        private Vector3 curveStart = new Vector3(-2f, -0.7f, 0f), curveEnd = new Vector3(2f, -0.7f, 0f);
+        private Vector3 CurveStart = new Vector3(-2f, -0.7f, 0f), CurveEnd = new Vector3(2f, -0.7f, 0f);
 
         #region UnityCallbacks
 
@@ -32,14 +32,14 @@ namespace Marsion
             // 그릴 선의 색상을 파란색으로 설정합니다.
             GL.Color(Color.blue);
 
-            DrawSphere(curveStart, 0.03f);
-            DrawSphere(curveEnd, 0.03f);
+            DrawSphere(CurveStart, 0.03f);
+            DrawSphere(CurveEnd, 0.03f);
 
-            Vector3 p1 = curveStart;
+            Vector3 p1 = CurveStart;
             for (int i = 0; i < 19; i++)
             {
                 float t = (i + 1) / 19f;
-                Vector3 p2 = GetCurvePoint(curveStart, Vector3.zero, curveEnd, t);
+                Vector3 p2 = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, t);
                 GL.Vertex(p1);
                 GL.Vertex(p2);
                 p1 = p2;
@@ -62,18 +62,37 @@ namespace Marsion
             if (cards == null)
                 throw new ArgumentNullException("Can't bend a null card list");
 
+            float[] objLerps = new float[cards.Length];
+
+            switch(cards.Length)
+            {
+                case 1: objLerps = new float[] { 0.5f }; break;
+                case 2: objLerps = new float[] { 0.27f, 0.73f }; break;
+                case 3: objLerps = new float[] { 0.1f, 0.5f, 0.9f }; break;
+                default:
+                    float interval = 1f / (cards.Length - 1);
+                    for(int i = 0; i < cards.Length; i++)
+                        objLerps[i] = interval * i;
+                    break;
+            }
+
             for (int i = 0; i < cards.Length; i++)
             {
                 ICardView card = cards[i];
 
                 if (!card.FSM.IsCurrent<CardViewIdle>()) continue;
 
-                float t = (cards.Length == 1) ? 0.5f : (float)i / (cards.Length - 1);
-
-                Vector3 cardPos = GetCurvePoint(curveStart, Vector3.zero, curveEnd, t);
+                var cardPos = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, objLerps[i]);
                 cardPos.z = i * -0.1f;
-                Vector3 cardUp = GetCurveNormal(curveStart, Vector3.zero, curveEnd, t);
-                Quaternion cardRot = Quaternion.LookRotation(Vector3.forward, cardUp);
+                var cardRot = Quaternion.identity;
+                
+                if(cards.Length >= 4)
+                {
+                    Vector3 cardUp = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, objLerps[i]);
+                    cardRot = Quaternion.LookRotation(Vector3.forward, cardUp);
+                }
+
+                cardPos += transform.position;
 
                 card.MoveToWithZ(cardPos, 10f);
                 card.Transform.rotation = cardRot;
@@ -166,7 +185,7 @@ namespace Marsion
 
                 float t = (float)i / 9;
 
-                Vector3 cardPos = GetCurvePoint(curveStart, Vector3.zero, curveEnd, t);
+                Vector3 cardPos = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, t);
 
 
                 DrawSphere(cardPos, 0.03f);

@@ -16,10 +16,14 @@ namespace Marsion
         public Transform Transform { get; set; }
         public Collider Collider { get; set; }
         public IMouseInput Input { get; private set; }
+        public Order Order { get; private set; }
+        [SerializeField] private GameObject hoverImage;
+        GameObject ICardView.HoverImage { get => hoverImage; }
 
         public BaseCardViewMotion Scale { get; private set; }
         public BaseCardViewMotion Position { get; private set; }
         public BaseCardViewMotion Rotation { get; private set; }
+        
 
         #endregion
 
@@ -31,6 +35,7 @@ namespace Marsion
             Collider = GetComponent<Collider>();
 
             Input = GetComponent<IMouseInput>();
+            Order = GetComponent<Order>();
 
             Scale = new ScaleCardViewMotion(this);
             Position = new PositionCardViewMotion(this);
