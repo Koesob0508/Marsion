@@ -27,15 +27,15 @@ namespace Marsion
 
         #region IMouseInput
 
-        Action<PointerEventData> IMouseInput.OnPointerEnter { get; set; } = eventData => { Debug.Log("OnPointerEnter"); };
-        Action<PointerEventData> IMouseInput.OnPointerExit { get; set; } = eventData => { Debug.Log("OnPointerExit"); };
-        Action<PointerEventData> IMouseInput.OnPointerDown { get; set; } = eventData => { Debug.Log("OnPointerDown"); };
-        Action<PointerEventData> IMouseInput.OnPointerUp { get; set; } = eventData => { Debug.Log("OnPointerUp"); };
-        Action<PointerEventData> IMouseInput.OnPointerClick { get; set; } = eventData => { Debug.Log("OnPointerClick"); };
-        Action<PointerEventData> IMouseInput.OnBeginDrag { get; set; } = eventData => { Debug.Log("OnBeginDrag"); };
-        Action<PointerEventData> IMouseInput.OnDrag { get; set; } = eventData => { Debug.Log("OnDrag"); };
-        Action<PointerEventData> IMouseInput.OnEndDrag { get; set; } = eventData => { Debug.Log("OnEndDrag"); };
-        Action<PointerEventData> IMouseInput.OnDrop { get; set; } = eventData => { Debug.Log("OnDrop"); };
+        Action<PointerEventData> IMouseInput.OnPointerEnter { get; set; } = eventData => { };
+        Action<PointerEventData> IMouseInput.OnPointerExit { get; set; } = eventData => { };
+        Action<PointerEventData> IMouseInput.OnPointerDown { get; set; } = eventData => { };
+        Action<PointerEventData> IMouseInput.OnPointerUp { get; set; } = eventData => { };
+        Action<PointerEventData> IMouseInput.OnPointerClick { get; set; } = eventData => { };
+        Action<PointerEventData> IMouseInput.OnBeginDrag { get; set; } = eventData => { };
+        Action<PointerEventData> IMouseInput.OnDrag { get; set; } = eventData => { };
+        Action<PointerEventData> IMouseInput.OnEndDrag { get; set; } = eventData => { };
+        Action<PointerEventData> IMouseInput.OnDrop { get; set; } = eventData => { };
 
         void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
         {

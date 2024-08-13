@@ -2,13 +2,16 @@
 using NUnit.Framework.Interfaces;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace Marsion
+namespace Marsion.Logic
 {
     [Serializable]
     public class Player
     {
-        public ulong ClientID;
+        public ulong ClientID { get; private set; }
+
+        public int Portrait;
 
         public List<Card> Deck = new List<Card>();
         public List<Card> Hand = new List<Card>();
@@ -27,6 +30,22 @@ namespace Marsion
             {
                 result += $"{card.Rank} {card.Suit}";
                 result += "/";
+            }
+
+            return result;
+        }
+        
+        public Card GetCard(List<Card> pile, string uid)
+        {
+            Card result = null;
+
+            foreach (Card card in pile)
+            {
+                if (card.UID == uid)
+                {
+                    result = card;
+                    break;
+                }
             }
 
             return result;

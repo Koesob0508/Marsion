@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Marsion.Logic;
 using UnityEngine;
 
 namespace Marsion
@@ -6,7 +6,7 @@ namespace Marsion
     [CreateAssetMenu(fileName = "CardSO", menuName = "Marsion/CardSO")]
     public class CardSO : ScriptableObject
     {
-        
+
 
         //public int ID;
         //public string Name;
@@ -18,6 +18,7 @@ namespace Marsion
         //public string Explanation;
         //public string VanilaText;
 
+        public ulong ClientID;
         public int Rank;
         public Suit Suit;
     }

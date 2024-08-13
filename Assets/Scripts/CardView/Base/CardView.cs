@@ -1,6 +1,7 @@
+using Card = Marsion.Logic.Card;
 using UnityEngine;
 
-namespace Marsion
+namespace Marsion.CardView
 {
     [RequireComponent(typeof(Collider))]
     [RequireComponent(typeof(IMouseInput))]
@@ -10,7 +11,7 @@ namespace Marsion
 
         [SerializeField] public CardViewParameters Parameters;
 
-        public bool IsMine { get; set; }
+        public Card Card { get; set; }
         public string Name => gameObject.name;
         public MonoBehaviour MonoBehaviour => this;
         public CardViewFsm FSM { get; private set; }
@@ -26,7 +27,6 @@ namespace Marsion
         public BaseCardViewMotion Scale { get; private set; }
         public BaseCardViewMotion Position { get; private set; }
         public BaseCardViewMotion Rotation { get; private set; }
-        
 
         #endregion
 

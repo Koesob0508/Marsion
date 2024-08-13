@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
-namespace Marsion
+namespace Marsion.Logic
 {
     public class GameLogic
     {
@@ -13,8 +13,8 @@ namespace Marsion
 
         public UnityAction OnGameStarted;
         public UnityAction OnUpdated;
-        public UnityAction<Player, int> OnCardDrawn;
-        public UnityAction OnCardPlayed;
+        public UnityAction<Player, Card> OnCardDrawn;
+        public UnityAction<Player, Card> OnCardPlayed;
 
         #endregion
 
@@ -39,7 +39,8 @@ namespace Marsion
             {
                 ShuffleDeck(player.Deck);
                 Managers.Logger.Log<GameLogic>("Draw");
-                DrawCard(player, 5);
+                for(int i = 0; i < 5; i++)
+                    DrawCard(player);
             }
 
             Managers.Logger.Log<GameLogic>("Game Start");
@@ -61,20 +62,19 @@ namespace Marsion
             }
         }
 
-        public void DrawCard(Player player, int count = 1)
+        public void DrawCard(Player player)
         {
-            for(int i = 0; i < count; i++)
+            Card card = null;
+
+            if (player.Deck.Count > 0 && player.Hand.Count < 10)
             {
-                if(player.Deck.Count > 0 && player.Hand.Count < 10)
-                {
-                    Card card = player.Deck[0];
-                    player.Deck.RemoveAt(0);
-                    player.Hand.Add(card);
-                }
+                card = player.Deck[0];
+                player.Deck.RemoveAt(0);
+                player.Hand.Add(card);
             }
 
             UpdateData();
-            OnCardDrawn?.Invoke(player, count);
+            OnCardDrawn?.Invoke(player, card);
         }
 
         public void PlayCard(Player player, Card card)
@@ -83,7 +83,7 @@ namespace Marsion
             player.Field.Add(card);
 
             UpdateData();
-            OnCardPlayed?.Invoke();
+            OnCardPlayed?.Invoke(player, card);
         }
     }
 }

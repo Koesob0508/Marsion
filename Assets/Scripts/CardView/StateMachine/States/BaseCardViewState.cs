@@ -1,4 +1,4 @@
-﻿namespace Marsion
+﻿namespace Marsion.CardView
 {
     public abstract class BaseCardViewState : IState
     {

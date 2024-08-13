@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Marsion
+namespace Marsion.CardView
 {
     public class CardViewDrag : BaseCardViewState
     {
@@ -20,6 +21,9 @@ namespace Marsion
         {
             Handler.Input.OnPointerUp -= OnPointerUp;
             Handler.Input.OnPointerUp += OnPointerUp;
+
+            Handler.Order.SetMostFrontOrder(true);
+            Handler.Transform.rotation = Quaternion.identity;
         }
 
         public override void OnUpdate() => FollowCursor();
@@ -35,14 +39,16 @@ namespace Marsion
 
         private void OnPointerUp(PointerEventData eventData)
         {
-            // Pointer가 Up 됐을 때,
-            // Hand 영역이면 Cancel
-            // Play 영역이면 Play
-            // ...
-            // 그걸 어떻게?
+            if (FSM.IsCurrent(this))
+            {
+                if (eventData.button == PointerEventData.InputButton.Left && DetectArea() && Managers.Client.TryPlayCard(Handler.Card))
+                {
+                    Managers.Client.PlayCard(Handler.Card);
+                    Handler.MonoBehaviour.gameObject.SetActive(false);
+                }
 
-            // 지금 당장은 Cancel로
-            FSM.PopState();
+                FSM.PopState();
+            }
         }
 
         #endregion
@@ -51,12 +57,35 @@ namespace Marsion
 
         private void FollowCursor()
         {
+            Handler.Transform.position = GetMouseWorldPosition();
+        }
+
+        private bool DetectArea()
+        {
+            RaycastHit2D[] hits = Physics2D.RaycastAll(GetMouseWorldPosition(), Vector3.forward);
+
+            int layer = LayerMask.NameToLayer("PlayArea");
+            bool result = Array.Exists(hits, x => x.collider.gameObject.layer == layer);
+
+            if (result) Debug.Log("Detect");
+
+            return result;
+        }
+
+        private Vector3 GetMouseWorldPosition()
+        {
             plane = new Plane(-Vector3.forward, Handler.Transform.position);
             Ray ray = Camera.main.ScreenPointToRay(Handler.Input.MousePosition);
-            if (plane.Raycast(ray, out float enter))
-                mousePos = ray.GetPoint(enter);
 
-            Handler.Transform.position = mousePos;
+            if (plane.Raycast(ray, out float enter))
+            {
+                return ray.GetPoint(enter);
+            }
+            else
+            {
+                Managers.Logger.Log<CardViewSelect>("Point not found.");
+                return default;
+            }
         }
 
         #endregion

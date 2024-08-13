@@ -1,12 +1,13 @@
-﻿using UnityEngine;
+﻿using Card = Marsion.Logic.Card;
+using UnityEngine;
 
-namespace Marsion
+namespace Marsion.CardView
 {
     public interface ICardView : IFsmHandler, ICardViewTransformMotion
     {
         #region Properties
 
-        bool IsMine { get; }
+        Card Card { get; }
         MonoBehaviour MonoBehaviour { get; }
         CardViewFsm FSM { get; }
         Transform Transform { get; }

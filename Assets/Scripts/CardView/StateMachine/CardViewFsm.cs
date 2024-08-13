@@ -1,4 +1,4 @@
-﻿namespace Marsion
+﻿namespace Marsion.CardView
 {
     public class CardViewFsm : BaseStateMachine
     {

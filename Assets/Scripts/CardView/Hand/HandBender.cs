@@ -1,17 +1,77 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Marsion
+namespace Marsion.CardView
 {
     public class HandBender : MonoBehaviour
     {
         private Material lineMaterial;
+        [SerializeField] bool IsMine;
 
         [SerializeField]
         [Tooltip("Controls the curve that the hand uses.")]
         private Vector3 CurveStart = new Vector3(-2f, -0.7f, 0f), CurveEnd = new Vector3(2f, -0.7f, 0f);
+        [SerializeField]
+        float Height;
 
         #region UnityCallbacks
+
+        private void OnDrawGizmos()
+        {
+            // 그릴 선의 색상을 파란색으로 설정합니다.
+            Gizmos.color = Color.red;
+
+
+            Vector3 curveStart = Vector3.zero;
+            Vector3 curveEnd = Vector3.zero;
+            Vector3 height = Vector3.zero;
+
+            if (IsMine)
+            {
+                curveStart = CurveStart + transform.position;
+                curveEnd = CurveEnd + transform.position;
+                height = new Vector3(0f, Height, 0f) + transform.position;
+            }
+            else
+            {
+                curveStart = transform.position - CurveStart;
+                curveEnd = transform.position - CurveEnd;
+                height = new Vector3(0f, -Height, 0f) + transform.position;
+            }
+                
+            // 시작점과 끝점을 나타내는 스피어를 그립니다.
+            Gizmos.DrawSphere(curveStart, 0.03f);
+            Gizmos.DrawSphere(curveEnd, 0.03f);
+
+            Vector3 p1 = curveStart;
+            for (int i = 0; i < 19; i++)
+            {
+                float t = (i + 1) / 19f;
+                Vector3 p2 = Vector3.zero;
+                p2 = GetCurvePoint(curveStart, height, curveEnd, t);
+
+                // 두 점 사이에 선을 그립니다.
+                Gizmos.DrawLine(p1, p2);
+
+                p1 = p2;
+            }
+        }
+
+        // 접선을 그리는 함수를 Gizmos용으로 만듭니다.
+        private void DrawTangentAtPointGizmos(Vector3 point, float t, float length)
+        {
+            Vector3 tangent = GetCurveTangent(CurveStart, Vector3.zero, CurveEnd, t);
+            Gizmos.color = Color.red; // 예: 접선의 색상은 빨간색으로 설정
+            Gizmos.DrawLine(point, point + tangent.normalized * length);
+        }
+
+        // 법선을 그리는 함수를 Gizmos용으로 만듭니다.
+        private void DrawNormalAtPointGizmos(Vector3 point, float t, float length)
+        {
+            Vector3 normal = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, t, true);
+            Gizmos.color = Color.green; // 예: 법선의 색상은 초록색으로 설정
+            Gizmos.DrawLine(point, point + normal.normalized * length);
+        }
 
         // OnRenderObject는 매 프레임마다 호출되며 GL 명령어를 사용해 직접적으로 객체를 그립니다.
         private void OnRenderObject()
@@ -39,7 +99,7 @@ namespace Marsion
             for (int i = 0; i < 19; i++)
             {
                 float t = (i + 1) / 19f;
-                Vector3 p2 = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, t);
+                Vector3 p2 = GetCurvePoint(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, t);
                 GL.Vertex(p1);
                 GL.Vertex(p2);
 
@@ -86,12 +146,18 @@ namespace Marsion
 
                 if (!card.FSM.IsCurrent<CardViewIdle>()) continue;
 
-                var cardPos = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, objLerps[i]);
+                var cardPos = GetCurvePoint(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, objLerps[i]);
                 var cardRot = Quaternion.identity;
 
                 if (cards.Length >= 4)
                 {
-                    Vector3 cardUp = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, objLerps[i], card.IsMine);
+                    Vector3 cardUp;
+
+                    if (Managers.Client.ID == card.Card.ClientID)
+                        cardUp = GetCurveNormal(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, objLerps[i], true);
+                    else
+                        cardUp = GetCurveNormal(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, objLerps[i], false);
+
                     cardRot = Quaternion.LookRotation(Vector3.forward, cardUp);
                 }
 
@@ -166,7 +232,7 @@ namespace Marsion
         private void DrawTangentAtPoint(Vector3 point, float t, float length)
         {
             // 곡선의 현재 점에서 Tangent 벡터를 계산합니다.
-            Vector3 tangent = GetCurveTangent(CurveStart, Vector3.zero, CurveEnd, t).normalized;
+            Vector3 tangent = GetCurveTangent(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, t).normalized;
 
             // Tangent 벡터 방향으로 선을 그립니다.
             GL.Color(Color.green);  // Tangent 선을 녹색으로 설정
@@ -177,7 +243,7 @@ namespace Marsion
         private void DrawNormalAtPoint(Vector3 point, float t, float length)
         {
             // 곡선의 현재 점에서 Normal 벡터를 계산합니다.
-            Vector3 normal = GetCurveNormal(CurveStart, Vector3.zero, CurveEnd, t, GetComponent<HandView>().IsMine).normalized;
+            Vector3 normal = GetCurveNormal(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, t, GetComponent<HandView>().IsMine).normalized;
 
             // Normal 벡터 방향으로 선을 그립니다.
             GL.Vertex(point);
@@ -210,7 +276,7 @@ namespace Marsion
 
                 float t = (float)i / 9;
 
-                Vector3 cardPos = GetCurvePoint(CurveStart, Vector3.zero, CurveEnd, t);
+                Vector3 cardPos = GetCurvePoint(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, t);
 
 
                 DrawSphere(cardPos, 0.03f);

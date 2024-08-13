@@ -2,7 +2,7 @@
 using Unity.Netcode;
 using UnityEngine.Rendering.Universal;
 
-namespace Marsion
+namespace Marsion.Logic
 {
     public class SerializedData
     {
@@ -73,6 +73,16 @@ namespace Marsion
                 if (size > 0)
                     serializer.SerializeValue(ref bytes);
             }
+        }
+    }
+
+    public class NetworkCardData : INetworkSerializable
+    {
+        public string cardUID;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref cardUID);
         }
     }
 }

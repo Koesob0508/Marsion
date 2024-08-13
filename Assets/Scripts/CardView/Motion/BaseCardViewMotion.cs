@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Marsion
+namespace Marsion.CardView
 {
     public abstract class BaseCardViewMotion
     {

@@ -1,7 +1,7 @@
 ﻿using Marsion;
 using System;
 
-namespace Marsion
+namespace Marsion.Logic
 {
     [Serializable]
     public class GameData

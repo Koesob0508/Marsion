@@ -19,13 +19,13 @@ namespace Marsion
 
         public override void Init()
         {
-            Managers.Client.OnStartGame -= HidePanel;
-            Managers.Client.OnStartGame += HidePanel;
+            Managers.Client.OnGameStarted -= HidePanel;
+            Managers.Client.OnGameStarted += HidePanel;
         }
 
         public void OnDisable()
         {
-            Managers.Client.OnStartGame -= HidePanel;
+            Managers.Client.OnGameStarted -= HidePanel;
         }
 
         public async void OnClickHost()

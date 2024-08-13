@@ -1,9 +1,6 @@
-﻿using Marsion.Server;
-using Marsion;
-using NUnit.Framework;
-using Unity.Netcode;
+﻿using Unity.Netcode;
+using Marsion.Logic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Marsion.Server
 {
@@ -11,8 +8,11 @@ namespace Marsion.Server
     {
         public bool IsConnected { get; private set; }
 
-        public DeckSO p1Deck;
-        public DeckSO p2Deck;
+        [Header("Player")]
+        [SerializeField] private DeckSO Player_Deck;
+
+        [Header("Enemy")]
+        [SerializeField] private DeckSO Enemy_Deck;
 
         private GameData gameData;
         private GameLogic Logic;
@@ -37,6 +37,9 @@ namespace Marsion.Server
 
                 Logic.OnCardDrawn -= OnCardDraw;
                 Logic.OnCardDrawn += OnCardDraw;
+
+                Logic.OnCardPlayed -= OnCardPlay;
+                Logic.OnCardPlayed += OnCardPlay;
             }
         }
 
@@ -103,9 +106,14 @@ namespace Marsion.Server
             Managers.Client.UpdateDataRpc(networkData);
         }
 
-        private void OnCardDraw(Player player, int count)
+        private void OnCardDraw(Player player, Card card)
         {
-            Managers.Client.DrawCardRpc(player.ClientID, count);
+            Managers.Client.DrawCardRpc(player.ClientID, card.UID);
+        }
+
+        private void OnCardPlay(Player player, Card card)
+        {
+            Managers.Client.PlayCardRpc(player.ClientID, card.UID);
         }
 
         #endregion
@@ -122,8 +130,11 @@ namespace Marsion.Server
             {
                 Managers.Logger.Log<ServerManager>($"Ready to start");
 
-                SetPlayerDeck(gameData.Players[0], p1Deck);
-                SetPlayerDeck(gameData.Players[1], p2Deck);
+                SetPlayerPortrait(gameData.Players[0], 0);
+                SetPlayerDeck(gameData.Players[0], Player_Deck);
+
+                SetPlayerPortrait(gameData.Players[1], 1);
+                SetPlayerDeck(gameData.Players[1], Enemy_Deck);
 
                 // 게임 시작
                 Logic.StartGame();
@@ -131,17 +142,17 @@ namespace Marsion.Server
         }
 
         [Rpc(SendTo.Server)]
-        public void DrawCardRpc(ulong clientID, int count = 1)
+        public void DrawCardRpc(ulong clientID)
         {
             Player player = GetPlayer(clientID);
-            Logic.DrawCard(player, count);
+            Logic.DrawCard(player);
         }
 
         [Rpc(SendTo.Server)]
-        public void PlayCardRpc(ulong clientID, int index)
+        public void PlayCardRpc(ulong clientID, string cardUID)
         {
             Player player = GetPlayer(clientID);
-            Card card = player.Hand[index];
+            Card card = player.GetCard(player.Hand, cardUID);
             Logic.PlayCard(player, card);
         }
 
@@ -149,6 +160,11 @@ namespace Marsion.Server
         private bool AreAllPlayersConnected()
         {
             return Managers.Network.ConnectedClientsList.Count == 2;
+        }
+
+        private void SetPlayerPortrait(Player player, int spriteIndex)
+        {
+            player.Portrait = spriteIndex;
         }
 
         private void SetPlayerDeck(Player player, DeckSO deck)
@@ -159,7 +175,7 @@ namespace Marsion.Server
             {
                 if (cardSO != null)
                 {
-                    Card card = new Card(cardSO);
+                    Card card = new Card(player.ClientID, cardSO);
                     player.Deck.Add(card);
                 }
             }

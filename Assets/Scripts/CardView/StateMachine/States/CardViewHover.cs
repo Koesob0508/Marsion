@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Marsion
+namespace Marsion.CardView
 {
     public class CardViewHover : BaseCardViewState
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Marsion
+namespace Marsion.CardView
 {
     public class HandView : MonoBehaviour
     {
@@ -22,6 +22,12 @@ namespace Marsion
             Bender = GetComponent<HandBender>();
         }
 
+        private void Start()
+        {
+            Managers.Client.OnCardPlayed -= CardPlayed;
+            Managers.Client.OnCardPlayed += CardPlayed;
+        }
+
         private void Update()
         {
             Bender.Bend(Cards.ToArray());
@@ -30,6 +36,23 @@ namespace Marsion
         #endregion
 
         #region Operations
+
+        
+
+        private void CardPlayed(ulong clientID, string uid)
+        {
+            foreach(ICardView card in Cards)
+            {
+                if(card.Card.UID == uid)
+                {
+                    Cards.Remove(card);
+                    Managers.Resource.Destroy(card.MonoBehaviour.gameObject);
+                    break;
+                }
+            }
+
+            OnPileChanged?.Invoke(Cards.ToArray());
+        }
 
         public void AddCard(ICardView card)
         {

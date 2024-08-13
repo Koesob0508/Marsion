@@ -1,28 +1,30 @@
-﻿using Unity.Netcode;
+﻿using Marsion.CardView;
+using Marsion.Logic;
+using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+
 
 namespace Marsion.Client
 {
     public class ClientManager : NetworkBehaviour
     {
+        #region Resource Fields
+
+        public List<Sprite> PortraitSprites;
+
+        #endregion
         private GameData gameData;
         public ulong ID;
 
         public InputManager Input { get; private set; }
         public DeckView Deck;
 
-        public UnityAction OnStartGame;
-        public UnityAction OnUpdateData;
-        public UnityAction<ulong, int> OnDrawCard;
-
-        public override void OnNetworkSpawn()
-        {
-            if (IsClient)
-            {
-                Debug.Log($"This object is owned by client with ID: {NetworkObject.OwnerClientId}");
-            }
-        }
+        public UnityAction OnGameStarted;
+        public UnityAction OnDataUpdated;
+        public UnityAction<ulong, string> OnCardDrawn;
+        public UnityAction<ulong, string> OnCardPlayed;
 
         public void Init()
         {
@@ -33,7 +35,6 @@ namespace Marsion.Client
             }
 
             Input = new InputManager();
-            Deck.Init();
         }
 
         public void Update()
@@ -51,12 +52,14 @@ namespace Marsion.Client
             ID = Managers.Network.LocalClientId;
         }
 
+        #region RPCs
+
         [Rpc(SendTo.ClientsAndHost)]
         public void GameStartRpc()
         {
             Managers.Logger.Log<ClientManager>("Game Start");
 
-            OnStartGame?.Invoke();
+            OnGameStarted?.Invoke();
         }
 
 
@@ -72,14 +75,24 @@ namespace Marsion.Client
                 Managers.Logger.Log<ClientManager>(player.LogPile(player.Hand));
             }
 
-            OnUpdateData?.Invoke();
+            OnDataUpdated?.Invoke();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void DrawCardRpc(ulong clientID, int count)
+        public void DrawCardRpc(ulong clientID, string cardUID)
         {
-            OnDrawCard?.Invoke(clientID, count);
+            OnCardDrawn?.Invoke(clientID, cardUID);
         }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        public void PlayCardRpc(ulong clientID, string cardUID)
+        {
+            OnCardPlayed?.Invoke(clientID, cardUID);
+        }
+
+        #endregion
+
+        #region Utils
 
         private Player GetPlayer()
         {
@@ -103,9 +116,34 @@ namespace Marsion.Client
             Managers.Logger.Log<ClientManager>(player.LogPile(player.Field));
         }
 
+        public Card GetCard(ulong clientID, string cardUID)
+        {
+            foreach(Card card in GetGameData().Players[clientID].Hand)
+            {
+                if (card.UID == cardUID)
+                    return card;
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        public bool TryPlayCard(Card card)
+        {
+            return true;
+        }
+
+        public void PlayCard(Card card)
+        {
+            Managers.Server.PlayCardRpc(ID, card.UID);
+        }
+
         public void PlayCard(int index)
         {
-            Managers.Server.PlayCardRpc(ID, index);
+            //Managers.Server.PlayCardRpc(ID, index);
+            
+            PlayCard(Managers.Client.GetPlayer().Hand[index]);
         }
     }
 }

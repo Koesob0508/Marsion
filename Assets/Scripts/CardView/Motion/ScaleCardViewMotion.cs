@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Marsion
+namespace Marsion.CardView
 {
     public class ScaleCardViewMotion : BaseCardViewMotion
     {

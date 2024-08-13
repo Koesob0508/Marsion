@@ -1,6 +1,7 @@
-﻿using System;
+﻿
+using System;
 
-namespace Marsion
+namespace Marsion.Logic
 {
     [Serializable]
     public enum Suit
@@ -31,13 +32,28 @@ namespace Marsion
         //    Health = so.Health;
         //}
 
+        public string UID;
+        public ulong ClientID { get; private set; }
         public int Rank { get; private set; }
         public Suit Suit { get; private set; }
 
-        public Card(CardSO so)
+        public Card(ulong clientID, CardSO so)
         {
+            UID = Guid.NewGuid().ToString();
+            ClientID = clientID;
             Rank = so.Rank;
             Suit = so.Suit;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Card card &&
+                   UID == card.UID;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(UID);
         }
     }
 }
