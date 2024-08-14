@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Marsion.CardView
 {
-    public class HandView : MonoBehaviour
+    public class HandView : MonoBehaviour, IHandView
     {
         public bool IsMine;
         public List<ICardView> Cards { get; protected set; }

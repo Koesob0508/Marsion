@@ -40,6 +40,9 @@ namespace Marsion.Server
 
                 Logic.OnCardPlayed -= OnCardPlay;
                 Logic.OnCardPlayed += OnCardPlay;
+
+                Logic.OnCardSpawned -= OnCardSpawned;
+                Logic.OnCardSpawned += OnCardSpawned;
             }
         }
 
@@ -116,6 +119,11 @@ namespace Marsion.Server
             Managers.Client.PlayCardRpc(player.ClientID, card.UID);
         }
 
+        private void OnCardSpawned(Player player, Card card, int index)
+        {
+            Managers.Client.SpawnCardRpc(player.ClientID, card.UID, index);
+        }
+
         #endregion
 
         /// <summary>
@@ -156,6 +164,13 @@ namespace Marsion.Server
             Logic.PlayCard(player, card);
         }
 
+        [Rpc(SendTo.Server)]
+        public void PlaySpawnCardRpc(ulong clientID, string cardUID, int index)
+        {
+            Player player = GetPlayer(clientID);
+            Card card = player.GetCard(player.Hand, cardUID);
+            Logic.PlayAndSpawnCard(player, card, index);
+        }
 
         private bool AreAllPlayersConnected()
         {

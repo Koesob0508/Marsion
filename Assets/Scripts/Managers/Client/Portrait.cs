@@ -15,15 +15,18 @@ namespace Marsion.Client
 
         private void SetPortrait()
         {
-            if(Managers.Network.IsHost)
+            foreach(var player in Managers.Client.GetGameData().Players)
             {
-                Player_Sprite.sprite = Managers.Client.PortraitSprites[0];
-                Enemy_Sprite.sprite = Managers.Client.PortraitSprites[1];
-            }
-            else
-            {
-                Player_Sprite.sprite = Managers.Client.PortraitSprites[1];
-                Enemy_Sprite.sprite = Managers.Client.PortraitSprites[0];
+                // Player
+                if(player.ClientID == Managers.Client.ID)
+                {
+                    Player_Sprite.sprite = Managers.Client.PortraitSprites[player.Portrait];
+                }
+                // Enemy
+                else
+                {
+                    Enemy_Sprite.sprite = Managers.Client.PortraitSprites[player.Portrait];
+                }
             }
         }
     }

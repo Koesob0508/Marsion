@@ -15,6 +15,7 @@ namespace Marsion.Logic
         public UnityAction OnUpdated;
         public UnityAction<Player, Card> OnCardDrawn;
         public UnityAction<Player, Card> OnCardPlayed;
+        public UnityAction<Player, Card, int> OnCardSpawned;
 
         #endregion
 
@@ -39,7 +40,7 @@ namespace Marsion.Logic
             {
                 ShuffleDeck(player.Deck);
                 Managers.Logger.Log<GameLogic>("Draw");
-                for(int i = 0; i < 5; i++)
+                for(int i = 0; i < 8; i++)
                     DrawCard(player);
             }
 
@@ -80,10 +81,20 @@ namespace Marsion.Logic
         public void PlayCard(Player player, Card card)
         {
             player.Hand.Remove(card);
-            player.Field.Add(card);
+            //player.Field.Add(card);
 
             UpdateData();
             OnCardPlayed?.Invoke(player, card);
+        }
+
+        public void PlayAndSpawnCard(Player player, Card card, int index)
+        {
+            player.Hand.Remove(card);
+            player.Field.Insert(index, card);
+
+            UpdateData();
+            OnCardPlayed?.Invoke(player, card);
+            OnCardSpawned?.Invoke(player, card, index);
         }
     }
 }

@@ -18,13 +18,19 @@ namespace Marsion.Client
         private GameData gameData;
         public ulong ID;
 
+        [SerializeField] HandView hand;
+        [SerializeField] FieldView field;
+
+        public IHandView Hand { get => hand; }
+        public IFieldView Field { get => field; }
+
         public InputManager Input { get; private set; }
-        public DeckView Deck;
 
         public UnityAction OnGameStarted;
         public UnityAction OnDataUpdated;
         public UnityAction<ulong, string> OnCardDrawn;
         public UnityAction<ulong, string> OnCardPlayed;
+        public UnityAction<ulong, string, int> OnCardSpawned;
 
         public void Init()
         {
@@ -90,6 +96,12 @@ namespace Marsion.Client
             OnCardPlayed?.Invoke(clientID, cardUID);
         }
 
+        [Rpc(SendTo.ClientsAndHost)]
+        public void SpawnCardRpc(ulong clientID, string cardUID, int index)
+        {
+            OnCardSpawned?.Invoke(clientID, cardUID, index);
+        }
+
         #endregion
 
         #region Utils
@@ -137,6 +149,11 @@ namespace Marsion.Client
         public void PlayCard(Card card)
         {
             Managers.Server.PlayCardRpc(ID, card.UID);
+        }
+
+        public void PlayAndSpawnCard(Card card, int index)
+        {
+            Managers.Server.PlaySpawnCardRpc(ID, card.UID, index);
         }
 
         public void PlayCard(int index)

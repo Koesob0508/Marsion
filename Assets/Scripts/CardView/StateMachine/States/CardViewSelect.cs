@@ -26,7 +26,14 @@ namespace Marsion.CardView
             Handler.Transform.rotation = Quaternion.identity;
         }
 
-        public override void OnUpdate() => FollowCursor();
+        public override void OnUpdate()
+        {
+            FollowCursor();
+            if (IsAreaDetected())
+                Managers.Client.Field.InsertEmptyCard(GetMouseWorldPosition().x);
+            else
+                Managers.Client.Field.RemoveEmptyCard();
+        }
 
         public override void OnExitState()
         {
@@ -41,9 +48,9 @@ namespace Marsion.CardView
         {
             if (FSM.IsCurrent(this))
             {
-                if(eventData.button == PointerEventData.InputButton.Left && DetectArea() && Managers.Client.TryPlayCard(Handler.Card))
+                if(eventData.button == PointerEventData.InputButton.Left && IsAreaDetected() && Managers.Client.TryPlayCard(Handler.Card) && !Managers.Client.Field.IsFullField)
                 {
-                    Managers.Client.PlayCard(Handler.Card);
+                    Managers.Client.PlayAndSpawnCard(Handler.Card, Managers.Client.Field.EmptyCardIndex);
                     Handler.MonoBehaviour.gameObject.SetActive(false);
                 }
 
@@ -60,7 +67,7 @@ namespace Marsion.CardView
             Handler.Transform.position = GetMouseWorldPosition();
         }
 
-        private bool DetectArea()
+        private bool IsAreaDetected()
         {
             RaycastHit2D[] hits = Physics2D.RaycastAll(GetMouseWorldPosition(), Vector3.forward);
 

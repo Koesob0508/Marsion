@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 5752587088249348017}
   - component: {fileID: 1660737451825867075}
   m_Layer: 6
-  m_Name: UI_Card
+  m_Name: HandCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -278,7 +278,7 @@ MonoBehaviour:
   - {fileID: 5261719984367310246}
   - {fileID: 3267434700863396934}
   - {fileID: 6790742615099538269}
-  SortingLayerName: Card
+  SortingLayerName: HandCard
   OriginOrder: 0
 --- !u!114 &1660737451825867075
 MonoBehaviour:
