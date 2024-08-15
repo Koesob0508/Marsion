@@ -1,5 +1,6 @@
 using Card = Marsion.Logic.Card;
 using UnityEngine;
+using TMPro;
 
 namespace Marsion.CardView
 {
@@ -7,6 +8,17 @@ namespace Marsion.CardView
     [RequireComponent(typeof(IMouseInput))]
     public class CardView : MonoBehaviour, ICardView
     {
+        #region UI Properties
+
+        [SerializeField] TMP_Text Text_Name;
+        [SerializeField] TMP_Text Text_Mana;
+        [SerializeField] TMP_Text Text_AbilityExplain;
+        [SerializeField] TMP_Text Text_Attack;
+        [SerializeField] TMP_Text Text_Health;
+        [SerializeField] SpriteRenderer CardSprite;
+
+        #endregion
+
         #region Properties
 
         [SerializeField] public CardViewParameters Parameters;
@@ -59,6 +71,16 @@ namespace Marsion.CardView
         #endregion
 
         #region Operations
+
+        public void Setup()
+        {
+            Text_Name.text = Card.Name;
+            Text_Mana.text = Card.Mana.ToString();
+            Text_AbilityExplain.text = Card.AbilityExplain;
+            Text_Attack.text = Card.Attack.ToString();
+            Text_Health.text = Card.Health.ToString();
+            CardSprite.sprite = Managers.Resource.Load<Sprite>(Card.FullArtPath);
+        }
 
         public void Enable() => FSM.PushState<CardViewIdle>();
 

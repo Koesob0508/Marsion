@@ -10,7 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be6885c7f25a094da563978b92e01cb, type: 3}
-  m_Name: Card_2
+  m_Name: Eagle
   m_EditorClassIdentifier: 
-  Rank: 2
-  Suit: 0
+  Name: Eagle
+  Mana: 3
+  FullArtPath: Sprites/Cards/eagle
+  BoardArtPath: Sprites/CardsBoard/eagle_board
+  AbilityExplain: 
+  Attack: 3
+  Health: 3

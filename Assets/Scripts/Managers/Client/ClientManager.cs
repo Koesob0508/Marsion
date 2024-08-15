@@ -128,12 +128,29 @@ namespace Marsion.Client
             Managers.Logger.Log<ClientManager>(player.LogPile(player.Field));
         }
 
-        public Card GetCard(ulong clientID, string cardUID)
+        public Card GetCardAtHand(ulong clientID, string cardUID)
         {
             foreach(Card card in GetGameData().Players[clientID].Hand)
             {
                 if (card.UID == cardUID)
+                {
+                    Managers.Logger.Log<ClientManager>($"Get Card UID : {card.UID}");
                     return card;
+                }
+            }
+
+            return null;
+        }
+
+        public Card GetCardAtField(ulong clientID, string cardUID)
+        {
+            foreach (Card card in GetGameData().Players[clientID].Field)
+            {
+                if (card.UID == cardUID)
+                {
+                    Managers.Logger.Log<ClientManager>($"Get Card UID : {card.UID}");
+                    return card;
+                }
             }
 
             return null;

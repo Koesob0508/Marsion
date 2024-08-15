@@ -70,7 +70,9 @@ namespace Marsion.CardView
                 FieldCards.Insert(index, fieldCard);
             }
 
-            fieldCard.Setup(Managers.Client.GetCard(clientID, uid));
+            Managers.Logger.Log<FieldView>($"CID : {clientID}, UID : {uid}");
+
+            fieldCard.Setup(Managers.Client.GetCardAtField(clientID, uid));
             Aligner.Align(FieldCards.ToArray());
         }
 

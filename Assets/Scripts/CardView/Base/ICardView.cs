@@ -21,6 +21,8 @@ namespace Marsion.CardView
 
         #region Operations
 
+        void Setup();
+
         void Enable();
 
         void Draw();

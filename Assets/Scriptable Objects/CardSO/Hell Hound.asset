@@ -10,7 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be6885c7f25a094da563978b92e01cb, type: 3}
-  m_Name: Card_4
+  m_Name: Hell Hound
   m_EditorClassIdentifier: 
-  Rank: 4
-  Suit: 0
+  Name: Hell Hound
+  Mana: 6
+  FullArtPath: Sprites/Cards/hell_hound
+  BoardArtPath: Sprites/CardsBoard/hell_hound_board
+  AbilityExplain: 
+  Attack: 8
+  Health: 3

@@ -26,11 +26,7 @@ namespace Marsion.Logic
         {
             string result = "";
 
-            foreach(Card card in pile)
-            {
-                result += $"{card.Rank} {card.Suit}";
-                result += "/";
-            }
+            Managers.Logger.Log<Player>("Log pile");
 
             return result;
         }

@@ -245,6 +245,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34c3055acc3c2f149972a14377218946, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Text_Name: {fileID: 1155681481407313986}
+  Text_Mana: {fileID: 8051745210430333723}
+  Text_AbilityExplain: {fileID: 8890023131924896174}
+  Text_Attack: {fileID: 6881354044119510802}
+  Text_Health: {fileID: 1553297349415523055}
+  CardSprite: {fileID: 333383820444466110}
   Parameters: {fileID: 11400000, guid: 63cad272d2c6157489890d5427da8e29, type: 2}
   hoverImage: {fileID: 9005707530703464639}
   backImage: {fileID: 2977534144434028983}

@@ -10,7 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be6885c7f25a094da563978b92e01cb, type: 3}
-  m_Name: Card_8
+  m_Name: Furious Wolf
   m_EditorClassIdentifier: 
-  Rank: 8
-  Suit: 0
+  Name: Furious Wolf
+  Mana: 4
+  FullArtPath: Sprites/Cards/furious_wolf
+  BoardArtPath: Sprites/CardsBoard/furious_wolf_board
+  AbilityExplain: 
+  Attack: 6
+  Health: 3

@@ -27,22 +27,24 @@ namespace Marsion.CardView
             if (Managers.Client.ID == clientID)
             {
                 var cardObject = Instantiate(cardPrefab);
-                cardObject.Card = Managers.Client.GetCard(clientID, cardUID);
+                cardObject.Card = Managers.Client.GetCardAtHand(clientID, cardUID);
                 cardObject.FrontImage.SetActive(true);
                 cardObject.BackImage.SetActive(false);
                 cardObject.transform.position = transform.position;
                 cardObject.name = $"Card";
+                cardObject.Setup();
                 hand.AddCard(cardObject);
             }
             else
             {
                 var cardObject = Instantiate(cardPrefab);
-                cardObject.Card = Managers.Client.GetCard(clientID, cardUID);
+                cardObject.Card = Managers.Client.GetCardAtHand(clientID, cardUID);
                 cardObject.FrontImage.SetActive(false);
                 cardObject.BackImage.SetActive(true);
                 cardObject.transform.position = EnemyDeck.transform.position;
                 cardObject.transform.rotation = EnemyDeck.transform.rotation;
                 cardObject.name = $"Enmey Card";
+                cardObject.Setup();
                 EnemyHand.AddCard(cardObject);
             }
         }

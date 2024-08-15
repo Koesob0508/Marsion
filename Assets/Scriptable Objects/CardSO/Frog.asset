@@ -10,7 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be6885c7f25a094da563978b92e01cb, type: 3}
-  m_Name: Card_6
+  m_Name: Frog
   m_EditorClassIdentifier: 
-  Rank: 6
-  Suit: 0
+  Name: Frog
+  Mana: 2
+  FullArtPath: Sprites/Cards/frog
+  BoardArtPath: Sprites/CardsBoard/frog_board
+  AbilityExplain: 
+  Attack: 1
+  Health: 4
