@@ -1,11 +1,10 @@
 ﻿using DG.Tweening;
 using TMPro;
 using UnityEngine;
-using Card = Marsion.Logic.Card;
 
 namespace Marsion.CardView
 {
-    public class FieldCardView : MonoBehaviour, IFieldCardView
+    public class CreatureView : MonoBehaviour, ICreatureView
     {
         [SerializeField] TMP_Text Text_Attack;
         [SerializeField] TMP_Text Text_Health;
@@ -18,7 +17,7 @@ namespace Marsion.CardView
         public void Setup(Card card)
         {
             if(card == null)
-                Managers.Logger.Log<FieldCardView>("Card is null");
+                Managers.Logger.Log<CreatureView>("Card is null");
             Text_Attack.text = card.Attack.ToString();
             Text_Health.text = card.Health.ToString();
             CardSprite.sprite = Managers.Resource.Load<Sprite>(card.BoardArtPath);

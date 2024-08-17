@@ -1,6 +1,6 @@
-using Card = Marsion.Logic.Card;
 using UnityEngine;
 using TMPro;
+using System;
 
 namespace Marsion.CardView
 {

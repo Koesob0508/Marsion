@@ -1,10 +1,7 @@
-﻿using Marsion;
-using NUnit.Framework.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace Marsion.Logic
+namespace Marsion
 {
     [Serializable]
     public class Player
@@ -45,6 +42,17 @@ namespace Marsion.Logic
             }
 
             return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Player player &&
+                   ClientID == player.ClientID;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ClientID);
         }
     }
 }

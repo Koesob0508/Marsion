@@ -4,7 +4,7 @@ namespace Marsion.CardView
 {
     public class Aligner : MonoBehaviour
     {
-        public void Align(IFieldCardView[] cards)
+        public void Align(ICreatureView[] cards)
         {
             float targetY = gameObject.transform.position.y;
 

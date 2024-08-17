@@ -2,7 +2,6 @@
 
 namespace Marsion.CardView
 {
-    
     public class DeckView : MonoBehaviour, IDeckView
     {
         public CardView cardPrefab;
@@ -22,12 +21,13 @@ namespace Marsion.CardView
             Managers.Server.DrawButtonRpc(Managers.Client.ID);
         }
 
-        public void DrawCard(ulong clientID, string cardUID)
+        public void DrawCard(Player player, Card card)
         {
-            if (Managers.Client.ID == clientID)
+            if (Managers.Client.IsMine(player))
             {
                 var cardObject = Instantiate(cardPrefab);
-                cardObject.Card = Managers.Client.GetCardAtHand(clientID, cardUID);
+                Managers.Logger.Log<DeckView>($"UID : {card.UID}");
+                cardObject.Card = card;
                 cardObject.FrontImage.SetActive(true);
                 cardObject.BackImage.SetActive(false);
                 cardObject.transform.position = transform.position;
@@ -38,7 +38,7 @@ namespace Marsion.CardView
             else
             {
                 var cardObject = Instantiate(cardPrefab);
-                cardObject.Card = Managers.Client.GetCardAtHand(clientID, cardUID);
+                cardObject.Card = card;
                 cardObject.FrontImage.SetActive(false);
                 cardObject.BackImage.SetActive(true);
                 cardObject.transform.position = EnemyDeck.transform.position;

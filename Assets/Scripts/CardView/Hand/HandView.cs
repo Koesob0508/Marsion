@@ -37,16 +37,14 @@ namespace Marsion.CardView
 
         #region Operations
 
-        
-
-        private void CardPlayed(ulong clientID, string uid)
+        private void CardPlayed(Player player, string cardUID)
         {
-            foreach(ICardView card in Cards)
+            foreach (ICardView cardView in Cards)
             {
-                if(card.Card.UID == uid)
+                if(cardView.Card.UID == cardUID)
                 {
-                    Cards.Remove(card);
-                    Managers.Resource.Destroy(card.MonoBehaviour.gameObject);
+                    Cards.Remove(cardView);
+                    Managers.Resource.Destroy(cardView.MonoBehaviour.gameObject);
                     break;
                 }
             }
@@ -72,7 +70,7 @@ namespace Marsion.CardView
             card.Draw();
         }
 
-        public  void RemoveCard(ICardView card)
+        public void RemoveCard(ICardView card)
         {
             if (card == null)
                 throw new ArgumentNullException("Null is not a valid argument");

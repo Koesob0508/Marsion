@@ -1,42 +1,49 @@
-﻿using Marsion;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
 namespace Marsion.Logic
 {
-    public class GameLogic
+    public class GameLogic : IGameLogic
     {
-        private GameData gameData;
+        GameData _gameData;
 
-        #region UnityActions
+        #region Logic Operations
 
-        public UnityAction OnGameStarted;
-        public UnityAction OnUpdated;
-        public UnityAction<Player, Card> OnCardDrawn;
-        public UnityAction<Player, Card> OnCardPlayed;
-        public UnityAction<Player, Card, int> OnCardSpawned;
-
-        #endregion
-
-        public GameLogic(GameData _gameData)
+        public GameLogic(GameData gameData)
         {
-            gameData = _gameData;
-        }
-
-        public GameData GetGameData()
-        {
-            return gameData;
+            _gameData = gameData;
         }
 
         private void UpdateData()
         {
-            OnUpdated?.Invoke();
+            OnDataUpdated?.Invoke();
         }
 
+        #endregion
+
+        #region Interface Operations
+
+        public event UnityAction OnDataUpdated;
+
+        public event UnityAction OnGameStarted;
+        public event UnityAction OnTurnStarted;
+        public event UnityAction OnTurnEnded;
+        public event UnityAction  OnGameEnded;
+
+        public event UnityAction<Player, Card> OnCardDrawn;
+        public event UnityAction <Player, Card> OnCardPlayed;
+        public event UnityAction <Player, Card, int> OnCardSpawned;
+
+        public GameData GetGameData()
+        {
+            return _gameData;
+        }
+
+        // Flow
         public void StartGame()
         {
-            foreach (var player in gameData.Players)
+            foreach (var player in _gameData.Players)
             {
                 ShuffleDeck(player.Deck);
                 Managers.Logger.Log<GameLogic>("Draw");
@@ -48,6 +55,23 @@ namespace Marsion.Logic
             UpdateData();
             OnGameStarted?.Invoke();
         }
+
+        public void EndGame()
+        {
+            OnGameEnded?.Invoke();
+        }
+
+        public void StartTurn()
+        {
+            OnTurnStarted?.Invoke();
+        }
+
+        public void EndTurn()
+        {
+            OnTurnEnded?.Invoke();
+        }
+
+        // Game Operations
 
         public void ShuffleDeck(List<Card> deck)
         {
@@ -81,10 +105,17 @@ namespace Marsion.Logic
         public void PlayCard(Player player, Card card)
         {
             player.Hand.Remove(card);
-            //player.Field.Add(card);
 
             UpdateData();
             OnCardPlayed?.Invoke(player, card);
+        }
+
+        public void SpanwCard(Player player, Card card, int index)
+        {
+            player.Field.Insert(index, card);
+
+            UpdateData();
+            OnCardSpawned?.Invoke(player, card, index);
         }
 
         public void PlayAndSpawnCard(Player player, Card card, int index)
@@ -96,5 +127,7 @@ namespace Marsion.Logic
             OnCardPlayed?.Invoke(player, card);
             OnCardSpawned?.Invoke(player, card, index);
         }
+
+        #endregion
     }
 }
