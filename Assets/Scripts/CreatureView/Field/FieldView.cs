@@ -6,9 +6,9 @@ namespace Marsion.CardView
     [RequireComponent(typeof(Aligner))]
     public class FieldView : MonoBehaviour, IFieldView
     {
-        [SerializeField] FieldCardView EmptyCard;
-        [SerializeField] FieldCardView FieldCardPrefab;
-        [SerializeField] List<FieldCardView> FieldCards;
+        [SerializeField] CreatureView EmptyCard;
+        [SerializeField] CreatureView FieldCardPrefab;
+        [SerializeField] List<CreatureView> FieldCards;
 
         const int MAX_CARD_COUNT = 7;
 
@@ -52,11 +52,11 @@ namespace Marsion.CardView
             Aligner.Align(FieldCards.ToArray());
         }
 
-        public void SpawnCard(ulong clientID, string uid, int index)
+        public void SpawnCard(Player player, Card card, int index)
         {
-            if ((clientID == Managers.Client.ID) != IsMine) return;
+            if (Managers.Client.IsMine(player) != IsMine) return;
 
-            FieldCardView fieldCard;
+            CreatureView fieldCard;
 
             if (EmptyCardIndex == index)
             {
@@ -70,9 +70,7 @@ namespace Marsion.CardView
                 FieldCards.Insert(index, fieldCard);
             }
 
-            Managers.Logger.Log<FieldView>($"CID : {clientID}, UID : {uid}");
-
-            fieldCard.Setup(Managers.Client.GetCardAtField(clientID, uid));
+            fieldCard.Setup(card);
             Aligner.Align(FieldCards.ToArray());
         }
 

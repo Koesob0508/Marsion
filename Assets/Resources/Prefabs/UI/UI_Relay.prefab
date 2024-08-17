@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3025033029764114677}
   - component: {fileID: 9075304338893019992}
   m_Layer: 5
-  m_Name: Panel_Relay
+  m_Name: UI_Relay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

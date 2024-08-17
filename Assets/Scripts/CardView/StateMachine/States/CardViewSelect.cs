@@ -48,7 +48,7 @@ namespace Marsion.CardView
         {
             if (FSM.IsCurrent(this))
             {
-                if(eventData.button == PointerEventData.InputButton.Left && IsAreaDetected() && Managers.Client.TryPlayCard(Handler.Card) && !Managers.Client.Field.IsFullField)
+                if(eventData.button == PointerEventData.InputButton.Left && Managers.Client.IsMyTurn() && IsAreaDetected() && Managers.Client.TryPlayCard(Handler.Card) && !Managers.Client.Field.IsFullField)
                 {
                     Managers.Client.PlayAndSpawnCard(Handler.Card, Managers.Client.Field.EmptyCardIndex);
                     Handler.MonoBehaviour.gameObject.SetActive(false);

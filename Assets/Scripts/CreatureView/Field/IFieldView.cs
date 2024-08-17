@@ -6,6 +6,6 @@
         int EmptyCardIndex { get; }
         void InsertEmptyCard(float x);
         void RemoveEmptyCard();
-        void SpawnCard(ulong clientID, string uid, int index);
+        void SpawnCard(Player player, Card card, int index);
     }
 }

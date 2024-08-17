@@ -10,8 +10,8 @@ namespace Marsion
         static Managers s_instance;
         public static Managers Instance { get { Init(); return s_instance; } }
 
-        [SerializeField] ServerManager _server;
-        [SerializeField] ClientManager _client;
+        [SerializeField] GameServer _server;
+        [SerializeField] GameClient _client;
 
         ResourceManager _resource = new ResourceManager();
         UIManager _ui = new UIManager();
@@ -20,8 +20,8 @@ namespace Marsion
 
         public static NetworkManager Network { get { return NetworkManager.Singleton; } }
 
-        public static ServerManager Server { get { return Instance._server; } }
-        public static ClientManager Client { get { return Instance._client; } }
+        public static IGameServer Server { get { return Instance._server; } }
+        public static IGameClient Client { get { return Instance._client; } }
 
         public static ResourceManager Resource { get { return Instance._resource; } }
         public static UIManager UI { get { return Instance._ui; } }

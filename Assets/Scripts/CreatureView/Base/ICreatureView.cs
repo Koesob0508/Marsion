@@ -2,7 +2,7 @@
 
 namespace Marsion.CardView
 {
-    public interface IFieldCardView
+    public interface ICreatureView
     {
         Vector3 OriginPosition { get; set; }
         Order Order { get; }

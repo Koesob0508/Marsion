@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Marsion.Server
 {
-    public class ServerManager : NetworkBehaviour
+    public class GameServer : NetworkBehaviour, IGameServer
     {
         public bool IsConnected { get; private set; }
 
@@ -15,7 +15,7 @@ namespace Marsion.Server
         [SerializeField] private DeckSO Enemy_Deck;
 
         private GameData gameData;
-        private GameLogic Logic;
+        private IGameLogic Logic;
 
         public override void OnNetworkSpawn()
         {
@@ -23,26 +23,35 @@ namespace Marsion.Server
 
             if(IsHost)
             {
-                Managers.Logger.Log<ServerManager>("Init Server");
+                Managers.Logger.Log<GameServer>("Init Server");
 
                 int playerCount = 2;
                 gameData = new GameData(playerCount);
                 Logic = new GameLogic(gameData);
 
-                Logic.OnGameStarted -= OnGameStart;
-                Logic.OnGameStarted += OnGameStart;
+                Logic.OnDataUpdated -= DataUpdated;
+                Logic.OnDataUpdated += DataUpdated;
+                
+                Logic.OnGameStarted -= GameStarted;
+                Logic.OnGameStarted += GameStarted;
 
-                Logic.OnUpdated -= OnUpdateData;
-                Logic.OnUpdated += OnUpdateData;
+                Logic.OnGameEnded -= GameEnded;
+                Logic.OnGameEnded += GameEnded;
 
-                Logic.OnCardDrawn -= OnCardDraw;
-                Logic.OnCardDrawn += OnCardDraw;
+                Logic.OnTurnStarted -= TurnStarted;
+                Logic.OnTurnStarted += TurnStarted;
 
-                Logic.OnCardPlayed -= OnCardPlay;
-                Logic.OnCardPlayed += OnCardPlay;
+                Logic.OnTurnEnded -= TurnEnded;
+                Logic.OnTurnEnded += TurnEnded;
 
-                Logic.OnCardSpawned -= OnCardSpawned;
-                Logic.OnCardSpawned += OnCardSpawned;
+                Logic.OnCardDrawn -= CardDrawn;
+                Logic.OnCardDrawn += CardDrawn;
+
+                Logic.OnCardPlayed -= CardPlayed;
+                Logic.OnCardPlayed += CardPlayed;
+
+                Logic.OnCardSpawned -= CardSpawned;
+                Logic.OnCardSpawned += CardSpawned;
             }
         }
 
@@ -50,8 +59,8 @@ namespace Marsion.Server
         {
             if (Managers.Network != null)
             {
-                Managers.Network.OnClientConnectedCallback -= OnClientConnected;
-                Managers.Network.OnClientConnectedCallback += OnClientConnected;
+                Managers.Network.OnClientConnectedCallback -= ClientConnected;
+                Managers.Network.OnClientConnectedCallback += ClientConnected;
             }
         }
 
@@ -59,16 +68,16 @@ namespace Marsion.Server
         {
             if (Managers.Network != null)
             {
-                Managers.Network.OnClientConnectedCallback -= OnClientConnected;
+                Managers.Network.OnClientConnectedCallback -= ClientConnected;
             }
         }
 
         [ServerRpc]
         public void ClearServerRpc()
         {
-            Logic.OnGameStarted -= OnGameStart;
-            Logic.OnUpdated -= OnUpdateData;
-            Logic.OnCardDrawn -= OnCardDraw;
+            Logic.OnGameStarted -= GameStarted;
+            Logic.OnDataUpdated -= DataUpdated;
+            Logic.OnCardDrawn -= CardDrawn;
         }
 
         /// <summary>
@@ -77,7 +86,7 @@ namespace Marsion.Server
         /// <param name="clientId"></param>
         #region Server Flow
 
-        private void OnClientConnected(ulong clientId)
+        private void ClientConnected(ulong clientId)
         {
             if (!IsHost)
             {
@@ -94,14 +103,8 @@ namespace Marsion.Server
         /// <summary>
         ///     Logic에서 발생한 이벤트를 Client로 전달해주는 역할하는 메서드들 (중복 구현)
         /// </summary>
-        #region Logic Flow
-
-        private void OnGameStart()
-        {
-            Managers.Client.GameStartRpc();
-        }
-
-        private void OnUpdateData()
+        #region Event Rpcs
+        private void DataUpdated()
         {
             gameData = Logic.GetGameData();
             NetworkGameData networkData = new NetworkGameData();
@@ -109,17 +112,37 @@ namespace Marsion.Server
             Managers.Client.UpdateDataRpc(networkData);
         }
 
-        private void OnCardDraw(Player player, Card card)
+        private void GameStarted()
+        {
+            Managers.Client.StartGameRpc();
+        }
+
+        private void GameEnded()
+        {
+
+        }
+
+        private void TurnStarted()
+        {
+
+        }
+
+        private void TurnEnded()
+        {
+            Managers.Client.EndTurnRpc();
+        }
+
+        private void CardDrawn(Player player, Card card)
         {
             Managers.Client.DrawCardRpc(player.ClientID, card.UID);
         }
 
-        private void OnCardPlay(Player player, Card card)
+        private void CardPlayed(Player player, Card card)
         {
             Managers.Client.PlayCardRpc(player.ClientID, card.UID);
         }
 
-        private void OnCardSpawned(Player player, Card card, int index)
+        private void CardSpawned(Player player, Card card, int index)
         {
             Managers.Client.SpawnCardRpc(player.ClientID, card.UID, index);
         }
@@ -136,7 +159,7 @@ namespace Marsion.Server
         {
             if (AreAllPlayersConnected())
             {
-                Managers.Logger.Log<ServerManager>($"Ready to start");
+                Managers.Logger.Log<GameServer>($"Ready to start");
 
                 SetPlayerPortrait(gameData.Players[0], 0);
                 SetPlayerDeck(gameData.Players[0], Player_Deck);
@@ -165,11 +188,17 @@ namespace Marsion.Server
         }
 
         [Rpc(SendTo.Server)]
-        public void PlaySpawnCardRpc(ulong clientID, string cardUID, int index)
+        public void PlayAndSpawnCardRpc(ulong clientID, string cardUID, int index)
         {
             Player player = GetPlayer(clientID);
             Card card = player.GetCard(player.Hand, cardUID);
             Logic.PlayAndSpawnCard(player, card, index);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TurnEndRpc()
+        {
+            Logic.EndTurn();
         }
 
         private bool AreAllPlayersConnected()
@@ -198,13 +227,14 @@ namespace Marsion.Server
 
         private Player GetPlayer(ulong clientID)
         {
+            if (gameData == null) Managers.Logger.Log<GameServer>("Game data is null");
+            if (gameData.Players[clientID] == null) Managers.Logger.Log<GameServer>("Players is null");
             return gameData.Players[clientID];
         }
 
         #endregion
 
         #region Buttons
-
         [Rpc(SendTo.Server)]
         public void DrawButtonRpc(ulong clientID)
         {

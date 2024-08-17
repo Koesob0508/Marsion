@@ -1,5 +1,6 @@
 ﻿using Marsion;
 using System;
+using System.Collections.Generic;
 
 namespace Marsion.Logic
 {
@@ -7,10 +8,8 @@ namespace Marsion.Logic
     public class GameData
     {
         public Player[] Players;
-
-        public int firstPlayer = 0;
-        public int currentPlayer = 0;
-        public int turnCount = 0;
+        public Player CurrentPlayer;
+        public int TurnCount = 0;
 
         public GameData(int playerCount)
         {
@@ -18,6 +17,41 @@ namespace Marsion.Logic
 
             for (int i = 0; i < playerCount; i++)
                 Players[i] = new Player(i);
+        }
+        
+        public Player GetPlayer(ulong clientID)
+        {
+            return Players[clientID];
+        }
+
+        public Card GetHandCard(ulong clientID, string cardUID)
+        {
+            foreach (Card card in GetPlayer(clientID).Hand)
+            {
+                if (card.UID == cardUID)
+                {
+                    return card;
+                }
+            }
+
+            Managers.Logger.Log<GameData>("Hand card is null.");
+
+            return null;
+        }
+
+        public Card GetFieldCard(ulong clientID, string cardUID)
+        {
+            foreach (Card card in GetPlayer(clientID).Field)
+            {
+                if (card.UID == cardUID)
+                {
+                    return card;
+                }
+            }
+
+            Managers.Logger.Log<GameData>("Field card is null.");
+
+            return null;
         }
     }
 }

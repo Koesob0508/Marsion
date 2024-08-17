@@ -20,12 +20,12 @@ namespace Marsion.Client
                 // Player
                 if(player.ClientID == Managers.Client.ID)
                 {
-                    Player_Sprite.sprite = Managers.Client.PortraitSprites[player.Portrait];
+                    Player_Sprite.sprite = Managers.Client.GetPortrait(player.Portrait);
                 }
                 // Enemy
                 else
                 {
-                    Enemy_Sprite.sprite = Managers.Client.PortraitSprites[player.Portrait];
+                    Enemy_Sprite.sprite = Managers.Client.GetPortrait(player.Portrait);
                 }
             }
         }

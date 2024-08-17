@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace Marsion.Logic
+namespace Marsion
 {
     [Serializable]
     public class Card
