@@ -33,6 +33,7 @@ namespace Marsion.Client
         #region Get Operations
 
         bool IsMine(Player player);
+        bool IsMyTurn();
         GameData GetGameData();
         Sprite GetPortrait(int index);
 
@@ -53,6 +54,7 @@ namespace Marsion.Client
         void PlayCard(Card card);
         void PlayAndSpawnCard(Card card, int index);
         bool TryPlayCard(Card card);
+        void TurnEnd();
 
         #endregion
 

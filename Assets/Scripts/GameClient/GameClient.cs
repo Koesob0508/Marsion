@@ -46,6 +46,11 @@ namespace Marsion.Client
             return _gameData.GetPlayer(ID) == player;
         }
 
+        public bool IsMyTurn()
+        {
+            return IsMine(GetGameData().CurrentPlayer);
+        }
+
         public GameData GetGameData()
         {
             return _gameData;
@@ -103,6 +108,11 @@ namespace Marsion.Client
         public void PlayAndSpawnCard(Card card, int index)
         {
             Managers.Server.PlayAndSpawnCardRpc(ID, card.UID, index);
+        }
+
+        public void TurnEnd()
+        {
+            Managers.Server.TurnEndRpc();
         }
 
         #endregion

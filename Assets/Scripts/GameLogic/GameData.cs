@@ -8,11 +8,8 @@ namespace Marsion.Logic
     public class GameData
     {
         public Player[] Players;
-        public Player CurrentPlayer { get; private set; }
-
-        public int firstPlayer = 0;
-        public int currentPlayer = 0;
-        public int turnCount = 0;
+        public Player CurrentPlayer;
+        public int TurnCount = 0;
 
         public GameData(int playerCount)
         {

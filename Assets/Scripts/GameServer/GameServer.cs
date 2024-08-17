@@ -129,7 +129,7 @@ namespace Marsion.Server
 
         private void TurnEnded()
         {
-
+            Managers.Client.EndTurnRpc();
         }
 
         private void CardDrawn(Player player, Card card)
@@ -193,6 +193,12 @@ namespace Marsion.Server
             Player player = GetPlayer(clientID);
             Card card = player.GetCard(player.Hand, cardUID);
             Logic.PlayAndSpawnCard(player, card, index);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TurnEndRpc()
+        {
+            Logic.EndTurn();
         }
 
         private bool AreAllPlayersConnected()

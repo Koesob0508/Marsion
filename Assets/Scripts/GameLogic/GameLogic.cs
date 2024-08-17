@@ -47,13 +47,17 @@ namespace Marsion.Logic
             {
                 ShuffleDeck(player.Deck);
                 Managers.Logger.Log<GameLogic>("Draw");
-                for(int i = 0; i < 8; i++)
+                for(int i = 0; i < 3; i++)
                     DrawCard(player);
             }
+
+            _gameData.CurrentPlayer = _gameData.GetPlayer(0);
 
             Managers.Logger.Log<GameLogic>("Game Start");
             UpdateData();
             OnGameStarted?.Invoke();
+
+            StartTurn();
         }
 
         public void EndGame()
@@ -63,12 +67,23 @@ namespace Marsion.Logic
 
         public void StartTurn()
         {
+            if(_gameData.TurnCount != 0)
+                DrawCard(GetGameData().CurrentPlayer);
+
+            _gameData.TurnCount++;
+
+            UpdateData();
             OnTurnStarted?.Invoke();
         }
 
         public void EndTurn()
         {
+            _gameData.CurrentPlayer = _gameData.CurrentPlayer == _gameData.GetPlayer(0) ? _gameData.GetPlayer(1) : _gameData.GetPlayer(0);
+
+            UpdateData();
             OnTurnEnded?.Invoke();
+
+            StartTurn();
         }
 
         // Game Operations
@@ -96,10 +111,14 @@ namespace Marsion.Logic
                 card = player.Deck[0];
                 player.Deck.RemoveAt(0);
                 player.Hand.Add(card);
-            }
 
-            UpdateData();
-            OnCardDrawn?.Invoke(player, card);
+                UpdateData();
+                OnCardDrawn?.Invoke(player, card);
+            }
+            else
+            {
+                Managers.Logger.Log<GameLogic>("Can't draw");
+            }
         }
 
         public void PlayCard(Player player, Card card)
