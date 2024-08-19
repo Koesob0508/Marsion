@@ -88,6 +88,8 @@ namespace Marsion.Server
 
         private void ClientConnected(ulong clientId)
         {
+            Managers.Logger.Log<GameServer>("Client connected");
+
             if (!IsHost)
             {
                 Clear();
@@ -157,6 +159,8 @@ namespace Marsion.Server
         [Rpc(SendTo.Server)]
         private void CheckConnectionRpc()
         {
+            Managers.Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsList.Count}");
+
             if (AreAllPlayersConnected())
             {
                 Managers.Logger.Log<GameServer>($"Ready to start");

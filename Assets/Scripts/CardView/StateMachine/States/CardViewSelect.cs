@@ -50,7 +50,7 @@ namespace Marsion.CardView
             {
                 if(eventData.button == PointerEventData.InputButton.Left && Managers.Client.IsMyTurn() && IsAreaDetected() && Managers.Client.TryPlayCard(Handler.Card) && !Managers.Client.Field.IsFullField)
                 {
-                    Managers.Client.PlayAndSpawnCard(Handler.Card, Managers.Client.Field.EmptyCardIndex);
+                    Managers.Client.PlayAndSpawnCard(Handler.Card, Managers.Client.Field.EmptyCreatureIndex);
                     Handler.MonoBehaviour.gameObject.SetActive(false);
                 }
 

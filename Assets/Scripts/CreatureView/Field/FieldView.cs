@@ -6,16 +6,16 @@ namespace Marsion.CardView
     [RequireComponent(typeof(Aligner))]
     public class FieldView : MonoBehaviour, IFieldView
     {
-        [SerializeField] CreatureView EmptyCard;
-        [SerializeField] CreatureView FieldCardPrefab;
-        [SerializeField] List<CreatureView> FieldCards;
+        [SerializeField] CreatureView EmptyCreature;
+        [SerializeField] CreatureView CreatureViewPrefab;
+        [SerializeField] List<ICreatureView> Creatures;
 
         const int MAX_CARD_COUNT = 7;
 
         [SerializeField] bool IsMine;
-        bool IsExistEmptyCard => FieldCards.Exists(x => x == EmptyCard);
-        public bool IsFullField => FieldCards.Count >= MAX_CARD_COUNT && !IsExistEmptyCard;
-        public int EmptyCardIndex => FieldCards.FindIndex(x => x == EmptyCard);
+        bool IsExistEmptyCard => Creatures.Exists(x => (Object)x == EmptyCreature);
+        public bool IsFullField => Creatures.Count >= MAX_CARD_COUNT && !IsExistEmptyCard;
+        public int EmptyCreatureIndex => Creatures.FindIndex(x => (Object)x == EmptyCreature);
 
         private Vector3 lastMousePosition;
 
@@ -25,6 +25,8 @@ namespace Marsion.CardView
         {
             Managers.Client.OnCardSpawned -= SpawnCard;
             Managers.Client.OnCardSpawned += SpawnCard;
+
+            Creatures = new List<ICreatureView>();
         }
 
         public void InsertEmptyCard(float x)
@@ -32,46 +34,47 @@ namespace Marsion.CardView
             if (IsFullField) return;
 
             if (!IsExistEmptyCard)
-                FieldCards.Add(EmptyCard);
+                Creatures.Add(EmptyCreature);
 
-            Vector3 emptyCardPos = Vector3.zero;
-            emptyCardPos.x = x;
-            EmptyCard.transform.localPosition = emptyCardPos;
+            Vector3 emptyCreaturePos = Vector3.zero;
+            emptyCreaturePos.x = x;
+            EmptyCreature.Transform.localPosition = emptyCreaturePos;
 
-            int emptyCardIndex = EmptyCardIndex;
-            FieldCards.Sort((card1, card2) => card1.transform.position.x.CompareTo(card2.transform.position.x));
+            int emptyCardIndex = EmptyCreatureIndex;
+            Creatures.Sort((creature1, creature2) => creature1.Transform.position.x.CompareTo(creature2.Transform.position.x));
             
-            Aligner.Align(FieldCards.ToArray());
+            Aligner.Align(Creatures.ToArray());
         }
 
         public void RemoveEmptyCard()
         {
             if (!IsExistEmptyCard) return;
 
-            FieldCards.RemoveAt(EmptyCardIndex);
-            Aligner.Align(FieldCards.ToArray());
+            Creatures.RemoveAt(EmptyCreatureIndex);
+            Aligner.Align(Creatures.ToArray());
         }
 
         public void SpawnCard(Player player, Card card, int index)
         {
             if (Managers.Client.IsMine(player) != IsMine) return;
 
-            CreatureView fieldCard;
+            ICreatureView creature;
 
-            if (EmptyCardIndex == index)
+            if (EmptyCreatureIndex == index)
             {
-                fieldCard = Instantiate(FieldCardPrefab, EmptyCard.transform.position, Quaternion.identity, transform);
-                FieldCards[EmptyCardIndex] = fieldCard;
+                creature = Instantiate(CreatureViewPrefab, EmptyCreature.Transform.position, Quaternion.identity, transform);
+                Creatures[EmptyCreatureIndex] = creature;
             }
             else
             {
                 RemoveEmptyCard();
-                fieldCard = Instantiate(FieldCardPrefab, EmptyCard.transform.position, Quaternion.identity, transform);
-                FieldCards.Insert(index, fieldCard);
+                creature = Instantiate(CreatureViewPrefab, EmptyCreature.Transform.position, Quaternion.identity, transform);
+                Creatures.Insert(index, creature);
             }
 
-            fieldCard.Setup(card);
-            Aligner.Align(FieldCards.ToArray());
+            creature.Setup(card);
+            Aligner.Align(Creatures.ToArray());
+            creature.Spawn();
         }
 
         public void SetLastMousePosition(Vector3 position)

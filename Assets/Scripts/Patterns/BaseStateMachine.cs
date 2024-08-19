@@ -7,8 +7,8 @@ namespace Marsion
     {
         #region Constructor
 
-        public IFsmHandler Handler { get; set; }
-        protected BaseStateMachine(IFsmHandler handler = null) => Handler = handler;
+        public IFSMHandler Handler { get; set; }
+        protected BaseStateMachine(IFSMHandler handler = null) => Handler = handler;
 
         #endregion
 

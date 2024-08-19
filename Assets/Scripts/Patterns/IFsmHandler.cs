@@ -1,6 +1,6 @@
 ﻿namespace Marsion
 {
-    public interface IFsmHandler
+    public interface IFSMHandler
     {
         string Name { get; }
     }
