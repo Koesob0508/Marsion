@@ -23,6 +23,7 @@ namespace Marsion.CardView
         public override void OnEnterState()
         {
             sequence.Play();
+            Managers.Logger.Log<CreatureViewSpawn>("Play");
         }
 
         public override void OnExitState()

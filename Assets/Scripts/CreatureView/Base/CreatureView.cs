@@ -31,7 +31,7 @@ namespace Marsion.CardView
 
         #region Unity Callbacks
 
-        private void Awake()
+        private void Start()
         {
             Transform = transform;
             Collider = GetComponent<Collider2D>();

@@ -794,6 +794,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EmptyCreature
       objectReference: {fileID: 0}
+    - target: {fileID: 4630432108301561830, guid: 3191cbfd2ee227f4e9afb0556f17dbe7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5778400873806108098, guid: 3191cbfd2ee227f4e9afb0556f17dbe7, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -2515,6 +2519,10 @@ PrefabInstance:
     - target: {fileID: 4630432108301561830, guid: 3191cbfd2ee227f4e9afb0556f17dbe7, type: 3}
       propertyPath: m_Name
       value: EmptyCreature
+      objectReference: {fileID: 0}
+    - target: {fileID: 4630432108301561830, guid: 3191cbfd2ee227f4e9afb0556f17dbe7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5778400873806108098, guid: 3191cbfd2ee227f4e9afb0556f17dbe7, type: 3}
       propertyPath: m_IsActive
