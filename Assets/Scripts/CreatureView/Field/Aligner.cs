@@ -15,6 +15,7 @@ namespace Marsion.CardView
 
                 targetCard.OriginPosition = new Vector3(targetX, targetY, 0f);
                 targetCard.MoveTransform(targetCard.OriginPosition, true, 0.5f);
+                if (targetCard.Order == null) Debug.Log($"{targetCard.MonoBehaviour.gameObject.name}");
                 targetCard.Order.SetOriginOrder(i);
             }
         }

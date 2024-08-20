@@ -33,6 +33,7 @@ namespace Marsion.CardView
 
         private void Start()
         {
+            Managers.Logger.Log<CreatureView>("Start");
             Transform = transform;
             Collider = GetComponent<Collider2D>();
 
