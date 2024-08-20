@@ -6,13 +6,15 @@ namespace Marsion.CardView
     [RequireComponent(typeof(Aligner))]
     public class FieldView : MonoBehaviour, IFieldView
     {
-        [SerializeField] CreatureView EmptyCreature;
+        [SerializeField] CreatureView EmptyCreaturePrefab;
         [SerializeField] CreatureView CreatureViewPrefab;
         [SerializeField] List<ICreatureView> Creatures;
 
         const int MAX_CARD_COUNT = 7;
 
         [SerializeField] bool IsMine;
+
+        CreatureView EmptyCreature;
         bool IsExistEmptyCard => Creatures.Exists(x => (Object)x == EmptyCreature);
         public bool IsFullField => Creatures.Count >= MAX_CARD_COUNT && !IsExistEmptyCard;
         public int EmptyCreatureIndex => Creatures.FindIndex(x => (Object)x == EmptyCreature);
@@ -27,6 +29,13 @@ namespace Marsion.CardView
             Managers.Client.OnCardSpawned += SpawnCard;
 
             Creatures = new List<ICreatureView>();
+
+            EmptyCreature = Instantiate(EmptyCreaturePrefab, transform);
+        }
+
+        private void Update()
+        {
+            Aligner.Align(Creatures.ToArray());
         }
 
         public void InsertEmptyCard(float x)
@@ -42,8 +51,6 @@ namespace Marsion.CardView
 
             int emptyCardIndex = EmptyCreatureIndex;
             Creatures.Sort((creature1, creature2) => creature1.Transform.position.x.CompareTo(creature2.Transform.position.x));
-            
-            Aligner.Align(Creatures.ToArray());
         }
 
         public void RemoveEmptyCard()
@@ -51,7 +58,6 @@ namespace Marsion.CardView
             if (!IsExistEmptyCard) return;
 
             Creatures.RemoveAt(EmptyCreatureIndex);
-            Aligner.Align(Creatures.ToArray());
         }
 
         public void SpawnCard(Player player, Card card, int index)
@@ -73,7 +79,6 @@ namespace Marsion.CardView
             }
 
             creature.Setup(card);
-            Aligner.Align(Creatures.ToArray());
             creature.Spawn();
         }
 

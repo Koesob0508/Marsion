@@ -12,6 +12,7 @@ namespace Marsion.CardView
         Collider2D Collider { get; }
         IMouseInput Input { get; }
         Order Order { get; }
+        Pointer Pointer { get; }
 
         void Setup(Card card);
 

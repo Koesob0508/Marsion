@@ -4,9 +4,9 @@
     {
         public bool IsInitialized { get; }
         protected ICreatureView Handler { get; }
-        protected BaseStateMachine FSM { get; }
+        protected CreatureViewFSM FSM { get; }
 
-        protected BaseCreatureViewState(ICreatureView handler, BaseStateMachine fsm)
+        protected BaseCreatureViewState(ICreatureView handler, CreatureViewFSM fsm)
         {
             Handler = handler;
             FSM = fsm;

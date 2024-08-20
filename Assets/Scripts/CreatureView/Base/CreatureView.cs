@@ -16,6 +16,7 @@ namespace Marsion.CardView
         [SerializeField] TMP_Text Text_Attack;
         [SerializeField] TMP_Text Text_Health;
         [SerializeField] SpriteRenderer CardSprite;
+        [SerializeField] Pointer pointer;
 
         #endregion
 
@@ -27,13 +28,13 @@ namespace Marsion.CardView
         public Collider2D Collider { get; private set; }
         public IMouseInput Input { get; private set; }
         public Order Order { get; private set; }
+        public Pointer Pointer => pointer;
         public string Name => gameObject.name;
 
         #region Unity Callbacks
 
-        private void Start()
+        private void Awake()
         {
-            Managers.Logger.Log<CreatureView>("Start");
             Transform = transform;
             Collider = GetComponent<Collider2D>();
 
