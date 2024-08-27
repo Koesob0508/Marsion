@@ -7,5 +7,6 @@
         void InsertEmptyCard(float x);
         void RemoveEmptyCard();
         void SpawnCard(Player player, Card card, int index);
+        ICreatureView GetCreature(Card card);
     }
 }

@@ -22,6 +22,10 @@ namespace Marsion.CardView
 
         #endregion
 
+        void UpdateStatus();
+
+        void Attack(Player attackPlayer, Card attacker, Player defendPlayer, Card defender);
+
         void MoveTransform(Vector3 position, bool useDOTween, float dotweenTime = 0);
     }
 }

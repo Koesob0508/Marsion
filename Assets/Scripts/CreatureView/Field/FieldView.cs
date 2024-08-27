@@ -82,6 +82,11 @@ namespace Marsion.CardView
             creature.Spawn();
         }
 
+        public ICreatureView GetCreature(Card card)
+        {
+            return Creatures.Find(x => x.Card.UID == card.UID);
+        }
+
         public void SetLastMousePosition(Vector3 position)
         {
             lastMousePosition = position;

@@ -18,11 +18,13 @@ namespace Marsion.Client
 
         GameData _gameData;
         [SerializeField] HandView hand;
-        [SerializeField] FieldView field;
+        [SerializeField] FieldView playerField;
+        [SerializeField] FieldView enemyField;
 
         public ulong ID { get; private set; }
         public IHandView Hand { get => hand; }
-        public IFieldView Field { get => field; }
+        public IFieldView PlayerField { get => playerField; }
+        public IFieldView EnemyField { get => enemyField; }
 
         public InputManager Input { get; private set; }
 
@@ -36,6 +38,8 @@ namespace Marsion.Client
         public event UnityAction<Player, Card> OnCardDrawn;
         public event UnityAction<Player, string> OnCardPlayed;
         public event UnityAction<Player, Card, int> OnCardSpawned;
+        public event UnityAction<Player, Card, Player, Card> OnStartAttack;
+        public event UnityAction OnCreatureDead;
 
         #endregion
 
@@ -46,6 +50,16 @@ namespace Marsion.Client
             return _gameData.GetPlayer(ID) == player;
         }
 
+        public bool IsMine(Card card)
+        {
+            return IsMine(card.ClientID);
+        }
+
+        public bool IsMine(ulong id)
+        {
+            return ID == id;
+        }
+
         public bool IsMyTurn()
         {
             return IsMine(GetGameData().CurrentPlayer);
@@ -54,6 +68,18 @@ namespace Marsion.Client
         public GameData GetGameData()
         {
             return _gameData;
+        }
+
+        public ICreatureView GetCreature(ulong clientID, string cardUID)
+        {
+            if(IsMine(clientID))
+            {
+                return PlayerField.GetCreature(GetGameData().GetFieldCard(clientID, cardUID));
+            }
+            else
+            {
+                return EnemyField.GetCreature(GetGameData().GetFieldCard(clientID, cardUID));
+            }
         }
 
         public Sprite GetPortrait(int index)
@@ -114,6 +140,11 @@ namespace Marsion.Client
         {
             Managers.Server.TurnEndRpc();
         }
+        
+        public void TryAttack(Card attacker, Card defender)
+        {
+            Managers.Server.TryAttackRpc(attacker.ClientID, attacker.UID, defender.ClientID, defender.UID);
+        }
 
         #endregion
 
@@ -170,6 +201,25 @@ namespace Marsion.Client
         public void SpawnCardRpc(ulong clientID, string cardUID, int index)
         {
             OnCardSpawned?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetFieldCard(clientID, cardUID), index);
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        public void DeadCardRpc()
+        {
+            OnCreatureDead?.Invoke();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        public void StartAttackRpc(ulong attackClientID, string attackerUID, ulong defendClientID, string defenderUID)
+        {
+            Managers.Logger.Log<GameClient>("Start Attack");
+
+            Player attackPlayer = GetGameData().GetPlayer(attackClientID);
+            Player defendPlayer = GetGameData().GetPlayer(defendClientID);
+            Card attacker = GetGameData().GetFieldCard(attackClientID, attackerUID);
+            Card defender = GetGameData().GetFieldCard(defendClientID, defenderUID);
+
+            OnStartAttack?.Invoke(attackPlayer, attacker, defendPlayer, defender);
         }
 
         #endregion

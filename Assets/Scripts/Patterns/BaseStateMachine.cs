@@ -100,6 +100,11 @@ namespace Marsion
             }
         }
 
+        public void ReserverState()
+        {
+            
+        }
+
         public virtual void Clear()
         {
             foreach (var state in register.Values)

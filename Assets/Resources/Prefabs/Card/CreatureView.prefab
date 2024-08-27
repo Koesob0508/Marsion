@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5721018896316559267}
   - component: {fileID: 6974162726731052710}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Icon_Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,6 +98,7 @@ GameObject:
   - component: {fileID: 7535775830988012601}
   - component: {fileID: 5982377347884566042}
   - component: {fileID: 4645693028116289394}
+  - component: {fileID: 4313290368528475118}
   m_Layer: 0
   m_Name: Pointer
   m_TagString: Untagged
@@ -232,6 +233,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bcf537640cf350489a6d7c93657b7b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4313290368528475118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1122089721951836937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 385a6dc4b4fc64a4faacc2796bd4eccb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1892588978106406508
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,7 +255,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4858587777897946217}
   - component: {fileID: 1725841014343300774}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Icon_Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -328,7 +341,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2961406676115064476}
   - component: {fileID: 42744718409594491}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -414,7 +427,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7951463541002344040}
   - component: {fileID: 2703719442061434229}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -500,7 +513,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4927648495668224751}
   - component: {fileID: 9109982573792273279}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -589,7 +602,7 @@ GameObject:
   - component: {fileID: 5006496091257542271}
   - component: {fileID: 537160176876131495}
   - component: {fileID: 8166275148988478574}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: CreatureView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -632,7 +645,7 @@ MonoBehaviour:
   Text_Attack: {fileID: 8023049733635646969}
   Text_Health: {fileID: 503467215805058376}
   CardSprite: {fileID: 9109982573792273279}
-  pointer: {fileID: 0}
+  pointer: {fileID: 4313290368528475118}
 --- !u!114 &5006496091257542271
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -728,7 +741,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3773261543555066538}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -763,7 +776,7 @@ GameObject:
   - component: {fileID: 1366123660990345354}
   - component: {fileID: 1350784101707828601}
   - component: {fileID: 8023049733635646969}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Text_Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -938,7 +951,7 @@ GameObject:
   - component: {fileID: 4486021342447987832}
   - component: {fileID: 4295022813635027542}
   - component: {fileID: 503467215805058376}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Text_Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1111,7 +1124,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6393975481336007845}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}

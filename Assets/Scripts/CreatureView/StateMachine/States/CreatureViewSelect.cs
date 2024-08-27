@@ -17,27 +17,50 @@ namespace Marsion.CardView
 
         public override void OnInitialize()
         {
-            sequence = DOTween.Sequence().SetAutoKill(false).Pause()
-                .Append(Handler.Transform.DOScale(HoverSize, 0.2f));
+            sequence = DOTween.Sequence();
+
+
         }
 
         public override void OnEnterState()
         {
-            FSM.ActivatePointer("CreatureView", OnPointerClick);
+            FSM.ActivatePointer("CreatureView", OnPointerUp);
             Handler.Order.SetMostFrontOrder(true);
-            sequence.Play();
+            Handler.Transform.DOScale(HoverSize, 0.2f);
         }
 
         public override void OnExitState()
         {
+            Handler.Transform.DOScale(DefaultSize, 0.1f);
             FSM.DeactivatePointer();
         }
 
         #endregion
 
-        private void OnPointerClick(bool isDetected, GameObject foundObject)
+        private void OnPointerUp(bool isDetected, GameObject foundObject)
         {
-            Managers.Logger.Log<CreatureViewSelect>($"{isDetected} & {foundObject.name}");
+            if (foundObject == null)
+            {
+                Managers.Logger.Log<CreatureViewSelect>($"{isDetected} & null");
+                FSM.PopState();
+            }
+            else
+            {
+                ICreatureView target = foundObject.GetComponent<CreatureView>();
+
+                if (Handler.Card.ClientID != target.Card.ClientID)
+                {
+                    Managers.Logger.Log<CreatureViewSelect>("Client : 공격");
+                    FSM.Target = foundObject;
+                    FSM.PopState();
+                    //FSM.PushState<CreatureViewAttack>();
+                    Managers.Client.TryAttack(Handler.Card, foundObject.GetComponent<ICreatureView>().Card);
+                }
+                else
+                {
+                    FSM.PopState();
+                }
+            }
         }
     }
 }

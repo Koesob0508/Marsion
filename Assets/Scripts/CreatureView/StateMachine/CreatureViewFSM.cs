@@ -9,18 +9,23 @@ namespace Marsion.CardView
         private CreatureViewSpawn SpawnState { get; }
         private CreatureViewIdle IdleState { get; }
         private CreatureViewSelect SelectState { get; }
+        private CreatureViewAttack AttackState { get; }
 
-        public CreatureViewFSM(ICreatureView handler = null)
+        public GameObject Target;
+
+        public CreatureViewFSM(ICreatureView handler = null) : base(handler)
         {
             Handler = handler;
 
             SpawnState = new CreatureViewSpawn(handler, this);
             IdleState = new CreatureViewIdle(handler, this);
             SelectState = new CreatureViewSelect(handler, this);
+            AttackState = new CreatureViewAttack(handler, this);
 
             RegisterState(SpawnState);
             RegisterState(IdleState);
             RegisterState(SelectState);
+            RegisterState(AttackState);
 
             Initialize();
         }

@@ -16,8 +16,8 @@ namespace Marsion.CardView
         {
             Input = GetComponent<IMouseInput>();
 
-            Input.OnPointerDown -= OnPointerDown;
-            Input.OnPointerDown += OnPointerDown;
+            Input.OnPointerUp -= OnPointeUp;
+            Input.OnPointerUp += OnPointeUp;
         }
 
         private void Update()
@@ -25,10 +25,15 @@ namespace Marsion.CardView
             transform.position = GetMouseWorldPosition();
         }
 
-        private void OnPointerDown(PointerEventData eventData)
+        private void OnPointeUp(PointerEventData eventData)
         {
             GameObject foundObject = null;
-            bool result = IsAreaDetected(LayerName, out foundObject);
+            bool result = false;
+
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                result = IsAreaDetected(LayerName, out foundObject);
+            }
 
             OnClick?.Invoke(result, foundObject);
             LayerName = null;

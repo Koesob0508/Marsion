@@ -29,11 +29,13 @@ namespace Marsion.Logic
         public event UnityAction OnGameStarted;
         public event UnityAction OnTurnStarted;
         public event UnityAction OnTurnEnded;
-        public event UnityAction  OnGameEnded;
+        public event UnityAction OnGameEnded;
 
         public event UnityAction<Player, Card> OnCardDrawn;
-        public event UnityAction <Player, Card> OnCardPlayed;
-        public event UnityAction <Player, Card, int> OnCardSpawned;
+        public event UnityAction<Player, Card> OnCardPlayed;
+        public event UnityAction<Player, Card, int> OnCardSpawned;
+        public event UnityAction<Card, Card> OnStartAttack;
+        public event UnityAction OnCardDead;
 
         public GameData GetGameData()
         {
@@ -145,6 +147,37 @@ namespace Marsion.Logic
             UpdateData();
             OnCardPlayed?.Invoke(player, card);
             OnCardSpawned?.Invoke(player, card, index);
+        }
+
+        public void TryAttack(Player attackPlayer, Card attacker, Player defenderPlayer, Card defender)
+        {
+            // 각 Player Field 확인해서 조건 검색
+
+            // OnBeforeAttack.Invoke(attacker, defender);
+            Damage(attacker, defender);
+            OnDataUpdated?.Invoke();
+            OnStartAttack?.Invoke(attacker, defender);
+            CheckDeadCard();
+            OnDataUpdated?.Invoke();
+            OnCardDead?.Invoke();
+        }
+
+        private void Damage(IDamageable attacker, IDamageable defender)
+        {
+            attacker.Damage(defender.Attack);
+            defender.Damage(attacker.Attack);
+        }
+
+        private void CheckDeadCard()
+        {
+            foreach(Player player in _gameData.Players)
+            {
+                foreach(Card card in player.Field)
+                {
+                    if (card.HP <= 0)
+                        card.Die();
+                }
+            }
         }
 
         #endregion

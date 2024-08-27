@@ -1,10 +1,11 @@
 ﻿
+using Marsion.Logic;
 using System;
 
 namespace Marsion
 {
     [Serializable]
-    public class Card
+    public class Card : IDamageable
     {
         public ulong ClientID { get; private set; }
         public string UID { get; private set; }
@@ -14,7 +15,8 @@ namespace Marsion
         public string BoardArtPath { get; private set; }
         public string AbilityExplain { get; private set; }
         public int Attack { get; private set; }
-        public int Health { get; private set; }
+        public int HP { get; private set; }
+        public bool IsDead { get; private set; }
 
         public Card(ulong clientID, CardSO so)
         {
@@ -26,7 +28,18 @@ namespace Marsion
             BoardArtPath = so.BoardArtPath;
             AbilityExplain = so.AbilityExplain;
             Attack = so.Attack;
-            Health = so.Health;
+            HP = so.Health;
+            IsDead = false;
+        }
+
+        public void Damage(int amount)
+        {
+            HP -= amount;
+        }
+
+        public void Die()
+        {
+            IsDead = true;
         }
 
         public override bool Equals(object obj)

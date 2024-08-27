@@ -39,55 +39,55 @@ namespace Marsion
 
         void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
         {
-            Managers.Logger.Log<MouseInputProvider>($"{gameObject.name} Pointer Enter");
+            Managers.Logger.LogPointer<MouseInputProvider>($"{gameObject.name} Pointer Enter");
             ((IMouseInput)this).OnPointerEnter.Invoke(eventData);
         }
 
         void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
         {
-            Managers.Logger.Log<MouseInputProvider>($"{gameObject.name} Pointer Exit");
+            Managers.Logger.LogPointer<MouseInputProvider>($"{gameObject.name} Pointer Exit");
             ((IMouseInput)this).OnPointerExit.Invoke(eventData);
         }
 
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
         {
-            Managers.Logger.Log<MouseInputProvider>($"{gameObject.name} Pointer Down");
+            Managers.Logger.LogPointer<MouseInputProvider>($"{gameObject.name} Pointer Down");
             ((IMouseInput)this).OnPointerDown.Invoke(eventData);
         }
 
         void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
         {
-            Managers.Logger.Log<MouseInputProvider>($"{gameObject.name} Pointer Up");
+            Managers.Logger.LogPointer<MouseInputProvider>($"{gameObject.name} Pointer Up");
             ((IMouseInput)this).OnPointerUp.Invoke(eventData);
         }
 
         void IPointerClickHandler.OnPointerClick(PointerEventData eventData)
         {
-            Managers.Logger.Log<MouseInputProvider>($"{gameObject.name} Pointer Click");
+            Managers.Logger.LogPointer<MouseInputProvider>($"{gameObject.name} Pointer Click");
             ((IMouseInput)this).OnPointerClick.Invoke(eventData);
         }
 
         void IBeginDragHandler.OnBeginDrag(PointerEventData eventData)
         {
-            Managers.Logger.Log<MouseInputProvider>($"{gameObject.name} Begin Drag");
+            Managers.Logger.LogPointer<MouseInputProvider>($"{gameObject.name} Begin Drag");
             ((IMouseInput)this).OnBeginDrag.Invoke(eventData);
         }
 
         void IDragHandler.OnDrag(PointerEventData eventData)
         {
-            Managers.Logger.Log<MouseInputProvider>($"{gameObject.name} Drag");
+            Managers.Logger.LogPointer<MouseInputProvider>($"{gameObject.name} Drag");
             ((IMouseInput)this).OnDrag.Invoke(eventData);
         }
 
         void IEndDragHandler.OnEndDrag(PointerEventData eventData)
         {
-            Managers.Logger.Log<MouseInputProvider>($"{gameObject.name} End Drag");
+            Managers.Logger.LogPointer<MouseInputProvider>($"{gameObject.name} End Drag");
             ((IMouseInput)this).OnEndDrag.Invoke(eventData);
         }
 
         void IDropHandler.OnDrop(PointerEventData eventData)
         {
-            Managers.Logger.Log<MouseInputProvider>($"{gameObject.name} Drop");
+            Managers.Logger.LogPointer<MouseInputProvider>($"{gameObject.name} Drop");
             ((IMouseInput)this).OnDrop.Invoke(eventData);
         }
 

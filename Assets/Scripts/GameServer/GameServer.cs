@@ -52,6 +52,12 @@ namespace Marsion.Server
 
                 Logic.OnCardSpawned -= CardSpawned;
                 Logic.OnCardSpawned += CardSpawned;
+
+                Logic.OnStartAttack -= StartAttack;
+                Logic.OnStartAttack += StartAttack;
+
+                Logic.OnCardDead -= CardDead;
+                Logic.OnCardDead += CardDead;
             }
         }
 
@@ -149,6 +155,17 @@ namespace Marsion.Server
             Managers.Client.SpawnCardRpc(player.ClientID, card.UID, index);
         }
 
+        private void CardDead()
+        {
+            Managers.Client.DeadCardRpc();
+        }
+
+
+        private void StartAttack(Card attacker, Card defender)
+        {
+            Managers.Client.StartAttackRpc(attacker.ClientID, attacker.UID, defender.ClientID, defender.UID);
+        }
+
         #endregion
 
         /// <summary>
@@ -203,6 +220,17 @@ namespace Marsion.Server
         public void TurnEndRpc()
         {
             Logic.EndTurn();
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TryAttackRpc(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
+        {
+            Player attackPlayer = GetPlayer(attackerID);
+            Card attacker = attackPlayer.GetCard(attackPlayer.Field, attackerUID);
+            Player defendPlayer = GetPlayer(defenderID);
+            Card defender = defendPlayer.GetCard(defendPlayer.Field, defenderUID);
+
+            Logic.TryAttack(attackPlayer, attacker, defendPlayer, defender);
         }
 
         private bool AreAllPlayersConnected()

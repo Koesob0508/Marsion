@@ -20,7 +20,7 @@ namespace Marsion.CardView
 
         private void OnPointerClick(PointerEventData eventData)
         {
-            if(FSM.IsCurrent(this))
+            if(FSM.IsCurrent(this) && Managers.Client.IsMyTurn() && eventData.button == PointerEventData.InputButton.Left)
             {
                 FSM.PushState<CreatureViewSelect>();
             }

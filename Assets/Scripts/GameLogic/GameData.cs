@@ -21,7 +21,16 @@ namespace Marsion.Logic
         
         public Player GetPlayer(ulong clientID)
         {
-            return Players[clientID];
+            if (Players[clientID] == null)
+            {
+                Managers.Logger.LogWarning<GameData>("");
+                
+                return null;
+            }
+            else
+            {
+                return Players[clientID];
+            }
         }
 
         public Card GetHandCard(ulong clientID, string cardUID)

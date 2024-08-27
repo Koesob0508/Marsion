@@ -20,6 +20,8 @@ namespace Marsion.CardView
 
         #endregion
 
+        [SerializeField] bool IsEmpty;
+
         public Vector3 OriginPosition { get; set; }
         public Card Card { get; private set; }
         public MonoBehaviour MonoBehaviour => this;
@@ -44,6 +46,14 @@ namespace Marsion.CardView
             FSM = new CreatureViewFSM(this);
         }
 
+        private void Start()
+        {
+            if (IsEmpty) return;
+
+            Managers.Client.OnStartAttack -= Attack;
+            Managers.Client.OnStartAttack += Attack;
+        }
+
         private void Update()
         {
             FSM?.Update();
@@ -55,12 +65,35 @@ namespace Marsion.CardView
         {
             if(card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
+            
+            Card = card;
             Text_Attack.text = card.Attack.ToString();
-            Text_Health.text = card.Health.ToString();
+            Text_Health.text = card.HP.ToString();
             CardSprite.sprite = Managers.Resource.Load<Sprite>(card.BoardArtPath);
         }
 
         public void Spawn() => FSM.PushState<CreatureViewSpawn>();
+
+        public void UpdateStatus()
+        {
+            Card card = Managers.Client.GetGameData().GetFieldCard(Card.ClientID, Card.UID);
+
+            Managers.Logger.Log<CreatureView>($"{Text_Health.text} / {card.HP}");
+
+            Text_Attack.text = card.Attack.ToString();
+            Text_Health.text = card.HP.ToString();
+        }
+
+        public void Attack(Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        {               
+            if (Card.UID == attacker.UID)
+            {
+                Managers.Logger.Log<CreatureView>($"{Card.UID} start attack");
+
+                FSM.Target = Managers.Client.GetCreature(defendPlayer.ClientID, defender.UID).MonoBehaviour.gameObject;
+                FSM.PushState<CreatureViewAttack>();
+            }
+        }
 
         public void MoveTransform(Vector3 position, bool useDOTween, float dotweenTime = 0)
         {

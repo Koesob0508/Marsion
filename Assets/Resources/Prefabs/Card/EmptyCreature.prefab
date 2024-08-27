@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3899948842847632108}
   - component: {fileID: 9059479879647560847}
   - component: {fileID: 4743736093787637652}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Text_Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -185,7 +185,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5065270909729361650}
   - component: {fileID: 1980325491594086721}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -271,7 +271,7 @@ GameObject:
   m_Component:
   - component: {fileID: 950698344272376591}
   - component: {fileID: 278496373697639759}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Icon_Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -357,7 +357,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4902835469739796978}
   - component: {fileID: 2427784872886806335}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Icon_Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -443,7 +443,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9178911122928009828}
   - component: {fileID: 1557159642028630623}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -529,7 +529,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7210768427142263221}
   - component: {fileID: 7379640132355264163}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -614,7 +614,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7312508564766432033}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -647,7 +647,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 690568910694678928}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -682,7 +682,7 @@ GameObject:
   - component: {fileID: 3677861275744975227}
   - component: {fileID: 8214624530966179954}
   - component: {fileID: 793300831132456093}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Text_Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -859,7 +859,7 @@ GameObject:
   - component: {fileID: 6257185054836936983}
   - component: {fileID: 8032132022661818981}
   - component: {fileID: 5081689853812850897}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: EmptyCreature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -901,6 +901,8 @@ MonoBehaviour:
   Text_Attack: {fileID: 793300831132456093}
   Text_Health: {fileID: 4743736093787637652}
   CardSprite: {fileID: 1980325491594086721}
+  pointer: {fileID: 0}
+  IsEmpty: 1
 --- !u!114 &6257185054836936983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -918,6 +920,7 @@ MonoBehaviour:
   AbilityRenderers: []
   FrontRenderers: []
   TextRenderers: []
+  MostFrontRenderers: []
   SortingLayerName: BoardCard
   OriginOrder: 0
 --- !u!61 &8032132022661818981

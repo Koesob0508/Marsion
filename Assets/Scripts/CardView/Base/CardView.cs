@@ -79,7 +79,7 @@ namespace Marsion.CardView
             Text_Mana.text = Card.Mana.ToString();
             Text_AbilityExplain.text = Card.AbilityExplain;
             Text_Attack.text = Card.Attack.ToString();
-            Text_Health.text = Card.Health.ToString();
+            Text_Health.text = Card.HP.ToString();
             CardSprite.sprite = Managers.Resource.Load<Sprite>(Card.FullArtPath);
         }
 
