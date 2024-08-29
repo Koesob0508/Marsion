@@ -1,7 +1,10 @@
-﻿namespace Marsion
+﻿using System;
+
+namespace Marsion
 {
     public interface IState
     {
+        Action OnComplete { get; set; }
         bool IsInitialized { get; }
         void OnInitialize();
         void OnEnterState();

@@ -5,6 +5,7 @@ namespace Marsion.CardView
 {
     public class CreatureViewAttack : BaseCreatureViewState
     {
+        Sequence mainSequence;
         Sequence attackSequence;
         Sequence backSequence;
         Vector3 DefaultSize = Vector3.one;
@@ -36,9 +37,7 @@ namespace Marsion.CardView
                 {
                     Handler.UpdateStatus();
                     FSM.Target.GetComponent<ICreatureView>().UpdateStatus();
-                    backSequence.Play();
                 });
-                
 
             backSequence = DOTween.Sequence().Pause()
                 .Append(Handler.Transform.DOMove(OriginalPosition, 0.3f).SetEase(Ease.InExpo))
@@ -49,12 +48,11 @@ namespace Marsion.CardView
                     FSM.PopState();
                 });
 
-            attackSequence.Play();
-        }
+            mainSequence = DOTween.Sequence().Pause()
+                .Append(attackSequence)
+                .Append(backSequence);
 
-        public override void OnExitState()
-        {
-            
+            mainSequence.Play();
         }
     }
 }

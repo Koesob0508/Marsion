@@ -2,6 +2,8 @@
 using Marsion.Logic;
 using UnityEngine;
 using UnityEngine.Events;
+using Marsion.Tool;
+using System;
 
 namespace Marsion.Client
 {
@@ -28,7 +30,7 @@ namespace Marsion.Client
         event UnityAction<Player, Card> OnCardDrawn;
         event UnityAction<Player, string> OnCardPlayed;
         event UnityAction<Player, Card, int> OnCardSpawned;
-        event UnityAction<Player, Card, Player, Card> OnStartAttack;
+        event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
         event UnityAction OnCreatureDead;
 
         #endregion

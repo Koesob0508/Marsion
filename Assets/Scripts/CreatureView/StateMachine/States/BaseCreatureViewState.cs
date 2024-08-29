@@ -1,10 +1,13 @@
-﻿namespace Marsion.CardView
+﻿using System;
+
+namespace Marsion.CardView
 {
     public class BaseCreatureViewState : IState
     {
         public bool IsInitialized { get; }
         protected ICreatureView Handler { get; }
         protected CreatureViewFSM FSM { get; }
+        public Action OnComplete { get; set; }
 
         protected BaseCreatureViewState(ICreatureView handler, CreatureViewFSM fsm)
         {
@@ -20,7 +23,11 @@
 
         public virtual void OnUpdate() { }
 
-        public virtual void OnExitState() { }
+        public virtual void OnExitState()
+        {
+            OnComplete?.Invoke();
+            OnComplete = null;
+        }
 
         public virtual void OnClear() { }
 

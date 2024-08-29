@@ -1,5 +1,7 @@
 ﻿using Marsion.CardView;
 using Marsion.Logic;
+using Marsion.Tool;
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -17,6 +19,8 @@ namespace Marsion.Client
         #endregion
 
         GameData _gameData;
+        MyTween.MainSequence ClientSequence;
+
         [SerializeField] HandView hand;
         [SerializeField] FieldView playerField;
         [SerializeField] FieldView enemyField;
@@ -38,7 +42,7 @@ namespace Marsion.Client
         public event UnityAction<Player, Card> OnCardDrawn;
         public event UnityAction<Player, string> OnCardPlayed;
         public event UnityAction<Player, Card, int> OnCardSpawned;
-        public event UnityAction<Player, Card, Player, Card> OnStartAttack;
+        public event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
         public event UnityAction OnCreatureDead;
 
         #endregion
@@ -98,6 +102,8 @@ namespace Marsion.Client
                 Managers.Network.OnClientConnectedCallback -= SetClientID;
                 Managers.Network.OnClientConnectedCallback += SetClientID;
             }
+
+            ClientSequence = new MyTween.MainSequence();
 
             Input = new InputManager();
         }
@@ -219,7 +225,13 @@ namespace Marsion.Client
             Card attacker = GetGameData().GetFieldCard(attackClientID, attackerUID);
             Card defender = GetGameData().GetFieldCard(defendClientID, defenderUID);
 
-            OnStartAttack?.Invoke(attackPlayer, attacker, defendPlayer, defender);
+            MyTween.Sequence attackSequence = new MyTween.Sequence();
+
+            OnStartAttack?.Invoke(attackSequence, attackPlayer, attacker, defendPlayer, defender);
+
+            ClientSequence.Append(attackSequence);
+
+            ClientSequence.Play();
         }
 
         #endregion

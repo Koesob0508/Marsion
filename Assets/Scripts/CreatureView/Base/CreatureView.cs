@@ -84,15 +84,21 @@ namespace Marsion.CardView
             Text_Health.text = card.HP.ToString();
         }
 
-        public void Attack(Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
-        {               
-            if (Card.UID == attacker.UID)
-            {
-                Managers.Logger.Log<CreatureView>($"{Card.UID} start attack");
+        public void Attack(Tool.MyTween.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        {
+            if (Card.UID != attacker.UID) return;
 
+            Managers.Logger.Log<CreatureView>($"{Card.UID} start attack");
+
+            Tool.MyTween.Task attackTask = new Tool.MyTween.Task();
+
+            attackTask.Action = () =>
+            {
                 FSM.Target = Managers.Client.GetCreature(defendPlayer.ClientID, defender.UID).MonoBehaviour.gameObject;
-                FSM.PushState<CreatureViewAttack>();
-            }
+                FSM.PushState<CreatureViewAttack>(attackTask.OnComplete);
+            };
+
+            sequence.Append(attackTask);
         }
 
         public void MoveTransform(Vector3 position, bool useDOTween, float dotweenTime = 0)
