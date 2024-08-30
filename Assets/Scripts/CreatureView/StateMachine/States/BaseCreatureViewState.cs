@@ -23,11 +23,7 @@ namespace Marsion.CardView
 
         public virtual void OnUpdate() { }
 
-        public virtual void OnExitState()
-        {
-            OnComplete?.Invoke();
-            OnComplete = null;
-        }
+        public virtual void OnExitState() { }
 
         public virtual void OnClear() { }
 

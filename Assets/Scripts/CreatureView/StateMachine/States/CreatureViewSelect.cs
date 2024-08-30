@@ -50,10 +50,8 @@ namespace Marsion.CardView
 
                 if (Handler.Card.ClientID != target.Card.ClientID)
                 {
-                    Managers.Logger.Log<CreatureViewSelect>("Client : 공격");
                     FSM.Target = foundObject;
                     FSM.PopState();
-                    //FSM.PushState<CreatureViewAttack>();
                     Managers.Client.TryAttack(Handler.Card, foundObject.GetComponent<ICreatureView>().Card);
                 }
                 else

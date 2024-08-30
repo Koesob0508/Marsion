@@ -8,18 +8,35 @@ namespace Marsion.Tool
     {
         public class MainSequence
         {
+            bool isPlaying = false;
+
             Queue<Sequence> Sequences = new Queue<Sequence>();
 
             public void Append(Sequence sequence)
             {
-                sequence.OnComplete -= Play;
-                sequence.OnComplete += Play;
+                sequence.OnComplete -= PlayNext;
+                sequence.OnComplete += PlayNext;
                 Sequences.Enqueue(sequence);
             }
 
             public void Play()
             {
-                if (Sequences.Count == 0) return;
+                if (isPlaying)
+                    return;
+                else
+                    isPlaying = true;
+
+                PlayNext();
+            }
+
+            private void PlayNext()
+            {
+                if (Sequences.Count == 0)
+                {
+                    isPlaying = false;
+
+                    return;
+                }
 
                 Sequences.Dequeue().Play();
             }

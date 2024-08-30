@@ -18,6 +18,7 @@ namespace Marsion.Tool
                 task.OnComplete += Play;
                 Tasks.Enqueue(task);
             }
+
             public void Play()
             {
                 if (Tasks.Count == 0)

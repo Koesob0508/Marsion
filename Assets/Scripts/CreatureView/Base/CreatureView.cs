@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using Marsion.Tool;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -50,8 +51,14 @@ namespace Marsion.CardView
         {
             if (IsEmpty) return;
 
+            Managers.Client.OnDataUpdated -= UpdateCard;
+            Managers.Client.OnDataUpdated += UpdateCard;
+
             Managers.Client.OnStartAttack -= Attack;
             Managers.Client.OnStartAttack += Attack;
+
+            Managers.Client.OnCreatureDead -= CheckDead;
+            Managers.Client.OnCreatureDead += CheckDead;
         }
 
         private void Update()
@@ -63,9 +70,9 @@ namespace Marsion.CardView
 
         public void Setup(Card card)
         {
-            if(card == null)
+            if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
-            
+
             Card = card;
             Text_Attack.text = card.Attack.ToString();
             Text_Health.text = card.HP.ToString();
@@ -74,23 +81,40 @@ namespace Marsion.CardView
 
         public void Spawn() => FSM.PushState<CreatureViewSpawn>();
 
-        public void UpdateStatus()
+        public void UpdateCard()
         {
-            Card card = Managers.Client.GetGameData().GetFieldCard(Card.ClientID, Card.UID);
+            Card = Managers.Client.GetGameData().GetFieldCard(Card.ClientID, Card.UID);
 
-            Managers.Logger.Log<CreatureView>($"{Text_Health.text} / {card.HP}");
+            foreach (Player player in Managers.Client.GetGameData().Players)
+            {
+                foreach (Card card in player.Field)
+                {
+                    if (card.HP <= 0)
+                        card.Die();
 
-            Text_Attack.text = card.Attack.ToString();
-            Text_Health.text = card.HP.ToString();
+                    if(card.ClientID == Card.ClientID && card.UID == Card.UID)
+                    {
+                        if(Managers.Client.GetGameData().GetFieldCard(player.ClientID, card.UID).IsDead)
+                        {
+                            Managers.Logger.Log<CreatureView>("Dead");
+                        }
+
+                    }
+                }
+            }
         }
 
-        public void Attack(Tool.MyTween.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        public void UpdateStatus()
+        {
+            Text_Attack.text = Card.Attack.ToString();
+            Text_Health.text = Card.HP.ToString();
+        }
+
+        public void Attack(MyTween.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
             if (Card.UID != attacker.UID) return;
 
-            Managers.Logger.Log<CreatureView>($"{Card.UID} start attack");
-
-            Tool.MyTween.Task attackTask = new Tool.MyTween.Task();
+            MyTween.Task attackTask = new();
 
             attackTask.Action = () =>
             {
@@ -99,6 +123,22 @@ namespace Marsion.CardView
             };
 
             sequence.Append(attackTask);
+        }
+
+        public void CheckDead(MyTween.Sequence sequence)
+        {
+            if (!Card.IsDead) return;
+
+            Managers.Logger.Log<CreatureView>($"I'm dead", colorName: "blue");
+
+            MyTween.Task deadAction = new MyTween.Task();
+            deadAction.Action = () =>
+            {
+                Transform.DOShakeRotation(1f, strength:30);
+                deadAction.OnComplete?.Invoke();
+            };
+
+            sequence.Append(deadAction);
         }
 
         public void MoveTransform(Vector3 position, bool useDOTween, float dotweenTime = 0)

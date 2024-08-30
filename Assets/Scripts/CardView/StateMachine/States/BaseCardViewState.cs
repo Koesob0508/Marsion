@@ -44,11 +44,7 @@ namespace Marsion.CardView
 
         public virtual void OnEnterState() { }
 
-        public virtual void OnExitState()
-        {
-            OnComplete?.Invoke();
-            OnComplete= null;
-        }
+        public virtual void OnExitState() { }
 
         public virtual void OnUpdate() { }
 

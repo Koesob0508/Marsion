@@ -31,7 +31,7 @@ namespace Marsion.Client
         event UnityAction<Player, string> OnCardPlayed;
         event UnityAction<Player, Card, int> OnCardSpawned;
         event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
-        event UnityAction OnCreatureDead;
+        event Action<MyTween.Sequence> OnCreatureDead;
 
         #endregion
 

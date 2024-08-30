@@ -26,7 +26,7 @@ namespace Marsion.CardView
             if (Managers.Client.IsMine(player))
             {
                 var cardObject = Instantiate(cardPrefab);
-                Managers.Logger.Log<DeckView>($"UID : {card.UID}");
+    
                 cardObject.Card = card;
                 cardObject.FrontImage.SetActive(true);
                 cardObject.BackImage.SetActive(false);

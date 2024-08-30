@@ -39,6 +39,7 @@ namespace Marsion
 
         public void Die()
         {
+            Managers.Logger.Log<Card>($"{Name} Dead", colorName: "red");
             IsDead = true;
         }
 

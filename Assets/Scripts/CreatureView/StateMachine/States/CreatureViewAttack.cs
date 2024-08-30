@@ -50,7 +50,12 @@ namespace Marsion.CardView
 
             mainSequence = DOTween.Sequence().Pause()
                 .Append(attackSequence)
-                .Append(backSequence);
+                .Append(backSequence)
+                .OnComplete(() =>
+                {
+                    OnComplete?.Invoke();
+                    OnComplete = null;
+                });
 
             mainSequence.Play();
         }

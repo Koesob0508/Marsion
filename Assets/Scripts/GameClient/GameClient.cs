@@ -43,7 +43,7 @@ namespace Marsion.Client
         public event UnityAction<Player, string> OnCardPlayed;
         public event UnityAction<Player, Card, int> OnCardSpawned;
         public event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
-        public event UnityAction OnCreatureDead;
+        public event Action<MyTween.Sequence> OnCreatureDead;
 
         #endregion
 
@@ -157,80 +157,212 @@ namespace Marsion.Client
         #region Event Rpcs
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void UpdateDataRpc(NetworkGameData networkData)
+        public void StartGameRpc()
         {
-            Managers.Logger.Log<GameClient>("Game data updated");
-            _gameData = networkData.gameData;
+            MyTween.Sequence gameStartSequence = new MyTween.Sequence();
+            MyTween.Task gameStartTask = new MyTween.Task();
 
-            OnDataUpdated?.Invoke();
+            gameStartTask.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Game Start");
+                OnGameStarted?.Invoke();
+                gameStartTask.OnComplete?.Invoke();
+            };
+
+            gameStartSequence.Append(gameStartTask);
+            ClientSequence.Append(gameStartSequence);
+
+            ClientSequence.Play();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void StartGameRpc()
+        public void UpdateDataRpc(NetworkGameData networkData)
         {
-            Managers.Logger.Log<GameClient>("Game Start");
+            MyTween.Sequence updateSequence = new MyTween.Sequence();
+            MyTween.Task updateTask = new MyTween.Task();
 
-            OnGameStarted?.Invoke();
+            updateTask.Action = () =>
+            {
+                _gameData = networkData.gameData;
+                Managers.Logger.Log<GameClient>("Game data updated");
+
+                foreach (Player player in _gameData.Players)
+                {
+                    foreach (Card card in player.Field)
+                    {
+                        if (card.HP <= 0)
+                            card.Die();
+
+                        Managers.Logger.Log<GameClient>($"{_gameData.GetFieldCard(player.ClientID, card.UID).IsDead}", colorName: "blue");
+                    }
+                }
+
+                OnDataUpdated?.Invoke();
+                updateTask.OnComplete?.Invoke();
+            };
+
+            updateSequence.Append(updateTask);
+            ClientSequence.Append(updateSequence);
+
+            ClientSequence.Play();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void EndGameRpc()
         {
-            OnGameEnded?.Invoke();
+            MyTween.Sequence gameEndSequence = new MyTween.Sequence();
+            MyTween.Task gameEndTask = new MyTween.Task();
+
+            gameEndTask.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Game end.");
+                OnGameEnded?.Invoke();
+                gameEndTask.OnComplete?.Invoke();
+            };
+
+            gameEndSequence.Append(gameEndTask);
+            ClientSequence.Append(gameEndSequence);
+
+            ClientSequence.Play();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void StartTurnRpc()
         {
-            OnTurnStarted?.Invoke();
+            MyTween.Sequence turnStartSequence = new MyTween.Sequence();
+            MyTween.Task turnStartTask = new MyTween.Task();
+
+            turnStartTask.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Turn Start.");
+                OnTurnStarted?.Invoke();
+                turnStartTask.OnComplete?.Invoke();
+            };
+
+            turnStartSequence.Append(turnStartTask);
+            ClientSequence.Append(turnStartSequence);
+
+            ClientSequence.Play();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void EndTurnRpc()
         {
-            OnTurnEnded?.Invoke();
+            MyTween.Sequence turnEndSequence = new MyTween.Sequence();
+            MyTween.Task turnEndTask = new MyTween.Task();
+
+            turnEndTask.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Turn End.");
+                OnTurnEnded?.Invoke();
+                turnEndTask.OnComplete?.Invoke();
+            };
+
+            turnEndSequence.Append(turnEndTask);
+            ClientSequence.Append(turnEndSequence);
+
+            ClientSequence.Play();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void DrawCardRpc(ulong clientID, string cardUID)
         {
-            OnCardDrawn?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetHandCard(clientID, cardUID));
+            MyTween.Sequence cardDrawSequence = new MyTween.Sequence();
+            MyTween.Task cardDrawTask = new MyTween.Task();
+
+            cardDrawTask.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Card Draw");
+                OnCardDrawn?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetHandCard(clientID, cardUID));
+                cardDrawTask.OnComplete?.Invoke();
+            };
+
+            cardDrawSequence.Append(cardDrawTask);
+            ClientSequence.Append(cardDrawSequence);
+
+            ClientSequence.Play();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void PlayCardRpc(ulong clientID, string cardUID)
         {
-            OnCardPlayed?.Invoke(GetGameData().GetPlayer(clientID), cardUID);
+            MyTween.Sequence cardPlaySequence = new MyTween.Sequence();
+            MyTween.Task cardPlayTask = new MyTween.Task();
+
+            cardPlayTask.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Card Play");
+                OnCardPlayed?.Invoke(GetGameData().GetPlayer(clientID), cardUID);
+                cardPlayTask.OnComplete?.Invoke();
+            };
+
+            cardPlaySequence.Append(cardPlayTask);
+            ClientSequence.Append(cardPlaySequence);
+
+            ClientSequence.Play();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void SpawnCardRpc(ulong clientID, string cardUID, int index)
         {
-            OnCardSpawned?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetFieldCard(clientID, cardUID), index);
+            MyTween.Sequence cardSpawnSequence = new MyTween.Sequence();
+            MyTween.Task cardSpawnTask = new MyTween.Task();
+
+            cardSpawnTask.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Card Spawn");
+                OnCardSpawned?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetFieldCard(clientID, cardUID), index);
+                cardSpawnTask.OnComplete?.Invoke();
+            };
+
+            cardSpawnSequence.Append(cardSpawnTask);
+            ClientSequence.Append(cardSpawnSequence);
+
+            ClientSequence.Play();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void DeadCardRpc()
         {
-            OnCreatureDead?.Invoke();
+            MyTween.Sequence deadSequence = new MyTween.Sequence();
+            MyTween.Task deadLog = new MyTween.Task();
+
+            deadLog.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Card dead");
+                deadLog.OnComplete?.Invoke();
+            };
+
+            deadSequence.Append(deadLog);
+
+            OnCreatureDead?.Invoke(deadSequence);
+
+            ClientSequence.Append(deadSequence);
+            ClientSequence.Play();
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void StartAttackRpc(ulong attackClientID, string attackerUID, ulong defendClientID, string defenderUID)
         {
-            Managers.Logger.Log<GameClient>("Start Attack");
-
             Player attackPlayer = GetGameData().GetPlayer(attackClientID);
             Player defendPlayer = GetGameData().GetPlayer(defendClientID);
             Card attacker = GetGameData().GetFieldCard(attackClientID, attackerUID);
             Card defender = GetGameData().GetFieldCard(defendClientID, defenderUID);
 
             MyTween.Sequence attackSequence = new MyTween.Sequence();
+            MyTween.Task attackLog = new MyTween.Task();
+
+            attackLog.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Start Attack");
+                attackLog.OnComplete?.Invoke();
+            };
+
+            attackSequence.Append(attackLog);
 
             OnStartAttack?.Invoke(attackSequence, attackPlayer, attacker, defendPlayer, defender);
 
             ClientSequence.Append(attackSequence);
-
             ClientSequence.Play();
         }
 
