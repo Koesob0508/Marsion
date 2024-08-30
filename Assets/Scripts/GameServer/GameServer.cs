@@ -118,17 +118,6 @@ namespace Marsion.Server
             NetworkGameData networkData = new NetworkGameData();
             networkData.gameData = gameData;
 
-            foreach (Player player in gameData.Players)
-            {
-                foreach (Card card in player.Field)
-                {
-                    if (card.HP <= 0)
-                        card.Die();
-
-                    Managers.Logger.Log<GameServer>($"{gameData.GetFieldCard(player.ClientID, card.UID).IsDead}", colorName: "yellow");
-                }
-            }
-
             Managers.Client.UpdateDataRpc(networkData);
         }
 

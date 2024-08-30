@@ -84,24 +84,6 @@ namespace Marsion.CardView
         public void UpdateCard()
         {
             Card = Managers.Client.GetGameData().GetFieldCard(Card.ClientID, Card.UID);
-
-            foreach (Player player in Managers.Client.GetGameData().Players)
-            {
-                foreach (Card card in player.Field)
-                {
-                    if (card.HP <= 0)
-                        card.Die();
-
-                    if(card.ClientID == Card.ClientID && card.UID == Card.UID)
-                    {
-                        if(Managers.Client.GetGameData().GetFieldCard(player.ClientID, card.UID).IsDead)
-                        {
-                            Managers.Logger.Log<CreatureView>("Dead");
-                        }
-
-                    }
-                }
-            }
         }
 
         public void UpdateStatus()
@@ -128,8 +110,6 @@ namespace Marsion.CardView
         public void CheckDead(MyTween.Sequence sequence)
         {
             if (!Card.IsDead) return;
-
-            Managers.Logger.Log<CreatureView>($"I'm dead", colorName: "blue");
 
             MyTween.Task deadAction = new MyTween.Task();
             deadAction.Action = () =>

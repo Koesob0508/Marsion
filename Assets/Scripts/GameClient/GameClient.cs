@@ -76,7 +76,7 @@ namespace Marsion.Client
 
         public ICreatureView GetCreature(ulong clientID, string cardUID)
         {
-            if(IsMine(clientID))
+            if (IsMine(clientID))
             {
                 return PlayerField.GetCreature(GetGameData().GetFieldCard(clientID, cardUID));
             }
@@ -146,7 +146,7 @@ namespace Marsion.Client
         {
             Managers.Server.TurnEndRpc();
         }
-        
+
         public void TryAttack(Card attacker, Card defender)
         {
             Managers.Server.TryAttackRpc(attacker.ClientID, attacker.UID, defender.ClientID, defender.UID);
@@ -185,17 +185,6 @@ namespace Marsion.Client
             {
                 _gameData = networkData.gameData;
                 Managers.Logger.Log<GameClient>("Game data updated");
-
-                foreach (Player player in _gameData.Players)
-                {
-                    foreach (Card card in player.Field)
-                    {
-                        if (card.HP <= 0)
-                            card.Die();
-
-                        Managers.Logger.Log<GameClient>($"{_gameData.GetFieldCard(player.ClientID, card.UID).IsDead}", colorName: "blue");
-                    }
-                }
 
                 OnDataUpdated?.Invoke();
                 updateTask.OnComplete?.Invoke();
@@ -335,7 +324,15 @@ namespace Marsion.Client
 
             deadSequence.Append(deadLog);
 
-            OnCreatureDead?.Invoke(deadSequence);
+            MyTween.Task deadTask = new MyTween.Task();
+
+            deadTask.Action = () =>
+            {
+                OnCreatureDead?.Invoke(deadSequence);
+                deadTask.OnComplete?.Invoke();
+            };
+
+            deadSequence.Append(deadTask);
 
             ClientSequence.Append(deadSequence);
             ClientSequence.Play();
@@ -373,6 +370,6 @@ namespace Marsion.Client
             return true;
         }
 
-        
+
     }
 }

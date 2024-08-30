@@ -166,7 +166,6 @@ namespace Marsion.Logic
             Managers.Logger.Log<GameLogic>("Card attack", colorName: "yellow");
             // 각 Player Field 확인해서 조건 검색
 
-            // OnBeforeAttack.Invoke(attacker, defender);
             Damage(attacker, defender);
             OnDataUpdated?.Invoke();
             OnStartAttack?.Invoke(attacker, defender);
@@ -190,8 +189,6 @@ namespace Marsion.Logic
                 {
                     if (card.HP <= 0)
                         card.Die();
-
-                    Managers.Logger.Log<GameLogic>($"{_gameData.GetFieldCard(player.ClientID, card.UID).IsDead}", colorName:"yellow");
                 }
             }
         }
