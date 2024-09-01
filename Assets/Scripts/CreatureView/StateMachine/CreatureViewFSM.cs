@@ -10,6 +10,7 @@ namespace Marsion.CardView
         private CreatureViewIdle IdleState { get; }
         private CreatureViewSelect SelectState { get; }
         private CreatureViewAttack AttackState { get; }
+        private CreatureViewDead DeadState { get; }
 
         public GameObject Target;
 
@@ -21,11 +22,13 @@ namespace Marsion.CardView
             IdleState = new CreatureViewIdle(handler, this);
             SelectState = new CreatureViewSelect(handler, this);
             AttackState = new CreatureViewAttack(handler, this);
+            DeadState = new CreatureViewDead(handler, this);
 
             RegisterState(SpawnState);
             RegisterState(IdleState);
             RegisterState(SelectState);
             RegisterState(AttackState);
+            RegisterState(DeadState);
 
             Initialize();
         }

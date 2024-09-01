@@ -43,7 +43,8 @@ namespace Marsion.Client
         public event UnityAction<Player, string> OnCardPlayed;
         public event UnityAction<Player, Card, int> OnCardSpawned;
         public event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
-        public event Action<MyTween.Sequence> OnCreatureDead;
+        public event Action<MyTween.Sequence> OnCreatureBeforeDead;
+        public event UnityAction OnCreatureAfterDead;
 
         #endregion
 
@@ -56,7 +57,7 @@ namespace Marsion.Client
 
         public bool IsMine(Card card)
         {
-            return IsMine(card.ClientID);
+            return IsMine(card.PlayerID);
         }
 
         public bool IsMine(ulong id)
@@ -149,7 +150,7 @@ namespace Marsion.Client
 
         public void TryAttack(Card attacker, Card defender)
         {
-            Managers.Server.TryAttackRpc(attacker.ClientID, attacker.UID, defender.ClientID, defender.UID);
+            Managers.Server.TryAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
         }
 
         #endregion
@@ -311,9 +312,9 @@ namespace Marsion.Client
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void DeadCardRpc()
+        public void BeforeDeadCardRpc()
         {
-            MyTween.Sequence deadSequence = new MyTween.Sequence();
+            MyTween.Sequence beforeDeadSequence = new MyTween.Sequence();
             MyTween.Task deadLog = new MyTween.Task();
 
             deadLog.Action = () =>
@@ -322,19 +323,37 @@ namespace Marsion.Client
                 deadLog.OnComplete?.Invoke();
             };
 
-            deadSequence.Append(deadLog);
+            beforeDeadSequence.Append(deadLog);
 
             MyTween.Task deadTask = new MyTween.Task();
 
             deadTask.Action = () =>
             {
-                OnCreatureDead?.Invoke(deadSequence);
+                OnCreatureBeforeDead?.Invoke(beforeDeadSequence);
                 deadTask.OnComplete?.Invoke();
             };
 
-            deadSequence.Append(deadTask);
+            beforeDeadSequence.Append(deadTask);
 
-            ClientSequence.Append(deadSequence);
+            ClientSequence.Append(beforeDeadSequence);
+            ClientSequence.Play();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        public void AfterDeadCardRpc()
+        {
+            MyTween.Sequence afterDeadSequence = new MyTween.Sequence();
+            MyTween.Task afterDeadTask = new MyTween.Task();
+
+            afterDeadTask.Action = () =>
+            {
+                OnCreatureAfterDead?.Invoke();
+                afterDeadTask.OnComplete?.Invoke();
+            };
+
+            afterDeadSequence.Append(afterDeadTask);
+
+            ClientSequence.Append(afterDeadSequence);
             ClientSequence.Play();
         }
 

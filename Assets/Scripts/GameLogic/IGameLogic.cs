@@ -18,7 +18,8 @@ namespace Marsion.Logic
         event UnityAction <Player, Card> OnCardPlayed;
         event UnityAction <Player, Card, int> OnCardSpawned;
         event UnityAction<Card, Card> OnStartAttack;
-        event UnityAction OnCardDead;
+        event UnityAction OnCardBeforeDead;
+        event UnityAction OnCardAfterDead;
 
         #endregion
 

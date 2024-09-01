@@ -37,7 +37,8 @@ namespace Marsion.Logic
         public event UnityAction<Player, Card> OnCardPlayed;
         public event UnityAction<Player, Card, int> OnCardSpawned;
         public event UnityAction<Card, Card> OnStartAttack;
-        public event UnityAction OnCardDead;
+        public event UnityAction OnCardBeforeDead;
+        public event UnityAction OnCardAfterDead;
 
         public GameData GetGameData()
         {
@@ -172,7 +173,10 @@ namespace Marsion.Logic
 
             CheckDeadCard();
             OnDataUpdated?.Invoke();
-            OnCardDead?.Invoke();
+            OnCardBeforeDead?.Invoke();
+            //OnCardAfterDead?.Invoke();
+            //RemoveDeadCard();
+            //OnDataUpdated?.Invoke();
         }
 
         private void Damage(IDamageable attacker, IDamageable defender)
@@ -188,7 +192,23 @@ namespace Marsion.Logic
                 foreach(Card card in player.Field)
                 {
                     if (card.HP <= 0)
+                    {
                         card.Die();
+                    }
+                }
+            }
+        }
+
+        private void RemoveDeadCard()
+        {
+            foreach (Player player in _gameData.Players)
+            {
+                for (int i = player.Field.Count - 1; i >= 0; i--)
+                {
+                    if (player.Field[i].IsDead)
+                    {
+                        player.Field.RemoveAt(i);
+                    }
                 }
             }
         }

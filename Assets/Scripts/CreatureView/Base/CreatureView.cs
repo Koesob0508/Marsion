@@ -57,8 +57,8 @@ namespace Marsion.CardView
             Managers.Client.OnStartAttack -= Attack;
             Managers.Client.OnStartAttack += Attack;
 
-            Managers.Client.OnCreatureDead -= CheckDead;
-            Managers.Client.OnCreatureDead += CheckDead;
+            Managers.Client.OnCreatureBeforeDead -= CheckDead;
+            Managers.Client.OnCreatureBeforeDead += CheckDead;
         }
 
         private void Update()
@@ -83,7 +83,7 @@ namespace Marsion.CardView
 
         public void UpdateCard()
         {
-            Card = Managers.Client.GetGameData().GetFieldCard(Card.ClientID, Card.UID);
+            Card = Managers.Client.GetGameData().GetFieldCard(Card.PlayerID, Card.UID);
         }
 
         public void UpdateStatus()
@@ -114,8 +114,7 @@ namespace Marsion.CardView
             MyTween.Task deadAction = new MyTween.Task();
             deadAction.Action = () =>
             {
-                Transform.DOShakeRotation(1f, strength:30);
-                deadAction.OnComplete?.Invoke();
+                FSM.PushState<CreatureViewDead>();
             };
 
             sequence.Append(deadAction);

@@ -48,7 +48,7 @@ namespace Marsion.CardView
             {
                 ICreatureView target = foundObject.GetComponent<CreatureView>();
 
-                if (Handler.Card.ClientID != target.Card.ClientID)
+                if (Handler.Card.PlayerID != target.Card.PlayerID)
                 {
                     FSM.Target = foundObject;
                     FSM.PopState();

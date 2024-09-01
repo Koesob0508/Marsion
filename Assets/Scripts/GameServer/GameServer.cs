@@ -56,8 +56,11 @@ namespace Marsion.Server
                 Logic.OnStartAttack -= StartAttack;
                 Logic.OnStartAttack += StartAttack;
 
-                Logic.OnCardDead -= CardDead;
-                Logic.OnCardDead += CardDead;
+                Logic.OnCardBeforeDead -= CardBeforeDead;
+                Logic.OnCardBeforeDead += CardBeforeDead;
+
+                Logic.OnCardAfterDead -= CardAfterDead;
+                Logic.OnCardAfterDead += CardAfterDead;
             }
         }
 
@@ -156,15 +159,19 @@ namespace Marsion.Server
             Managers.Client.SpawnCardRpc(player.ClientID, card.UID, index);
         }
 
-        private void CardDead()
+        private void CardBeforeDead()
         {
-            Managers.Client.DeadCardRpc();
+            Managers.Client.BeforeDeadCardRpc();
         }
 
+        private void CardAfterDead()
+        {
+            Managers.Client.AfterDeadCardRpc();
+        }
 
         private void StartAttack(Card attacker, Card defender)
         {
-            Managers.Client.StartAttackRpc(attacker.ClientID, attacker.UID, defender.ClientID, defender.UID);
+            Managers.Client.StartAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
         }
 
         #endregion

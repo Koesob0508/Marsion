@@ -154,7 +154,7 @@ namespace Marsion.CardView
                 {
                     Vector3 cardUp;
 
-                    if (Managers.Client.ID == card.Card.ClientID)
+                    if (Managers.Client.ID == card.Card.PlayerID)
                         cardUp = GetCurveNormal(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, objLerps[i], true);
                     else
                         cardUp = GetCurveNormal(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, objLerps[i], false);

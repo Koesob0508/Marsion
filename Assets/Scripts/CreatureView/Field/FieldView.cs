@@ -28,6 +28,9 @@ namespace Marsion.CardView
             Managers.Client.OnCardSpawned -= SpawnCard;
             Managers.Client.OnCardSpawned += SpawnCard;
 
+            Managers.Client.OnCreatureAfterDead -= RemoveDeadCreature;
+            Managers.Client.OnCreatureAfterDead += RemoveDeadCreature;
+
             Creatures = new List<ICreatureView>();
 
             EmptyCreature = Instantiate(EmptyCreaturePrefab, transform);
@@ -60,7 +63,7 @@ namespace Marsion.CardView
             Creatures.RemoveAt(EmptyCreatureIndex);
         }
 
-        public void SpawnCard(Player player, Card card, int index)
+        private void SpawnCard(Player player, Card card, int index)
         {
             if (Managers.Client.IsMine(player) != IsMine) return;
 
@@ -80,6 +83,18 @@ namespace Marsion.CardView
 
             creature.Setup(card);
             creature.Spawn();
+        }
+
+        private void RemoveDeadCreature()
+        {
+            foreach(var creature in Creatures)
+            {
+                if(creature.Card.IsDead)
+                {
+                    Creatures.Remove(creature);
+                    Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+                }
+            }
         }
 
         public ICreatureView GetCreature(Card card)

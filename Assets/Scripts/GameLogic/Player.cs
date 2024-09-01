@@ -13,6 +13,7 @@ namespace Marsion
         public List<Card> Deck = new List<Card>();
         public List<Card> Hand = new List<Card>();
         public List<Card> Field = new List<Card>();
+        public List<Card> Proecssing = new List<Card>();
 
         public Player(int clientID)
         {
