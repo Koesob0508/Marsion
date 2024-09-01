@@ -87,14 +87,23 @@ namespace Marsion.CardView
 
         private void RemoveDeadCreature()
         {
+            List<ICreatureView> removeObjects = new List<ICreatureView>();
+
             foreach(var creature in Creatures)
             {
                 if(creature.Card.IsDead)
                 {
-                    Creatures.Remove(creature);
-                    Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+                    removeObjects.Add(creature);
                 }
             }
+
+            foreach(var obj in removeObjects)
+            {
+                Creatures.Remove(obj);
+                Managers.Resource.Destroy(obj.MonoBehaviour.gameObject);
+            }
+
+            removeObjects.Clear();
         }
 
         public ICreatureView GetCreature(Card card)

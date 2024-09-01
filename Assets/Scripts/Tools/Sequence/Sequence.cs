@@ -14,6 +14,15 @@ namespace Marsion.Tool
 
             public void Append(Task task)
             {
+                task.Type = TaskType.Append;
+                task.OnComplete -= Play;
+                task.OnComplete += Play;
+                Tasks.Enqueue(task);
+            }
+
+            public void Join(Task task)
+            {
+                task.Type = TaskType.Join;
                 task.OnComplete -= Play;
                 task.OnComplete += Play;
                 Tasks.Enqueue(task);
@@ -28,6 +37,13 @@ namespace Marsion.Tool
                 else
                 {
                     Tasks.Dequeue().Action.Invoke();
+                    if(Tasks.TryPeek(out var result))
+                    {
+                        if(result.Type == TaskType.Join)
+                        {
+                            Tasks.Dequeue().Action.Invoke();
+                        }
+                    }
                 }
             }
         }

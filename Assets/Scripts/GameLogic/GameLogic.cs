@@ -174,7 +174,7 @@ namespace Marsion.Logic
             CheckDeadCard();
             OnDataUpdated?.Invoke();
             OnCardBeforeDead?.Invoke();
-            //OnCardAfterDead?.Invoke();
+            OnCardAfterDead?.Invoke();
             //RemoveDeadCard();
             //OnDataUpdated?.Invoke();
         }

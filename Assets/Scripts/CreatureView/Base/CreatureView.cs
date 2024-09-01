@@ -114,10 +114,10 @@ namespace Marsion.CardView
             MyTween.Task deadAction = new MyTween.Task();
             deadAction.Action = () =>
             {
-                FSM.PushState<CreatureViewDead>();
+                FSM.PushState<CreatureViewDead>(deadAction.OnComplete);
             };
 
-            sequence.Append(deadAction);
+            sequence.Join(deadAction);
         }
 
         public void MoveTransform(Vector3 position, bool useDOTween, float dotweenTime = 0)

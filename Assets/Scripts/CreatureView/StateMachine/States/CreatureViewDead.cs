@@ -14,6 +14,8 @@ namespace Marsion.CardView
                 {
                     FSM.PopState();
                     Handler.MonoBehaviour.gameObject.SetActive(false);
+                    OnComplete?.Invoke();
+                    OnComplete = null;
                 });
         }
     }
