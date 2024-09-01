@@ -2,7 +2,7 @@
 
 namespace Marsion.CardView
 {
-    public interface ICardView : IFsmHandler, ICardViewTransformMotion
+    public interface ICardView : IFSMHandler, ICardViewTransformMotion
     {
         #region Properties
 
@@ -10,7 +10,7 @@ namespace Marsion.CardView
         MonoBehaviour MonoBehaviour { get; }
         CardViewFsm FSM { get; }
         Transform Transform { get; }
-        Collider Collider { get; }
+        Collider2D Collider { get; }
         IMouseInput Input { get; }
         Order Order { get; }
         GameObject FrontImage { get; }

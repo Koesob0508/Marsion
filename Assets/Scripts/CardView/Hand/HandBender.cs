@@ -147,13 +147,14 @@ namespace Marsion.CardView
                 if (!card.FSM.IsCurrent<CardViewIdle>()) continue;
 
                 var cardPos = GetCurvePoint(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, objLerps[i]);
+                cardPos.z = -1;
                 var cardRot = Quaternion.identity;
 
                 if (cards.Length >= 4)
                 {
                     Vector3 cardUp;
 
-                    if (Managers.Client.ID == card.Card.ClientID)
+                    if (Managers.Client.ID == card.Card.PlayerID)
                         cardUp = GetCurveNormal(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, objLerps[i], true);
                     else
                         cardUp = GetCurveNormal(CurveStart, new Vector3(0f, Height, 0f), CurveEnd, objLerps[i], false);

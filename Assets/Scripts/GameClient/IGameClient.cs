@@ -2,6 +2,8 @@
 using Marsion.Logic;
 using UnityEngine;
 using UnityEngine.Events;
+using Marsion.Tool;
+using System;
 
 namespace Marsion.Client
 {
@@ -12,7 +14,8 @@ namespace Marsion.Client
     {
         ulong ID { get; }
         IHandView Hand { get; }
-        IFieldView Field { get; }
+        IFieldView PlayerField { get; }
+        IFieldView EnemyField { get; }
         InputManager Input { get; }
 
         
@@ -27,14 +30,20 @@ namespace Marsion.Client
         event UnityAction<Player, Card> OnCardDrawn;
         event UnityAction<Player, string> OnCardPlayed;
         event UnityAction<Player, Card, int> OnCardSpawned;
+        event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
+        event Action<MyTween.Sequence> OnCreatureBeforeDead;
+        event UnityAction OnCreatureAfterDead;
 
         #endregion
 
         #region Get Operations
 
         bool IsMine(Player player);
+        bool IsMine(Card card);
+        bool IsMine(ulong id);
         bool IsMyTurn();
         GameData GetGameData();
+        ICreatureView GetCreature(ulong clientID, string cardUID);
         Sprite GetPortrait(int index);
 
         #endregion
@@ -55,6 +64,7 @@ namespace Marsion.Client
         void PlayAndSpawnCard(Card card, int index);
         bool TryPlayCard(Card card);
         void TurnEnd();
+        void TryAttack(Card attacker, Card defender);
 
         #endregion
 
@@ -68,6 +78,11 @@ namespace Marsion.Client
         void DrawCardRpc(ulong clientID, string cardUID);
         void PlayCardRpc(ulong clientID, string cardUID);
         void SpawnCardRpc(ulong clientID, string cardUID, int index);
+
+        void BeforeDeadCardRpc();
+        void AfterDeadCardRpc();
+
+        void StartAttackRpc(ulong attackClientID, string attackerUID, ulong defendClientID, string defenderUID);
 
         #endregion
     }

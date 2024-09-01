@@ -1,4 +1,6 @@
-﻿namespace Marsion.CardView
+﻿using System;
+
+namespace Marsion.CardView
 {
     public abstract class BaseCardViewState : IState
     {
@@ -8,6 +10,7 @@
         protected ICardView Handler { get; }
         protected BaseStateMachine FSM { get; }
         protected CardViewParameters Parameters { get; }
+        public Action OnComplete { get; set; }
 
         #endregion
 

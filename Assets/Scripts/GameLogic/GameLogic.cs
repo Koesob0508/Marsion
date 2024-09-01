@@ -17,6 +17,8 @@ namespace Marsion.Logic
 
         private void UpdateData()
         {
+            Managers.Logger.Log<GameLogic>("Data update", colorName: "yellow");
+
             OnDataUpdated?.Invoke();
         }
 
@@ -29,11 +31,14 @@ namespace Marsion.Logic
         public event UnityAction OnGameStarted;
         public event UnityAction OnTurnStarted;
         public event UnityAction OnTurnEnded;
-        public event UnityAction  OnGameEnded;
+        public event UnityAction OnGameEnded;
 
         public event UnityAction<Player, Card> OnCardDrawn;
-        public event UnityAction <Player, Card> OnCardPlayed;
-        public event UnityAction <Player, Card, int> OnCardSpawned;
+        public event UnityAction<Player, Card> OnCardPlayed;
+        public event UnityAction<Player, Card, int> OnCardSpawned;
+        public event UnityAction<Card, Card> OnStartAttack;
+        public event UnityAction OnCardBeforeDead;
+        public event UnityAction OnCardAfterDead;
 
         public GameData GetGameData()
         {
@@ -46,14 +51,13 @@ namespace Marsion.Logic
             foreach (var player in _gameData.Players)
             {
                 ShuffleDeck(player.Deck);
-                Managers.Logger.Log<GameLogic>("Draw");
                 for(int i = 0; i < 3; i++)
                     DrawCard(player);
             }
 
             _gameData.CurrentPlayer = _gameData.GetPlayer(0);
 
-            Managers.Logger.Log<GameLogic>("Game Start");
+            Managers.Logger.Log<GameLogic>("Game start", colorName : "yellow");
             UpdateData();
             OnGameStarted?.Invoke();
 
@@ -62,12 +66,15 @@ namespace Marsion.Logic
 
         public void EndGame()
         {
+            Managers.Logger.Log<GameLogic>("Game end", colorName: "yellow");
             OnGameEnded?.Invoke();
         }
 
         public void StartTurn()
         {
-            if(_gameData.TurnCount != 0)
+            Managers.Logger.Log<GameLogic>("Turn start", colorName: "yellow");
+
+            if (_gameData.TurnCount != 0)
                 DrawCard(GetGameData().CurrentPlayer);
 
             _gameData.TurnCount++;
@@ -78,6 +85,8 @@ namespace Marsion.Logic
 
         public void EndTurn()
         {
+            Managers.Logger.Log<GameLogic>("Turn end", colorName: "yellow");
+
             _gameData.CurrentPlayer = _gameData.CurrentPlayer == _gameData.GetPlayer(0) ? _gameData.GetPlayer(1) : _gameData.GetPlayer(0);
 
             UpdateData();
@@ -104,6 +113,8 @@ namespace Marsion.Logic
 
         public void DrawCard(Player player)
         {
+            Managers.Logger.Log<GameLogic>("Card draw", colorName: "yellow");
+
             Card card = null;
 
             if (player.Deck.Count > 0 && player.Hand.Count < 10)
@@ -117,12 +128,14 @@ namespace Marsion.Logic
             }
             else
             {
-                Managers.Logger.Log<GameLogic>("Can't draw");
+                Managers.Logger.Log<GameLogic>("Can't draw", colorName: "yellow");
             }
         }
 
         public void PlayCard(Player player, Card card)
         {
+            Managers.Logger.Log<GameLogic>("Card play", colorName: "yellow");
+
             player.Hand.Remove(card);
 
             UpdateData();
@@ -131,6 +144,8 @@ namespace Marsion.Logic
 
         public void SpanwCard(Player player, Card card, int index)
         {
+            Managers.Logger.Log<GameLogic>("Card spawn", colorName: "yellow");
+
             player.Field.Insert(index, card);
 
             UpdateData();
@@ -145,6 +160,57 @@ namespace Marsion.Logic
             UpdateData();
             OnCardPlayed?.Invoke(player, card);
             OnCardSpawned?.Invoke(player, card, index);
+        }
+
+        public void TryAttack(Player attackPlayer, Card attacker, Player defenderPlayer, Card defender)
+        {
+            Managers.Logger.Log<GameLogic>("Card attack", colorName: "yellow");
+            // 각 Player Field 확인해서 조건 검색
+
+            Damage(attacker, defender);
+            OnDataUpdated?.Invoke();
+            OnStartAttack?.Invoke(attacker, defender);
+
+            CheckDeadCard();
+            OnDataUpdated?.Invoke();
+            OnCardBeforeDead?.Invoke();
+            OnCardAfterDead?.Invoke();
+            //RemoveDeadCard();
+            //OnDataUpdated?.Invoke();
+        }
+
+        private void Damage(IDamageable attacker, IDamageable defender)
+        {
+            attacker.Damage(defender.Attack);
+            defender.Damage(attacker.Attack);
+        }
+
+        private void CheckDeadCard()
+        {
+            foreach(Player player in _gameData.Players)
+            {
+                foreach(Card card in player.Field)
+                {
+                    if (card.HP <= 0)
+                    {
+                        card.Die();
+                    }
+                }
+            }
+        }
+
+        private void RemoveDeadCard()
+        {
+            foreach (Player player in _gameData.Players)
+            {
+                for (int i = player.Field.Count - 1; i >= 0; i--)
+                {
+                    if (player.Field[i].IsDead)
+                    {
+                        player.Field.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         #endregion

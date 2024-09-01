@@ -24,7 +24,6 @@ namespace Marsion
                 log = string.Format("[" + context + OpenColor + log + CloseColor + GetTypeName(param), colorName);
                 Debug.Log(log);
             }
-
         }
 
         public void LogWarning<T>(object log, string colorName = "black", Type param = null)
@@ -47,6 +46,26 @@ namespace Marsion
                 Debug.LogError(log);
             }
 
+        }
+
+        public void LogPointer<T>(object log, string colorName = "yellow", Type param = null)
+        {
+            if (AreLogsEnabled)
+            {
+                var context = GetTypeName(typeof(T));
+                log = string.Format("[" + context + OpenColor + log + CloseColor + GetTypeName(param), colorName);
+                // Debug.Log(log);
+            }
+        }
+
+        public void LogState<T>(object log, string colorName = "yellow", Type param = null) where T : BaseStateMachine
+        {
+            if (AreLogsEnabled)
+            {
+                var context = GetTypeName(typeof(T));
+                log = string.Format("[" + context + OpenColor + log + CloseColor + GetTypeName(param), colorName);
+                Debug.Log(log);
+            }
         }
 
         #endregion

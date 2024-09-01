@@ -13,6 +13,8 @@ namespace Marsion.CardView
                 float targetX = (cards.Length - 1) * -1.125f + i * 2.25f;
                 var targetCard = cards[i];
 
+                if (!targetCard.FSM.IsCurrent<CreatureViewIdle>()) continue;
+
                 targetCard.OriginPosition = new Vector3(targetX, targetY, 0f);
                 targetCard.MoveTransform(targetCard.OriginPosition, true, 0.5f);
                 targetCard.Order.SetOriginOrder(i);

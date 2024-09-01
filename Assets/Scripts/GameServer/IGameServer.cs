@@ -11,6 +11,7 @@ namespace Marsion.Server
         void PlayCardRpc(ulong clientID, string cardUID);
         void PlayAndSpawnCardRpc(ulong clientID, string cardUID, int index);
         void TurnEndRpc();
+        void TryAttackRpc(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID);
 
         void DrawButtonRpc(ulong clientID);
     }

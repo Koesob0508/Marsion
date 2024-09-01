@@ -7,6 +7,7 @@ public class Order : MonoBehaviour
     [SerializeField] Renderer[] AbilityRenderers;
     [SerializeField] Renderer[] FrontRenderers;
     [SerializeField] Renderer[] TextRenderers;
+    [SerializeField] Renderer[] MostFrontRenderers;
     [SerializeField] string SortingLayerName;
     [SerializeField] int OriginOrder;
 
@@ -41,6 +42,12 @@ public class Order : MonoBehaviour
         {
             renderer.sortingLayerName = SortingLayerName;
             renderer.sortingOrder = mulOrder + 4;
+        }
+
+        foreach(var renderer in MostFrontRenderers)
+        {
+            renderer.sortingLayerName = SortingLayerName;
+            renderer.sortingOrder = mulOrder + 5;
         }
     }
 

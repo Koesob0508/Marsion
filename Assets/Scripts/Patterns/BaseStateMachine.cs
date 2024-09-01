@@ -7,8 +7,8 @@ namespace Marsion
     {
         #region Constructor
 
-        public IFsmHandler Handler { get; set; }
-        protected BaseStateMachine(IFsmHandler handler = null) => Handler = handler;
+        public IFSMHandler Handler { get; set; }
+        protected BaseStateMachine(IFSMHandler handler = null) => Handler = handler;
 
         #endregion
 
@@ -33,7 +33,7 @@ namespace Marsion
 
             var type = state.GetType();
             register.Add(type, state);
-            Managers.Logger.Log<BaseStateMachine>($"{Handler.Name}, Registered : ", "black", type);
+            Managers.Logger.LogState<BaseStateMachine>($"{Handler.Name}, Registered : ", "black", type);
         }
 
         public void Initialize()
@@ -47,7 +47,7 @@ namespace Marsion
 
             OnAfterInitialize();
 
-            Managers.Logger.Log<BaseStateMachine>($"{Handler.Name}, Initialized! ", "yellow");
+            Managers.Logger.LogState<BaseStateMachine>($"{Handler.Name}, Initialized! ", "yellow");
         }
 
         protected virtual void OnBeforeInitialize() { }
@@ -60,10 +60,11 @@ namespace Marsion
 
         public void Update() => Current?.OnUpdate();
 
-        public void PushState<T>(bool isSilent = false) where T : IState
+        public void PushState<T>(Action onComplete = null, bool isSilent = false) where T : IState
         {
             var stateType = typeof(T);
             var state = register[stateType];
+            state.OnComplete = onComplete;
 
             PushState(state, isSilent);
         }
@@ -81,7 +82,7 @@ namespace Marsion
             stack.Push(state);
             state.OnEnterState();
 
-            Managers.Logger.Log<BaseStateMachine>($"{Handler.Name}, {stack.Count}, Push state : ", "green", type);
+            Managers.Logger.LogState<BaseStateMachine>($"{Handler.Name}, {stack.Count}, Push state : ", "green", type);
         }
 
         public void PopState(bool isSilent = false)
@@ -90,13 +91,13 @@ namespace Marsion
 
             var state = stack.Pop();
 
-            Managers.Logger.Log<BaseStateMachine>($"{Handler.Name}, {stack.Count}, Pop state : ", "purple", state.GetType());
+            Managers.Logger.LogState<BaseStateMachine>($"{Handler.Name}, {stack.Count}, Pop state : ", "purple", state.GetType());
             state.OnExitState();
 
             if (!isSilent)
             {
                 Current?.OnEnterState();
-                Managers.Logger.Log<BaseStateMachine>($"Current State : ", "purple", Current.GetType());
+                Managers.Logger.LogState<BaseStateMachine>($"Current State : ", "purple", Current.GetType());
             }
         }
 

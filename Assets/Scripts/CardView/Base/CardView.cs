@@ -4,7 +4,7 @@ using System;
 
 namespace Marsion.CardView
 {
-    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(IMouseInput))]
     public class CardView : MonoBehaviour, ICardView
     {
@@ -16,6 +16,8 @@ namespace Marsion.CardView
         [SerializeField] TMP_Text Text_Attack;
         [SerializeField] TMP_Text Text_Health;
         [SerializeField] SpriteRenderer CardSprite;
+        [SerializeField] GameObject hoverImage;
+        [SerializeField] GameObject backImage;
 
         #endregion
 
@@ -27,12 +29,11 @@ namespace Marsion.CardView
         public string Name => gameObject.name;
         public MonoBehaviour MonoBehaviour => this;
         public CardViewFsm FSM { get; private set; }
-        public Transform Transform { get; set; }
-        public Collider Collider { get; set; }
+        public Transform Transform { get; private set; }
+        public Collider2D Collider { get; private set; }
         public IMouseInput Input { get; private set; }
         public Order Order { get; private set; }
-        [SerializeField] private GameObject hoverImage;
-        [SerializeField] private GameObject backImage;
+        
         public GameObject FrontImage { get => hoverImage; }
         public GameObject BackImage { get => backImage; }
 
@@ -47,7 +48,7 @@ namespace Marsion.CardView
         private void Awake()
         {
             Transform = transform;
-            Collider = GetComponent<Collider>();
+            Collider = GetComponent<Collider2D>();
 
             Input = GetComponent<IMouseInput>();
             Order = GetComponent<Order>();
@@ -78,7 +79,7 @@ namespace Marsion.CardView
             Text_Mana.text = Card.Mana.ToString();
             Text_AbilityExplain.text = Card.AbilityExplain;
             Text_Attack.text = Card.Attack.ToString();
-            Text_Health.text = Card.Health.ToString();
+            Text_Health.text = Card.HP.ToString();
             CardSprite.sprite = Managers.Resource.Load<Sprite>(Card.FullArtPath);
         }
 

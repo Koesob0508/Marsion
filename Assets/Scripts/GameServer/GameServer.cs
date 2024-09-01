@@ -52,6 +52,15 @@ namespace Marsion.Server
 
                 Logic.OnCardSpawned -= CardSpawned;
                 Logic.OnCardSpawned += CardSpawned;
+
+                Logic.OnStartAttack -= StartAttack;
+                Logic.OnStartAttack += StartAttack;
+
+                Logic.OnCardBeforeDead -= CardBeforeDead;
+                Logic.OnCardBeforeDead += CardBeforeDead;
+
+                Logic.OnCardAfterDead -= CardAfterDead;
+                Logic.OnCardAfterDead += CardAfterDead;
             }
         }
 
@@ -88,6 +97,8 @@ namespace Marsion.Server
 
         private void ClientConnected(ulong clientId)
         {
+            Managers.Logger.Log<GameServer>("Client connected");
+
             if (!IsHost)
             {
                 Clear();
@@ -109,6 +120,7 @@ namespace Marsion.Server
             gameData = Logic.GetGameData();
             NetworkGameData networkData = new NetworkGameData();
             networkData.gameData = gameData;
+
             Managers.Client.UpdateDataRpc(networkData);
         }
 
@@ -147,6 +159,21 @@ namespace Marsion.Server
             Managers.Client.SpawnCardRpc(player.ClientID, card.UID, index);
         }
 
+        private void CardBeforeDead()
+        {
+            Managers.Client.BeforeDeadCardRpc();
+        }
+
+        private void CardAfterDead()
+        {
+            Managers.Client.AfterDeadCardRpc();
+        }
+
+        private void StartAttack(Card attacker, Card defender)
+        {
+            Managers.Client.StartAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
+        }
+
         #endregion
 
         /// <summary>
@@ -157,6 +184,8 @@ namespace Marsion.Server
         [Rpc(SendTo.Server)]
         private void CheckConnectionRpc()
         {
+            Managers.Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsList.Count}");
+
             if (AreAllPlayersConnected())
             {
                 Managers.Logger.Log<GameServer>($"Ready to start");
@@ -199,6 +228,17 @@ namespace Marsion.Server
         public void TurnEndRpc()
         {
             Logic.EndTurn();
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TryAttackRpc(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
+        {
+            Player attackPlayer = GetPlayer(attackerID);
+            Card attacker = attackPlayer.GetCard(attackPlayer.Field, attackerUID);
+            Player defendPlayer = GetPlayer(defenderID);
+            Card defender = defendPlayer.GetCard(defendPlayer.Field, defenderUID);
+
+            Logic.TryAttack(attackPlayer, attacker, defendPlayer, defender);
         }
 
         private bool AreAllPlayersConnected()

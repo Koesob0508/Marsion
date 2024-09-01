@@ -26,12 +26,12 @@ namespace Marsion.CardView
             if (Managers.Client.IsMine(player))
             {
                 var cardObject = Instantiate(cardPrefab);
-                Managers.Logger.Log<DeckView>($"UID : {card.UID}");
+    
                 cardObject.Card = card;
                 cardObject.FrontImage.SetActive(true);
                 cardObject.BackImage.SetActive(false);
                 cardObject.transform.position = transform.position;
-                cardObject.name = $"Card";
+                cardObject.name = $"Card_{hand.Cards.Count}";
                 cardObject.Setup();
                 hand.AddCard(cardObject);
             }
