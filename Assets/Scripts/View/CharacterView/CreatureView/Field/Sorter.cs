@@ -2,9 +2,9 @@
 
 namespace Marsion.CardView
 {
-    public class Aligner : MonoBehaviour
+    public class Sorter : MonoBehaviour
     {
-        public void Align(ICreatureView[] cards)
+        public void Sort(ICreatureView[] cards)
         {
             float targetY = gameObject.transform.position.y;
 
@@ -15,8 +15,7 @@ namespace Marsion.CardView
 
                 if (!targetCard.FSM.IsCurrent<CreatureViewIdle>()) continue;
 
-                targetCard.OriginPosition = new Vector3(targetX, targetY, 0f);
-                targetCard.MoveTransform(targetCard.OriginPosition, true, 0.5f);
+                targetCard.MoveTransform(new Vector3(targetX, targetY, 0f), true, 0.5f);
                 targetCard.Order.SetOriginOrder(i);
             }
         }

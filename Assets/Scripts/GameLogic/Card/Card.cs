@@ -19,6 +19,13 @@ namespace Marsion
         public int HP { get; private set; }
         public bool IsDead { get; private set; }
 
+        public Card(ulong playerID)
+        {
+            PlayerID = playerID;
+            UID = Guid.NewGuid().ToString();
+            IsDead = false;
+        }
+
         public Card(ulong playerID, CardSO so)
         {
             PlayerID = playerID;

@@ -5,7 +5,7 @@ namespace Marsion.CardView
 {
     public class CreatureViewDead : BaseCreatureViewState
     {
-        public CreatureViewDead(ICreatureView handler, CreatureViewFSM fsm) : base(handler, fsm) { }
+        public CreatureViewDead(ICharacterView handler, CharacterViewFSM fsm) : base(handler, fsm) { }
 
         public override void OnEnterState()
         {

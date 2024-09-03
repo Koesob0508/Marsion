@@ -71,6 +71,10 @@ namespace Marsion.Server
                 Managers.Network.OnClientConnectedCallback -= ClientConnected;
                 Managers.Network.OnClientConnectedCallback += ClientConnected;
             }
+            else
+            {
+                Managers.Logger.Log<GameServer>("Network is null", colorName: "yellow");
+            }
         }
 
         public void Clear()

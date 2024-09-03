@@ -4,7 +4,7 @@ namespace Marsion.CardView
 {
     public class CreatureViewIdle : BaseCreatureViewState
     {
-        public CreatureViewIdle(ICreatureView handler, CreatureViewFSM fsm) : base(handler, fsm) { }
+        public CreatureViewIdle(ICharacterView handler, CharacterViewFSM fsm) : base(handler, fsm) { }
 
         #region State Operations
 

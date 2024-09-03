@@ -9,7 +9,7 @@ namespace Marsion.CardView
         Vector3 DefaultSize = Vector3.one;
         Vector3 HoverSize = new Vector3(2, 2, 1);
 
-        public CreatureViewSpawn(ICreatureView handler, CreatureViewFSM fsm) : base(handler, fsm) { }
+        public CreatureViewSpawn(ICharacterView handler, CharacterViewFSM fsm) : base(handler, fsm) { }
 
         public override void OnInitialize()
         {

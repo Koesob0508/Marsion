@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Marsion.CardView
 {
-    [RequireComponent(typeof(Aligner))]
+    [RequireComponent(typeof(Sorter))]
     public class FieldView : MonoBehaviour, IFieldView
     {
         [SerializeField] CreatureView EmptyCreaturePrefab;
@@ -19,9 +19,7 @@ namespace Marsion.CardView
         public bool IsFullField => Creatures.Count >= MAX_CARD_COUNT && !IsExistEmptyCard;
         public int EmptyCreatureIndex => Creatures.FindIndex(x => (Object)x == EmptyCreature);
 
-        private Vector3 lastMousePosition;
-
-        Aligner Aligner => GetComponent<Aligner>();
+        Sorter Sorter => GetComponent<Sorter>();
 
         private void Start()
         {
@@ -34,11 +32,12 @@ namespace Marsion.CardView
             Creatures = new List<ICreatureView>();
 
             EmptyCreature = Instantiate(EmptyCreaturePrefab, transform);
+            EmptyCreature.Init(null);
         }
 
         private void Update()
         {
-            Aligner.Align(Creatures.ToArray());
+            Sorter.Sort(Creatures.ToArray());
         }
 
         public void InsertEmptyCard(float x)
@@ -81,7 +80,7 @@ namespace Marsion.CardView
                 Creatures.Insert(index, creature);
             }
 
-            creature.Setup(card);
+            creature.Init(card);
             creature.Spawn();
         }
 
@@ -106,14 +105,9 @@ namespace Marsion.CardView
             removeObjects.Clear();
         }
 
-        public ICreatureView GetCreature(Card card)
+        public ICharacterView GetCreature(Card card)
         {
             return Creatures.Find(x => x.Card.UID == card.UID);
-        }
-
-        public void SetLastMousePosition(Vector3 position)
-        {
-            lastMousePosition = position;
         }
     }
 }

@@ -75,7 +75,7 @@ namespace Marsion.Client
             return _gameData;
         }
 
-        public ICreatureView GetCreature(ulong clientID, string cardUID)
+        public ICharacterView GetCreature(ulong clientID, string cardUID)
         {
             if (IsMine(clientID))
             {
@@ -92,6 +92,23 @@ namespace Marsion.Client
             return PortraitSprites[index];
         }
 
+        public Card GetCard(CardType type, ulong clientID, string cardUID)
+        {
+            Card result = null;
+
+            switch(type)
+            {
+                case CardType.Hero:
+                    result = GetGameData().GetPlayer(clientID).PlayerCard;
+                    break;
+                case CardType.Field:
+                    result = GetGameData().GetFieldCard(clientID, cardUID);
+                    break;
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region Manager Operations
@@ -102,6 +119,10 @@ namespace Marsion.Client
             {
                 Managers.Network.OnClientConnectedCallback -= SetClientID;
                 Managers.Network.OnClientConnectedCallback += SetClientID;
+            }
+            else
+            {
+                Managers.Logger.Log<GameClient>("Network is null", colorName: "yellow");
             }
 
             ClientSequence = new MyTween.MainSequence();

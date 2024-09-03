@@ -8,6 +8,7 @@ namespace Marsion
     {
         public ulong ClientID { get; private set; }
 
+        public Card PlayerCard;
         public int Portrait;
 
         public List<Card> Deck = new List<Card>();
@@ -18,6 +19,7 @@ namespace Marsion
         public Player(int clientID)
         {
             ClientID = (ulong)clientID;
+            PlayerCard = new Card(ClientID);
         }
 
         public string LogPile(List<Card> pile)

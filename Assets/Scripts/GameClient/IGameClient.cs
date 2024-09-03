@@ -43,8 +43,10 @@ namespace Marsion.Client
         bool IsMine(ulong id);
         bool IsMyTurn();
         GameData GetGameData();
-        ICreatureView GetCreature(ulong clientID, string cardUID);
+        ICharacterView GetCreature(ulong clientID, string cardUID);
         Sprite GetPortrait(int index);
+
+        Card GetCard(CardType type, ulong clientID, string cardUID);
 
         #endregion
 

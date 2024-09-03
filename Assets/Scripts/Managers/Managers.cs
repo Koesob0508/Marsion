@@ -8,7 +8,14 @@ namespace Marsion
     public class Managers : MonoBehaviour
     {
         static Managers s_instance;
-        public static Managers Instance { get { Init(); return s_instance; } }
+        public static Managers Instance
+        {
+            get
+            {
+                Init();
+                return s_instance;
+            }
+        }
 
         [SerializeField] GameServer _server;
         [SerializeField] GameClient _client;

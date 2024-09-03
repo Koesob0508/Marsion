@@ -11,7 +11,7 @@ namespace Marsion.CardView
         Vector3 DefaultSize = Vector3.one;
         Vector3 HoverSize = new Vector3(1.5f, 1.5f, 1);
 
-        public CreatureViewSelect(ICreatureView handler, CreatureViewFSM fsm) : base(handler, fsm) { }
+        public CreatureViewSelect(ICharacterView handler, CharacterViewFSM fsm) : base(handler, fsm) { }
 
         #region State Operations
 
@@ -24,7 +24,7 @@ namespace Marsion.CardView
 
         public override void OnEnterState()
         {
-            FSM.ActivatePointer("CreatureView", OnPointerUp);
+            FSM.ActivatePointer("Pointable", OnPointerUp);
             Handler.Order.SetMostFrontOrder(true);
             Handler.Transform.DOScale(HoverSize, 0.2f);
         }
@@ -46,13 +46,13 @@ namespace Marsion.CardView
             }
             else
             {
-                ICreatureView target = foundObject.GetComponent<CreatureView>();
+                ICharacterView target = foundObject.GetComponent<CreatureView>();
 
                 if (Handler.Card.PlayerID != target.Card.PlayerID)
                 {
                     FSM.Target = foundObject;
                     FSM.PopState();
-                    Managers.Client.TryAttack(Handler.Card, foundObject.GetComponent<ICreatureView>().Card);
+                    Managers.Client.TryAttack(Handler.Card, foundObject.GetComponent<ICharacterView>().Card);
                 }
                 else
                 {

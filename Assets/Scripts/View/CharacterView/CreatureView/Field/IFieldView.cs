@@ -6,6 +6,6 @@
         int EmptyCreatureIndex { get; }
         void InsertEmptyCard(float x);
         void RemoveEmptyCard();
-        ICreatureView GetCreature(Card card);
+        ICharacterView GetCreature(Card card);
     }
 }

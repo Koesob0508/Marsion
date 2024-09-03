@@ -12,7 +12,7 @@ namespace Marsion.CardView
         Vector3 OriginalPosition;
         Quaternion OriginalRotation;
 
-        public CreatureViewAttack(ICreatureView handler, CreatureViewFSM fsm) : base(handler, fsm) { }
+        public CreatureViewAttack(ICharacterView handler, CharacterViewFSM fsm) : base(handler, fsm) { }
 
         public override void OnEnterState()
         {
@@ -36,7 +36,7 @@ namespace Marsion.CardView
                 .OnComplete(() =>
                 {
                     Handler.UpdateStatus();
-                    FSM.Target.GetComponent<ICreatureView>().UpdateStatus();
+                    FSM.Target.GetComponent<ICharacterView>().UpdateStatus();
                 });
 
             backSequence = DOTween.Sequence().Pause()

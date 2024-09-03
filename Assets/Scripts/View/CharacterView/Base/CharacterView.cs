@@ -1,7 +1,6 @@
 ﻿using DG.Tweening;
 using Marsion.Tool;
 using System;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -9,9 +8,8 @@ namespace Marsion.CardView
 {
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(IMouseInput))]
-    public class CreatureView : MonoBehaviour, ICreatureView
+    public class CharacterView : MonoBehaviour, ICharacterView
     {
-
         #region UI Properties
 
         [SerializeField] TMP_Text Text_Attack;
@@ -22,11 +20,12 @@ namespace Marsion.CardView
         #endregion
 
         [SerializeField] bool IsEmpty;
+        [SerializeField] CardType Type;
 
         public Vector3 OriginPosition { get; set; }
         public Card Card { get; private set; }
         public MonoBehaviour MonoBehaviour => this;
-        public CreatureViewFSM FSM { get; private set; }
+        public CharacterViewFSM FSM { get; private set; }
         public Transform Transform { get; private set; }
         public Collider2D Collider { get; private set; }
         public IMouseInput Input { get; private set; }
@@ -36,7 +35,7 @@ namespace Marsion.CardView
 
         #region Unity Callbacks
 
-        private void Awake()
+        private void Start()
         {
             Transform = transform;
             Collider = GetComponent<Collider2D>();
@@ -44,11 +43,8 @@ namespace Marsion.CardView
             Input = GetComponent<IMouseInput>();
             Order = GetComponent<Order>();
 
-            FSM = new CreatureViewFSM(this);
-        }
+            FSM = new CharacterViewFSM(this);
 
-        private void Start()
-        {
             if (IsEmpty) return;
 
             Managers.Client.OnDataUpdated -= UpdateCard;
@@ -68,7 +64,7 @@ namespace Marsion.CardView
 
         #endregion
 
-        public void Setup(Card card)
+        public void Init(Card card)
         {
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
@@ -79,11 +75,9 @@ namespace Marsion.CardView
             CardSprite.sprite = Managers.Resource.Load<Sprite>(card.BoardArtPath);
         }
 
-        public void Spawn() => FSM.PushState<CreatureViewSpawn>();
-
         public void UpdateCard()
         {
-            Card = Managers.Client.GetGameData().GetFieldCard(Card.PlayerID, Card.UID);
+            Card = Managers.Client.GetCard(Type, Card.PlayerID, Card.UID);
         }
 
         public void UpdateStatus()
@@ -92,7 +86,7 @@ namespace Marsion.CardView
             Text_Health.text = Card.HP.ToString();
         }
 
-        public void Attack(MyTween.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        private void Attack(MyTween.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
             if (Card.UID != attacker.UID) return;
 
@@ -107,7 +101,7 @@ namespace Marsion.CardView
             sequence.Append(attackTask);
         }
 
-        public void CheckDead(MyTween.Sequence sequence)
+        private void CheckDead(MyTween.Sequence sequence)
         {
             if (!Card.IsDead) return;
 
@@ -131,8 +125,7 @@ namespace Marsion.CardView
         public override bool Equals(object obj)
         {
             return obj is CreatureView view &&
-                   base.Equals(obj) &&
-                   EqualityComparer<Card>.Default.Equals(Card, view.Card);
+                   Card.Equals(view.Card);
         }
 
         public override int GetHashCode()

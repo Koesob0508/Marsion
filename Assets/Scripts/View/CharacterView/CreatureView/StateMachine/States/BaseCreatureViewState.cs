@@ -5,11 +5,11 @@ namespace Marsion.CardView
     public class BaseCreatureViewState : IState
     {
         public bool IsInitialized { get; }
-        protected ICreatureView Handler { get; }
-        protected CreatureViewFSM FSM { get; }
+        protected ICharacterView Handler { get; }
+        protected CharacterViewFSM FSM { get; }
         public Action OnComplete { get; set; }
 
-        protected BaseCreatureViewState(ICreatureView handler, CreatureViewFSM fsm)
+        protected BaseCreatureViewState(ICharacterView handler, CharacterViewFSM fsm)
         {
             Handler = handler;
             FSM = fsm;

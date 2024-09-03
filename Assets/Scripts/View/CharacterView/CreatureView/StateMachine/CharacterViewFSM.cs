@@ -3,9 +3,9 @@ using UnityEngine.Events;
 
 namespace Marsion.CardView
 {
-    public class CreatureViewFSM : BaseStateMachine
+    public class CharacterViewFSM : BaseStateMachine
     {
-        private new ICreatureView Handler { get; }
+        private new ICharacterView Handler { get; }
         private CreatureViewSpawn SpawnState { get; }
         private CreatureViewIdle IdleState { get; }
         private CreatureViewSelect SelectState { get; }
@@ -14,7 +14,7 @@ namespace Marsion.CardView
 
         public GameObject Target;
 
-        public CreatureViewFSM(ICreatureView handler = null) : base(handler)
+        public CharacterViewFSM(ICharacterView handler = null) : base(handler)
         {
             Handler = handler;
 
