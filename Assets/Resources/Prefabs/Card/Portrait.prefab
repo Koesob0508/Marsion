@@ -95,7 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9002453084408395184}
-  - component: {fileID: 6400313921351991303}
+  - component: {fileID: 2755206691652567768}
   - component: {fileID: 8849483693644199270}
   - component: {fileID: 9053879177216039261}
   - component: {fileID: 5811739093314079757}
@@ -126,7 +126,7 @@ Transform:
   - {fileID: 5386706461318804672}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6400313921351991303
+--- !u!114 &2755206691652567768
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -135,14 +135,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4367174524156641509}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48198dc74cecfaf44b1da0e88c118fe3, type: 3}
+  m_Script: {fileID: 11500000, guid: e469a0174ea932543b32d9870987c39b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Text_Attack: {fileID: 1795495379086723405}
   Text_Health: {fileID: 2936331677650446171}
   CardSprite: {fileID: 4135621811233612057}
   pointer: {fileID: 6477960403040080293}
-  IsEmpty: 0
+  Type: 0
 --- !u!114 &8849483693644199270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,7 +166,8 @@ MonoBehaviour:
   TextRenderers:
   - {fileID: 5894231542727485798}
   - {fileID: 7964900728619786161}
-  MostFrontRenderers: []
+  MostFrontRenderers:
+  - {fileID: 5819134834504495836}
   SortingLayerName: Hero
   OriginOrder: 0
 --- !u!61 &9053879177216039261

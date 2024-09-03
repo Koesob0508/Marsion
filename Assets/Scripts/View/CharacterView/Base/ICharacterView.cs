@@ -14,7 +14,8 @@ namespace Marsion.CardView
         Pointer Pointer { get; }
 
         void Init(Card card);
-
+        void Clear();
+        void Spawn();
         void UpdateStatus();
     }
 }

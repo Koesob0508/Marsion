@@ -40,6 +40,11 @@ namespace Marsion
             IsDead = false;
         }
 
+        public void SetHP(int amount)
+        {
+            HP = amount;
+        }
+
         public void Damage(int amount)
         {
             HP -= amount;

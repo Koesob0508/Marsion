@@ -31,8 +31,8 @@ namespace Marsion.Client
         event UnityAction<Player, string> OnCardPlayed;
         event UnityAction<Player, Card, int> OnCardSpawned;
         event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
-        event Action<MyTween.Sequence> OnCreatureBeforeDead;
-        event UnityAction OnCreatureAfterDead;
+        event Action<MyTween.Sequence> OnCharacterBeforeDead;
+        event UnityAction OnCharacterAfterDead;
 
         #endregion
 
@@ -74,7 +74,7 @@ namespace Marsion.Client
 
         void UpdateDataRpc(NetworkGameData networkData);
         void StartGameRpc();
-        void EndGameRpc();
+        void EndGameRpc(int clientID);
         void StartTurnRpc();
         void EndTurnRpc();
         void DrawCardRpc(ulong clientID, string cardUID);

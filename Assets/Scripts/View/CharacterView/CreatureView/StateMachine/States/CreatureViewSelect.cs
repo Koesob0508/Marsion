@@ -18,8 +18,6 @@ namespace Marsion.CardView
         public override void OnInitialize()
         {
             sequence = DOTween.Sequence();
-
-
         }
 
         public override void OnEnterState()

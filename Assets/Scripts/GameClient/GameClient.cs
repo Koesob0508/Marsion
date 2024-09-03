@@ -24,6 +24,8 @@ namespace Marsion.Client
         [SerializeField] HandView hand;
         [SerializeField] FieldView playerField;
         [SerializeField] FieldView enemyField;
+        [SerializeField] HeroView PlayerHero;
+        [SerializeField] HeroView EnemyHero;
 
         public ulong ID { get; private set; }
         public IHandView Hand { get => hand; }
@@ -43,8 +45,8 @@ namespace Marsion.Client
         public event UnityAction<Player, string> OnCardPlayed;
         public event UnityAction<Player, Card, int> OnCardSpawned;
         public event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
-        public event Action<MyTween.Sequence> OnCreatureBeforeDead;
-        public event UnityAction OnCreatureAfterDead;
+        public event Action<MyTween.Sequence> OnCharacterBeforeDead;
+        public event UnityAction OnCharacterAfterDead;
 
         #endregion
 
@@ -99,7 +101,7 @@ namespace Marsion.Client
             switch(type)
             {
                 case CardType.Hero:
-                    result = GetGameData().GetPlayer(clientID).PlayerCard;
+                    result = GetGameData().GetPlayer(clientID).Card;
                     break;
                 case CardType.Field:
                     result = GetGameData().GetFieldCard(clientID, cardUID);
@@ -187,6 +189,24 @@ namespace Marsion.Client
             gameStartTask.Action = () =>
             {
                 Managers.Logger.Log<GameClient>("Game Start");
+
+                // 여기에 Start와 관련한 작업이 들어가야한다.
+                // 예를 들면, Player Hero와 Enemy Hero에 대해 Card를 넣는다던지.
+
+                foreach(var player in GetGameData().Players)
+                {
+                    if(ID == player.ClientID)
+                    {
+                        PlayerHero.Init(player.Card);
+                        PlayerHero.Spawn();
+                    }
+                    else
+                    {
+                        EnemyHero.Init(player.Card);
+                        EnemyHero.Spawn();
+                    }
+                }
+
                 OnGameStarted?.Invoke();
                 gameStartTask.OnComplete?.Invoke();
             };
@@ -219,7 +239,7 @@ namespace Marsion.Client
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void EndGameRpc()
+        public void EndGameRpc(int clientID)
         {
             MyTween.Sequence gameEndSequence = new MyTween.Sequence();
             MyTween.Task gameEndTask = new MyTween.Task();
@@ -227,6 +247,17 @@ namespace Marsion.Client
             gameEndTask.Action = () =>
             {
                 Managers.Logger.Log<GameClient>("Game end.");
+
+                if (clientID == -1)
+                    Managers.Logger.Log<GameClient>("무승부");
+                else
+                {
+                    if ((ulong)clientID == ID)
+                        Managers.Logger.Log<GameClient>("승리");
+                    else
+                        Managers.Logger.Log<GameClient>("패배");
+                }
+
                 OnGameEnded?.Invoke();
                 gameEndTask.OnComplete?.Invoke();
             };
@@ -350,7 +381,7 @@ namespace Marsion.Client
 
             deadTask.Action = () =>
             {
-                OnCreatureBeforeDead?.Invoke(beforeDeadSequence);
+                OnCharacterBeforeDead?.Invoke(beforeDeadSequence);
                 deadTask.OnComplete?.Invoke();
             };
 
@@ -368,7 +399,7 @@ namespace Marsion.Client
 
             afterDeadTask.Action = () =>
             {
-                OnCreatureAfterDead?.Invoke();
+                OnCharacterAfterDead?.Invoke();
                 afterDeadTask.OnComplete?.Invoke();
             };
 
@@ -383,8 +414,8 @@ namespace Marsion.Client
         {
             Player attackPlayer = GetGameData().GetPlayer(attackClientID);
             Player defendPlayer = GetGameData().GetPlayer(defendClientID);
-            Card attacker = GetGameData().GetFieldCard(attackClientID, attackerUID);
-            Card defender = GetGameData().GetFieldCard(defendClientID, defenderUID);
+            Card attacker = attackPlayer.GetCard(attackerUID);
+            Card defender = defendPlayer.GetCard(defenderUID);
 
             MyTween.Sequence attackSequence = new MyTween.Sequence();
             MyTween.Task attackLog = new MyTween.Task();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NUnit.Framework.Constraints;
+using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
@@ -31,7 +32,7 @@ namespace Marsion.Logic
         public event UnityAction OnGameStarted;
         public event UnityAction OnTurnStarted;
         public event UnityAction OnTurnEnded;
-        public event UnityAction OnGameEnded;
+        public event UnityAction<int> OnGameEnded;
 
         public event UnityAction<Player, Card> OnCardDrawn;
         public event UnityAction<Player, Card> OnCardPlayed;
@@ -39,6 +40,8 @@ namespace Marsion.Logic
         public event UnityAction<Card, Card> OnStartAttack;
         public event UnityAction OnCardBeforeDead;
         public event UnityAction OnCardAfterDead;
+
+        private List<Player> AlivePlayers = new List<Player>();
 
         public GameData GetGameData()
         {
@@ -50,6 +53,7 @@ namespace Marsion.Logic
         {
             foreach (var player in _gameData.Players)
             {
+                player.Card.SetHP(30);
                 ShuffleDeck(player.Deck);
                 for(int i = 0; i < 3; i++)
                     DrawCard(player);
@@ -67,7 +71,15 @@ namespace Marsion.Logic
         public void EndGame()
         {
             Managers.Logger.Log<GameLogic>("Game end", colorName: "yellow");
-            OnGameEnded?.Invoke();
+
+            int winner = -1;
+
+            foreach(var player in AlivePlayers)
+            {
+                winner = (int)player.ClientID;
+            }
+
+            OnGameEnded?.Invoke(winner);
         }
 
         public void StartTurn()
@@ -175,8 +187,6 @@ namespace Marsion.Logic
             OnDataUpdated?.Invoke();
             OnCardBeforeDead?.Invoke();
             OnCardAfterDead?.Invoke();
-            //RemoveDeadCard();
-            //OnDataUpdated?.Invoke();
         }
 
         private void Damage(IDamageable attacker, IDamageable defender)
@@ -189,6 +199,11 @@ namespace Marsion.Logic
         {
             foreach(Player player in _gameData.Players)
             {
+                if(player.Card.HP <= 0)
+                {
+                    player.Card.Die();
+                }
+
                 foreach(Card card in player.Field)
                 {
                     if (card.HP <= 0)
@@ -197,6 +212,17 @@ namespace Marsion.Logic
                     }
                 }
             }
+
+            AlivePlayers.Clear();
+
+            foreach(Player player in _gameData.Players)
+            {
+                if (!player.Card.IsDead)
+                    AlivePlayers.Add(player);
+            }
+
+            if (AlivePlayers.Count != 2)
+                EndGame();
         }
 
         private void RemoveDeadCard()

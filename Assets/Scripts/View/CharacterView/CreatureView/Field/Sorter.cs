@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using UnityEngine;
 
 namespace Marsion.CardView
 {
@@ -15,7 +16,7 @@ namespace Marsion.CardView
 
                 if (!targetCard.FSM.IsCurrent<CreatureViewIdle>()) continue;
 
-                targetCard.MoveTransform(new Vector3(targetX, targetY, 0f), true, 0.5f);
+                targetCard.Transform.DOMove(new Vector3(targetX, targetY, 0f), 0.5f);
                 targetCard.Order.SetOriginOrder(i);
             }
         }

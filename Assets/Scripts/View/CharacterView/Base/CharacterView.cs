@@ -6,36 +6,46 @@ using UnityEngine;
 
 namespace Marsion.CardView
 {
-    [RequireComponent(typeof(Collider2D))]
-    [RequireComponent(typeof(IMouseInput))]
-    public class CharacterView : MonoBehaviour, ICharacterView
+    public enum CardType
+    {
+        Hero,
+        Field
+    }
+
+    public abstract class CharacterView : MonoBehaviour, ICharacterView
     {
         #region UI Properties
 
-        [SerializeField] TMP_Text Text_Attack;
-        [SerializeField] TMP_Text Text_Health;
-        [SerializeField] SpriteRenderer CardSprite;
-        [SerializeField] Pointer pointer;
+        [SerializeField] protected TMP_Text Text_Attack;
+        [SerializeField] protected TMP_Text Text_Health;
+        [SerializeField] protected SpriteRenderer CardSprite;
 
         #endregion
 
-        [SerializeField] bool IsEmpty;
-        [SerializeField] CardType Type;
+        [SerializeField] protected Pointer pointer;
+        [SerializeField] protected CardType Type;
 
         public Vector3 OriginPosition { get; set; }
-        public Card Card { get; private set; }
+        public Card Card { get; protected set; }
         public MonoBehaviour MonoBehaviour => this;
-        public CharacterViewFSM FSM { get; private set; }
-        public Transform Transform { get; private set; }
-        public Collider2D Collider { get; private set; }
-        public IMouseInput Input { get; private set; }
-        public Order Order { get; private set; }
+        public CharacterViewFSM FSM { get; protected set; }
+        public Transform Transform { get; protected set; }
+        public Collider2D Collider { get; protected set; }
+        public IMouseInput Input { get; protected set; }
+        public Order Order { get; protected set; }
         public Pointer Pointer => pointer;
         public string Name => gameObject.name;
 
         #region Unity Callbacks
 
-        private void Start()
+        private void Update()
+        {
+            FSM?.Update();
+        }
+
+        #endregion
+
+        public virtual void Init(Card card)
         {
             Transform = transform;
             Collider = GetComponent<Collider2D>();
@@ -45,48 +55,41 @@ namespace Marsion.CardView
 
             FSM = new CharacterViewFSM(this);
 
-            if (IsEmpty) return;
-
             Managers.Client.OnDataUpdated -= UpdateCard;
             Managers.Client.OnDataUpdated += UpdateCard;
 
             Managers.Client.OnStartAttack -= Attack;
             Managers.Client.OnStartAttack += Attack;
 
-            Managers.Client.OnCreatureBeforeDead -= CheckDead;
-            Managers.Client.OnCreatureBeforeDead += CheckDead;
-        }
+            Managers.Client.OnCharacterBeforeDead -= BeforeDead;
+            Managers.Client.OnCharacterBeforeDead += BeforeDead;
 
-        private void Update()
-        {
-            FSM?.Update();
-        }
-
-        #endregion
-
-        public void Init(Card card)
-        {
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
 
             Card = card;
             Text_Attack.text = card.Attack.ToString();
             Text_Health.text = card.HP.ToString();
-            CardSprite.sprite = Managers.Resource.Load<Sprite>(card.BoardArtPath);
         }
 
-        public void UpdateCard()
+        public virtual void Clear()
         {
-            Card = Managers.Client.GetCard(Type, Card.PlayerID, Card.UID);
+            Managers.Client.OnDataUpdated -= UpdateCard;
+            Managers.Client.OnStartAttack -= Attack;
+            Managers.Client.OnCharacterBeforeDead -= BeforeDead;
         }
 
-        public void UpdateStatus()
+        protected abstract void UpdateCard();
+
+        public virtual void UpdateStatus()
         {
             Text_Attack.text = Card.Attack.ToString();
             Text_Health.text = Card.HP.ToString();
         }
 
-        private void Attack(MyTween.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        public abstract void Spawn();
+
+        protected virtual void Attack(MyTween.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
             if (Card.UID != attacker.UID) return;
 
@@ -101,7 +104,7 @@ namespace Marsion.CardView
             sequence.Append(attackTask);
         }
 
-        private void CheckDead(MyTween.Sequence sequence)
+        protected virtual void BeforeDead(MyTween.Sequence sequence)
         {
             if (!Card.IsDead) return;
 
@@ -112,14 +115,6 @@ namespace Marsion.CardView
             };
 
             sequence.Join(deadAction);
-        }
-
-        public void MoveTransform(Vector3 position, bool useDOTween, float dotweenTime = 0)
-        {
-            if (useDOTween)
-                transform.DOMove(position, dotweenTime);
-            else
-                transform.position = position;
         }
 
         public override bool Equals(object obj)

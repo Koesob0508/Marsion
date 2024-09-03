@@ -26,8 +26,8 @@ namespace Marsion.CardView
             Managers.Client.OnCardSpawned -= SpawnCard;
             Managers.Client.OnCardSpawned += SpawnCard;
 
-            Managers.Client.OnCreatureAfterDead -= RemoveDeadCreature;
-            Managers.Client.OnCreatureAfterDead += RemoveDeadCreature;
+            Managers.Client.OnCharacterAfterDead -= RemoveDeadCreature;
+            Managers.Client.OnCharacterAfterDead += RemoveDeadCreature;
 
             Creatures = new List<ICreatureView>();
 
@@ -92,6 +92,7 @@ namespace Marsion.CardView
             {
                 if(creature.Card.IsDead)
                 {
+                    creature.Clear();
                     removeObjects.Add(creature);
                 }
             }

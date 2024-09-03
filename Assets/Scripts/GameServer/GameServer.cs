@@ -133,9 +133,9 @@ namespace Marsion.Server
             Managers.Client.StartGameRpc();
         }
 
-        private void GameEnded()
+        private void GameEnded(int playerID)
         {
-
+            Managers.Client.EndGameRpc(playerID);
         }
 
         private void TurnStarted()
@@ -238,9 +238,9 @@ namespace Marsion.Server
         public void TryAttackRpc(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
         {
             Player attackPlayer = GetPlayer(attackerID);
-            Card attacker = attackPlayer.GetCard(attackPlayer.Field, attackerUID);
+            Card attacker = attackPlayer.GetCard(attackerUID);
             Player defendPlayer = GetPlayer(defenderID);
-            Card defender = defendPlayer.GetCard(defendPlayer.Field, defenderUID);
+            Card defender = defendPlayer.GetCard(defenderUID);
 
             Logic.TryAttack(attackPlayer, attacker, defendPlayer, defender);
         }
