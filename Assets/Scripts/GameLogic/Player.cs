@@ -17,7 +17,9 @@ namespace Marsion
         public List<Card> Deck = new List<Card>();
         public List<Card> Hand = new List<Card>();
         public List<Card> Field = new List<Card>();
-        public List<Card> Proecssing = new List<Card>();
+
+        public int Mana { get; private set; }
+        public int MaxMana { get; private set; }
 
         public Player(int clientID)
         {
@@ -53,21 +55,25 @@ namespace Marsion
 
             return result;
         }
-        
-        public Card GetCard(List<Card> pile, string uid)
+
+        public void IncreaseMaxMana(int amount)
         {
-            Card result = null;
+            MaxMana += amount;
+        }
 
-            foreach (Card card in pile)
-            {
-                if (card.UID == uid)
-                {
-                    result = card;
-                    break;
-                }
-            }
+        public void RestoreMana(int amount)
+        {
+            Mana += amount;
+        }
 
-            return result;
+        public void RestoreAllMana()
+        {
+            Mana = MaxMana;
+        }
+
+        public void PayMana(int amount)
+        {
+            Mana -= amount;
         }
 
         public override bool Equals(object obj)

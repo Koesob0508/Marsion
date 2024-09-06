@@ -15,8 +15,9 @@ namespace Marsion.Logic
         event UnityAction OnTurnStarted;
         event UnityAction OnTurnEnded;
         event UnityAction<Player, Card> OnCardDrawn;
-        event UnityAction <Player, Card> OnCardPlayed;
-        event UnityAction <Player, Card, int> OnCardSpawned;
+        event UnityAction OnManaChanged;
+        event UnityAction <bool, Player, Card> OnCardPlayed;
+        event UnityAction <bool, Player, Card, int> OnCardSpawned;
         event UnityAction<Card, Card> OnStartAttack;
         event UnityAction OnCardBeforeDead;
         event UnityAction OnCardAfterDead;

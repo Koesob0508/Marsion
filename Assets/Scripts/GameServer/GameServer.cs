@@ -47,6 +47,9 @@ namespace Marsion.Server
                 Logic.OnCardDrawn -= CardDrawn;
                 Logic.OnCardDrawn += CardDrawn;
 
+                Logic.OnManaChanged -= ManaChanged;
+                Logic.OnManaChanged += ManaChanged;
+
                 Logic.OnCardPlayed -= CardPlayed;
                 Logic.OnCardPlayed += CardPlayed;
 
@@ -140,7 +143,7 @@ namespace Marsion.Server
 
         private void TurnStarted()
         {
-
+            Managers.Client.StartTurnRpc();
         }
 
         private void TurnEnded()
@@ -151,6 +154,11 @@ namespace Marsion.Server
         private void CardDrawn(Player player, Card card)
         {
             Managers.Client.DrawCardRpc(player.ClientID, card.UID);
+        }
+
+        private void ManaChanged()
+        {
+            Managers.Client.ChangeManaRpc();
         }
 
         private void CardPlayed(Player player, Card card)
@@ -216,7 +224,7 @@ namespace Marsion.Server
         public void PlayCardRpc(ulong clientID, string cardUID)
         {
             Player player = GetPlayer(clientID);
-            Card card = player.GetCard(player.Hand, cardUID);
+            Card card = player.GetCard(cardUID);
             Logic.PlayCard(player, card);
         }
 
@@ -224,7 +232,7 @@ namespace Marsion.Server
         public void PlayAndSpawnCardRpc(ulong clientID, string cardUID, int index)
         {
             Player player = GetPlayer(clientID);
-            Card card = player.GetCard(player.Hand, cardUID);
+            Card card = player.GetCard(cardUID);
             Logic.PlayAndSpawnCard(player, card, index);
         }
 

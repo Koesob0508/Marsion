@@ -1,6 +1,7 @@
 ﻿using Marsion.CardView;
 using Marsion.Logic;
 using Marsion.Tool;
+using Marsion.UI;
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -28,6 +29,7 @@ namespace Marsion.Client
         [SerializeField] HeroView EnemyHero;
 
         public ulong ID { get; private set; }
+        public ulong EnemyID { get; private set; }
         public IHandView Hand { get => hand; }
         public IFieldView PlayerField { get => playerField; }
         public IFieldView EnemyField { get => enemyField; }
@@ -42,6 +44,7 @@ namespace Marsion.Client
         public event UnityAction OnTurnStarted;
         public event UnityAction OnTurnEnded;
         public event UnityAction<Player, Card> OnCardDrawn;
+        public event UnityAction OnManaChanged;
         public event UnityAction<Player, string> OnCardPlayed;
         public event UnityAction<Player, Card, int> OnCardSpawned;
         public event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
@@ -202,6 +205,7 @@ namespace Marsion.Client
                     }
                     else
                     {
+                        EnemyID = player.ClientID;
                         EnemyHero.Init(player.Card);
                         EnemyHero.Spawn();
                     }
@@ -247,20 +251,24 @@ namespace Marsion.Client
             gameEndTask.Action = () =>
             {
                 Managers.Logger.Log<GameClient>("Game end.");
+                UI_EndGame ui = Managers.UI.ShowPopupUI<UI_EndGame>();
 
                 if (clientID == -1)
-                    Managers.Logger.Log<GameClient>("무승부");
+                {
+                    ui.Text_Result.text = "DRAW";
+                }
                 else
                 {
                     if ((ulong)clientID == ID)
-                        Managers.Logger.Log<GameClient>("승리");
+                        ui.Text_Result.text = "WINNER!";
                     else
-                        Managers.Logger.Log<GameClient>("패배");
+                        ui.Text_Result.text = "LOSE";
                 }
 
                 OnGameEnded?.Invoke();
                 gameEndTask.OnComplete?.Invoke();
             };
+
 
             gameEndSequence.Append(gameEndTask);
             ClientSequence.Append(gameEndSequence);
@@ -271,6 +279,7 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void StartTurnRpc()
         {
+            Managers.Logger.Log<GameClient>("Start turn", colorName: "green");
             MyTween.Sequence turnStartSequence = new MyTween.Sequence();
             MyTween.Task turnStartTask = new MyTween.Task();
 
@@ -321,6 +330,25 @@ namespace Marsion.Client
 
             cardDrawSequence.Append(cardDrawTask);
             ClientSequence.Append(cardDrawSequence);
+
+            ClientSequence.Play();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        public void ChangeManaRpc()
+        {
+            MyTween.Sequence changeManaSequence = new MyTween.Sequence();
+            MyTween.Task changeManaTask = new MyTween.Task();
+
+            changeManaTask.Action = () =>
+            {
+                Managers.Logger.Log<GameClient>("Mana Changed");
+                OnManaChanged?.Invoke();
+                changeManaTask.OnComplete?.Invoke();
+            };
+
+            changeManaSequence.Append(changeManaTask);
+            ClientSequence.Append(changeManaSequence);
 
             ClientSequence.Play();
         }

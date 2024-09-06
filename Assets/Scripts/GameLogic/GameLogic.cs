@@ -25,6 +25,8 @@ namespace Marsion.Logic
 
         #endregion
 
+        private List<Player> AlivePlayers = new List<Player>();
+
         #region Interface Operations
 
         public event UnityAction OnDataUpdated;
@@ -35,13 +37,12 @@ namespace Marsion.Logic
         public event UnityAction<int> OnGameEnded;
 
         public event UnityAction<Player, Card> OnCardDrawn;
-        public event UnityAction<Player, Card> OnCardPlayed;
-        public event UnityAction<Player, Card, int> OnCardSpawned;
+        public event UnityAction OnManaChanged;
+        public event UnityAction<bool, Player, Card> OnCardPlayed;
+        public event UnityAction<bool, Player, Card, int> OnCardSpawned;
         public event UnityAction<Card, Card> OnStartAttack;
         public event UnityAction OnCardBeforeDead;
         public event UnityAction OnCardAfterDead;
-
-        private List<Player> AlivePlayers = new List<Player>();
 
         public GameData GetGameData()
         {
@@ -86,12 +87,17 @@ namespace Marsion.Logic
         {
             Managers.Logger.Log<GameLogic>("Turn start", colorName: "yellow");
 
-            if (_gameData.TurnCount != 0)
-                DrawCard(GetGameData().CurrentPlayer);
-
             _gameData.TurnCount++;
 
+            if (_gameData.TurnCount != 1)
+                DrawCard(GetGameData().CurrentPlayer);
+
+            if (GetGameData().CurrentPlayer.MaxMana < 10)
+                GetGameData().CurrentPlayer.IncreaseMaxMana(1);
+
+            GetGameData().CurrentPlayer.RestoreAllMana();
             UpdateData();
+            OnManaChanged?.Invoke();
             OnTurnStarted?.Invoke();
         }
 
@@ -146,11 +152,14 @@ namespace Marsion.Logic
 
         public void PlayCard(Player player, Card card)
         {
+            if (!(player.Mana >= card.Mana)) return;
+
             Managers.Logger.Log<GameLogic>("Card play", colorName: "yellow");
 
             player.Hand.Remove(card);
 
             UpdateData();
+            OnManaChanged?.Invoke();
             OnCardPlayed?.Invoke(player, card);
         }
 
@@ -166,10 +175,14 @@ namespace Marsion.Logic
 
         public void PlayAndSpawnCard(Player player, Card card, int index)
         {
+            if (!(player.Mana >= card.Mana)) return;
+
+            player.PayMana(card.Mana);
             player.Hand.Remove(card);
             player.Field.Insert(index, card);
 
             UpdateData();
+            OnManaChanged?.Invoke();
             OnCardPlayed?.Invoke(player, card);
             OnCardSpawned?.Invoke(player, card, index);
         }
