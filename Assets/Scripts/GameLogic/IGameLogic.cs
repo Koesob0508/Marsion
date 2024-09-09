@@ -46,7 +46,7 @@ namespace Marsion.Logic
 
         void SpanwCard(Player player, Card card, int index);
 
-        void PlayAndSpawnCard(Player player, Card card, int index);
+        void TryPlayAndSpawnCard(Player player, Card card, int index);
 
         void TryAttack(Player attackPlayer, Card attacker, Player defenderPlayer, Card defender);
 

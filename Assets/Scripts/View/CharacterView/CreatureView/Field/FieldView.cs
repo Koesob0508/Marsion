@@ -62,26 +62,33 @@ namespace Marsion.CardView
             Creatures.RemoveAt(EmptyCreatureIndex);
         }
 
-        private void SpawnCard(Player player, Card card, int index)
+        private void SpawnCard(bool succeeded, Player player, Card card, int index)
         {
             if (Managers.Client.IsMine(player) != IsMine) return;
 
-            ICreatureView creature;
-
-            if (EmptyCreatureIndex == index)
+            if(succeeded)
             {
-                creature = Instantiate(CreatureViewPrefab, EmptyCreature.Transform.position, Quaternion.identity, transform);
-                Creatures[EmptyCreatureIndex] = creature;
+                ICreatureView creature;
+
+                if (EmptyCreatureIndex == index)
+                {
+                    creature = Instantiate(CreatureViewPrefab, EmptyCreature.Transform.position, Quaternion.identity, transform);
+                    Creatures[EmptyCreatureIndex] = creature;
+                }
+                else
+                {
+                    RemoveEmptyCard();
+                    creature = Instantiate(CreatureViewPrefab, EmptyCreature.Transform.position, Quaternion.identity, transform);
+                    Creatures.Insert(index, creature);
+                }
+
+                creature.Init(card);
+                creature.Spawn();
             }
             else
             {
                 RemoveEmptyCard();
-                creature = Instantiate(CreatureViewPrefab, EmptyCreature.Transform.position, Quaternion.identity, transform);
-                Creatures.Insert(index, creature);
             }
-
-            creature.Init(card);
-            creature.Spawn();
         }
 
         private void RemoveDeadCreature()

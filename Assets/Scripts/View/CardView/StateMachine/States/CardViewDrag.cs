@@ -29,6 +29,7 @@ namespace Marsion.CardView
         public override void OnUpdate()
         {
             FollowCursor();
+
             if (IsAreaDetected())
                 Managers.Client.PlayerField.InsertEmptyCard(GetMouseWorldPosition().x);
             else
@@ -48,10 +49,15 @@ namespace Marsion.CardView
         {
             if (FSM.IsCurrent(this))
             {
-                if (eventData.button == PointerEventData.InputButton.Left && Managers.Client.IsMyTurn() && IsAreaDetected() && Managers.Client.TryPlayCard(Handler.Card) && !Managers.Client.PlayerField.IsFullField)
+                if (eventData.button == PointerEventData.InputButton.Left && IsAreaDetected() && !Managers.Client.PlayerField.IsFullField)
                 {
-                    Managers.Client.PlayAndSpawnCard(Handler.Card, Managers.Client.PlayerField.EmptyCreatureIndex);
+                    Managers.Client.TryPlayAndSpawnCard(Handler.Card, Managers.Client.PlayerField.EmptyCreatureIndex);
                     // Handler.MonoBehaviour.gameObject.SetActive(false);
+                }
+                else
+                {
+                    Managers.Logger.Log<CardViewDrag>("Remove Card");
+                    Managers.Client.PlayerField.RemoveEmptyCard();
                 }
 
                 FSM.PopState();

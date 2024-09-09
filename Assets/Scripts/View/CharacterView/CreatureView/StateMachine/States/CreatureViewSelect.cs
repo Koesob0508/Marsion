@@ -44,7 +44,7 @@ namespace Marsion.CardView
             }
             else
             {
-                ICharacterView target = foundObject.GetComponent<CreatureView>();
+                ICharacterView target = foundObject.GetComponent<ICharacterView>();
 
                 if (Handler.Card.PlayerID != target.Card.PlayerID)
                 {

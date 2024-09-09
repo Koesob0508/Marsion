@@ -5,7 +5,7 @@ using System;
 namespace Marsion
 {
     [Serializable]
-    public class Card : IDamageable
+    public class Card : IDamageable, IServerCard
     {
         public ulong PlayerID { get; private set; }
         public string UID { get; private set; }

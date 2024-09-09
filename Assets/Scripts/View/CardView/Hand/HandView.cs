@@ -37,19 +37,22 @@ namespace Marsion.CardView
 
         #region Operations
 
-        private void CardPlayed(Player player, string cardUID)
+        private void CardPlayed(bool succeeded, Player player, string cardUID)
         {
-            foreach (ICardView cardView in Cards)
+            if(succeeded)
             {
-                if(cardView.Card.UID == cardUID)
+                foreach (ICardView cardView in Cards)
                 {
-                    Cards.Remove(cardView);
-                    Managers.Resource.Destroy(cardView.MonoBehaviour.gameObject);
-                    break;
+                    if (cardView.Card.UID == cardUID)
+                    {
+                        Cards.Remove(cardView);
+                        Managers.Resource.Destroy(cardView.MonoBehaviour.gameObject);
+                        break;
+                    }
                 }
-            }
 
-            OnPileChanged?.Invoke(Cards.ToArray());
+                OnPileChanged?.Invoke(Cards.ToArray());
+            }
         }
 
         public void AddCard(ICardView card)

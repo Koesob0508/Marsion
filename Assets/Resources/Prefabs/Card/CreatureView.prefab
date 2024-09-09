@@ -646,8 +646,8 @@ MonoBehaviour:
   Text_Health: {fileID: 503467215805058376}
   CardSprite: {fileID: 9109982573792273279}
   pointer: {fileID: 4313290368528475118}
-  IsEmpty: 0
   Type: 1
+  IsEmpty: 0
 --- !u!114 &5006496091257542271
 MonoBehaviour:
   m_ObjectHideFlags: 0

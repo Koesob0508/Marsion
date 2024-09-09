@@ -161,14 +161,14 @@ namespace Marsion.Server
             Managers.Client.ChangeManaRpc();
         }
 
-        private void CardPlayed(Player player, Card card)
+        private void CardPlayed(bool succeeded, Player player, Card card)
         {
-            Managers.Client.PlayCardRpc(player.ClientID, card.UID);
+            Managers.Client.PlayCardRpc(succeeded, player.ClientID, card.UID);
         }
 
-        private void CardSpawned(Player player, Card card, int index)
+        private void CardSpawned(bool succeeded, Player player, Card card, int index)
         {
-            Managers.Client.SpawnCardRpc(player.ClientID, card.UID, index);
+            Managers.Client.SpawnCardRpc(succeeded, player.ClientID, card.UID, index);
         }
 
         private void CardBeforeDead()
@@ -229,11 +229,11 @@ namespace Marsion.Server
         }
 
         [Rpc(SendTo.Server)]
-        public void PlayAndSpawnCardRpc(ulong clientID, string cardUID, int index)
+        public void TryPlayAndSpawnCardRpc(ulong clientID, string cardUID, int index)
         {
             Player player = GetPlayer(clientID);
             Card card = player.GetCard(cardUID);
-            Logic.PlayAndSpawnCard(player, card, index);
+            Logic.TryPlayAndSpawnCard(player, card, index);
         }
 
         [Rpc(SendTo.Server)]

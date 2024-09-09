@@ -152,6 +152,9 @@ namespace Marsion.Logic
 
         public void PlayCard(Player player, Card card)
         {
+            // Player의 턴이 아니라면 false
+            // Field에 넣을 공간이 없다면 false
+            // 현재 Player의 마나가 Card의 마나보다 적다면 false
             if (!(player.Mana >= card.Mana)) return;
 
             Managers.Logger.Log<GameLogic>("Card play", colorName: "yellow");
@@ -160,7 +163,7 @@ namespace Marsion.Logic
 
             UpdateData();
             OnManaChanged?.Invoke();
-            OnCardPlayed?.Invoke(player, card);
+            OnCardPlayed?.Invoke(true, player, card);
         }
 
         public void SpanwCard(Player player, Card card, int index)
@@ -170,12 +173,21 @@ namespace Marsion.Logic
             player.Field.Insert(index, card);
 
             UpdateData();
-            OnCardSpawned?.Invoke(player, card, index);
+            OnCardSpawned?.Invoke(true, player, card, index);
         }
 
-        public void PlayAndSpawnCard(Player player, Card card, int index)
+        public void TryPlayAndSpawnCard(Player player, Card card, int index)
         {
-            if (!(player.Mana >= card.Mana)) return;
+            // Player의 턴이 아니라면 false
+            // Field에 넣을 공간이 없다면 false
+            // 현재 Player의 마나가 Card의 마나보다 적다면 false
+            if (!(player.Mana >= card.Mana))
+            {
+                Managers.Logger.Log<GameLogic>("그럴 수 없어요.", colorName: "yellow");
+                OnCardPlayed?.Invoke(false, player, card);
+                OnCardSpawned?.Invoke(false, player, card, index);
+                return;
+            }
 
             player.PayMana(card.Mana);
             player.Hand.Remove(card);
@@ -183,8 +195,8 @@ namespace Marsion.Logic
 
             UpdateData();
             OnManaChanged?.Invoke();
-            OnCardPlayed?.Invoke(player, card);
-            OnCardSpawned?.Invoke(player, card, index);
+            OnCardPlayed?.Invoke(true, player, card);
+            OnCardSpawned?.Invoke(true, player, card, index);
         }
 
         public void TryAttack(Player attackPlayer, Card attacker, Player defenderPlayer, Card defender)

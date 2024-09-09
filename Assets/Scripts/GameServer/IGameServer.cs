@@ -9,7 +9,7 @@ namespace Marsion.Server
         void Clear();
         void DrawCardRpc(ulong clientID);
         void PlayCardRpc(ulong clientID, string cardUID);
-        void PlayAndSpawnCardRpc(ulong clientID, string cardUID, int index);
+        void TryPlayAndSpawnCardRpc(ulong clientID, string cardUID, int index);
         void TurnEndRpc();
         void TryAttackRpc(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID);
 

@@ -263,6 +263,7 @@ MonoBehaviour:
   - {fileID: 5261719984367310246}
   - {fileID: 3267434700863396934}
   - {fileID: 6790742615099538269}
+  MostFrontRenderers: []
   SortingLayerName: HandCard
   OriginOrder: 0
 --- !u!114 &1660737451825867075
@@ -1569,7 +1570,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.72, y: 0.72}
+  m_Size: {x: 0.45866665, y: 0.36266667}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

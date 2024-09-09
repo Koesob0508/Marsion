@@ -45,8 +45,8 @@ namespace Marsion.Client
         public event UnityAction OnTurnEnded;
         public event UnityAction<Player, Card> OnCardDrawn;
         public event UnityAction OnManaChanged;
-        public event UnityAction<Player, string> OnCardPlayed;
-        public event UnityAction<Player, Card, int> OnCardSpawned;
+        public event UnityAction<bool, Player, string> OnCardPlayed;
+        public event UnityAction<bool, Player, Card, int> OnCardSpawned;
         public event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
         public event Action<MyTween.Sequence> OnCharacterBeforeDead;
         public event UnityAction OnCharacterAfterDead;
@@ -164,9 +164,9 @@ namespace Marsion.Client
             Managers.Server.PlayCardRpc(ID, card.UID);
         }
 
-        public void PlayAndSpawnCard(Card card, int index)
+        public void TryPlayAndSpawnCard(Card card, int index)
         {
-            Managers.Server.PlayAndSpawnCardRpc(ID, card.UID, index);
+            Managers.Server.TryPlayAndSpawnCardRpc(ID, card.UID, index);
         }
 
         public void TurnEnd()
@@ -354,7 +354,7 @@ namespace Marsion.Client
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void PlayCardRpc(ulong clientID, string cardUID)
+        public void PlayCardRpc(bool succeeded, ulong clientID, string cardUID)
         {
             MyTween.Sequence cardPlaySequence = new MyTween.Sequence();
             MyTween.Task cardPlayTask = new MyTween.Task();
@@ -362,7 +362,7 @@ namespace Marsion.Client
             cardPlayTask.Action = () =>
             {
                 Managers.Logger.Log<GameClient>("Card Play");
-                OnCardPlayed?.Invoke(GetGameData().GetPlayer(clientID), cardUID);
+                OnCardPlayed?.Invoke(succeeded, GetGameData().GetPlayer(clientID), cardUID);
                 cardPlayTask.OnComplete?.Invoke();
             };
 
@@ -373,7 +373,7 @@ namespace Marsion.Client
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void SpawnCardRpc(ulong clientID, string cardUID, int index)
+        public void SpawnCardRpc(bool succeeded, ulong clientID, string cardUID, int index)
         {
             MyTween.Sequence cardSpawnSequence = new MyTween.Sequence();
             MyTween.Task cardSpawnTask = new MyTween.Task();
@@ -381,7 +381,7 @@ namespace Marsion.Client
             cardSpawnTask.Action = () =>
             {
                 Managers.Logger.Log<GameClient>("Card Spawn");
-                OnCardSpawned?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetFieldCard(clientID, cardUID), index);
+                OnCardSpawned?.Invoke(succeeded, GetGameData().GetPlayer(clientID), GetGameData().GetFieldCard(clientID, cardUID), index);
                 cardSpawnTask.OnComplete?.Invoke();
             };
 
@@ -463,12 +463,5 @@ namespace Marsion.Client
         }
 
         #endregion
-
-        public bool TryPlayCard(Card card)
-        {
-            return true;
-        }
-
-
     }
 }

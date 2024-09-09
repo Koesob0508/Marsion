@@ -30,8 +30,8 @@ namespace Marsion.Client
         event UnityAction OnTurnEnded;
         event UnityAction<Player, Card> OnCardDrawn;
         event UnityAction OnManaChanged;
-        event UnityAction<Player, string> OnCardPlayed;
-        event UnityAction<Player, Card, int> OnCardSpawned;
+        event UnityAction<bool, Player, string> OnCardPlayed;
+        event UnityAction<bool, Player, Card, int> OnCardSpawned;
         event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
         event Action<MyTween.Sequence> OnCharacterBeforeDead;
         event UnityAction OnCharacterAfterDead;
@@ -65,8 +65,7 @@ namespace Marsion.Client
         void SetClientID(ulong clientID);
         void DrawCard();
         void PlayCard(Card card);
-        void PlayAndSpawnCard(Card card, int index);
-        bool TryPlayCard(Card card);
+        void TryPlayAndSpawnCard(Card card, int index);
         void TurnEnd();
         void TryAttack(Card attacker, Card defender);
 
@@ -81,8 +80,8 @@ namespace Marsion.Client
         void EndTurnRpc();
         void DrawCardRpc(ulong clientID, string cardUID);
         void ChangeManaRpc();
-        void PlayCardRpc(ulong clientID, string cardUID);
-        void SpawnCardRpc(ulong clientID, string cardUID, int index);
+        void PlayCardRpc(bool succeeded, ulong clientID, string cardUID);
+        void SpawnCardRpc(bool succeeded, ulong clientID, string cardUID, int index);
 
         void BeforeDeadCardRpc();
         void AfterDeadCardRpc();
