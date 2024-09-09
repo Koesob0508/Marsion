@@ -123,6 +123,9 @@ namespace Marsion.Client
 
         public void Init()
         {
+            Managers.Server.OnGameStarted -= TestStartGameRpc;
+            Managers.Server.OnGameStarted += TestStartGameRpc;
+
             if (Managers.Network != null)
             {
                 Managers.Network.OnClientConnectedCallback -= SetClientID;
@@ -185,6 +188,12 @@ namespace Marsion.Client
         #endregion
 
         #region Event Rpcs
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void TestStartGameRpc()
+        {
+            Managers.Logger.Log<GameClient>("Start game", colorName: "green");
+        }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void StartGameRpc()

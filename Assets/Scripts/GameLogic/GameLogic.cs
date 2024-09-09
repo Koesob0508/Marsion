@@ -16,6 +16,11 @@ namespace Marsion.Logic
             _gameData = gameData;
         }
 
+        public GameLogic(IServerGameData gameData)
+        {
+            
+        }
+
         private void UpdateData()
         {
             Managers.Logger.Log<GameLogic>("Data update", colorName: "yellow");
