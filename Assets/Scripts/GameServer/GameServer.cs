@@ -18,7 +18,7 @@ namespace Marsion.Server
         [Header("Enemy")]
         [SerializeField] private DeckSO EnemyDeck;
 
-        private IServerGameData GameData;
+        private GameData GameData;
         private IGameLogic Logic;
 
         // Action
@@ -104,7 +104,17 @@ namespace Marsion.Server
         {
             Managers.Logger.Log<GameServer>("Start game", colorName: "blue");
 
+            GameData = new GameData(2);
+
+            // 덱을 등록한다. 등록할 덱은 이미 위에 있음
+            // 두 Player의 HP를 30으로 만든다.
+            // 각자의 덱을 셔플한다.
+            // 카드를 뽑는다.
+            // CurrentPlayer를 Host Player(1)로 한다.
+            // UpdateData 호출
+
             OnGameStarted?.Invoke();
+            // StartTurn 함수 호출. 여기서 해야 순서가 올바르게 들어간다.
         }
 
         private void DataUpdated()
@@ -245,14 +255,5 @@ namespace Marsion.Server
 
             return new Player((int)clientID);
         }
-
-        #region Buttons
-        [Rpc(SendTo.Server)]
-        public void DrawButtonRpc(ulong clientID)
-        {
-            Logic.DrawCard(GetPlayer(clientID));
-        }
-
-        #endregion
     }
 }

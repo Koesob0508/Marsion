@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEngine;
 
 namespace Marsion
 {
@@ -27,15 +28,6 @@ namespace Marsion
             Card = new Card(ClientID);
         }
 
-        public string LogPile(List<Card> pile)
-        {
-            string result = "";
-
-            Managers.Logger.Log<Player>("Log pile");
-
-            return result;
-        }
-
         public Card GetCard(string uid)
         {
             Cards.Add(Card.UID, Card);
@@ -52,6 +44,9 @@ namespace Marsion
 
             Cards.TryGetValue(uid, out var result);
             Cards.Clear();
+
+            if (result == null)
+                Debug.LogWarning("Get card result is null.");
 
             return result;
         }
