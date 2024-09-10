@@ -15,12 +15,6 @@ namespace Marsion.CardView
             Managers.Client.OnCardDrawn += DrawCard;
         }
 
-        [Button]
-        public void Draw()
-        {
-            Managers.Server.DrawButtonRpc(Managers.Client.ID);
-        }
-
         public void DrawCard(Player player, Card card)
         {
             if (Managers.Client.IsMine(player))
