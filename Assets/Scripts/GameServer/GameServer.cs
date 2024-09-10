@@ -2,6 +2,7 @@
 using Marsion.Logic;
 using UnityEngine;
 using System;
+using Marsion.Tool;
 
 namespace Marsion.Server
 {
@@ -15,6 +16,8 @@ namespace Marsion.Server
 
         private GameData GameData;
         private IGameLogic Logic;
+
+        MyTween.MainSequence ServerSequence;
 
         // Action
         public event Action OnGameStarted;
@@ -32,6 +35,8 @@ namespace Marsion.Server
             {
                 Managers.Logger.Log<GameServer>("Network is null", colorName: "blue");
             }
+
+            ServerSequence = new MyTween.MainSequence();
         }
 
         public override void OnNetworkSpawn()
@@ -97,19 +102,43 @@ namespace Marsion.Server
         // Flow
         private void StartGame()
         {
-            Managers.Logger.Log<GameServer>("Start game", colorName: "blue");
+            MyTween.Sequence gameStartSequence = new MyTween.Sequence();
+            MyTween.Task gameStartTask = new MyTween.Task();
 
-            GameData = new GameData(2);
+            gameStartTask.Action = () =>
+            {
+                Managers.Logger.Log<GameServer>("Start game", colorName: "blue");
 
-            // 덱을 등록한다. 등록할 덱은 이미 위에 있음
-            // 두 Player의 HP를 30으로 만든다.
-            // 각자의 덱을 셔플한다.
-            // 카드를 뽑는다.
-            // CurrentPlayer를 Host Player(1)로 한다.
-            // UpdateData 호출
+                GameData = new GameData(2);
+                Logic = new GameLogic(GameData);
 
-            OnGameStarted?.Invoke();
-            // StartTurn 함수 호출. 여기서 해야 순서가 올바르게 들어간다.
+                SetPlayerDeck(GetPlayer(0), Player_Deck);
+                SetPlayerDeck(GetPlayer(1), Enemy_Deck);
+
+                for(int i = 0; i < 2; i++)
+                {
+                    var player = GetPlayer((ulong)i);
+
+                    SetPlayerPortrait(player, i);
+                    Logic.ShuffleDeck(player.Deck);
+                    player.Card.SetHP(30);
+                    for (int j = 0; j < 3; j++)
+                        Logic.DrawCard(player);
+                }
+
+                Logic.DrawCard(GetPlayer(1));
+
+                GameData.CurrentPlayer = GetPlayer(0);
+
+                OnGameStarted?.Invoke();
+
+                gameStartTask.OnComplete?.Invoke();
+            };
+
+            gameStartSequence.Append(gameStartTask);
+            ServerSequence.Append(gameStartSequence);
+
+            ServerSequence.Play();
         }
 
         private void DataUpdated()
@@ -244,11 +273,7 @@ namespace Marsion.Server
 
         private Player GetPlayer(ulong clientID)
         {
-            //if (GameData == null) Managers.Logger.Log<GameServer>("Game data is null");
-            //if (GameData.Players[clientID] == null) Managers.Logger.Log<GameServer>("Players is null");
-            //return GameData.Players[clientID];
-
-            return new Player((int)clientID);
+            return GameData.GetPlayer(clientID);
         }
     }
 }
