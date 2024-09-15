@@ -169,7 +169,7 @@ namespace Marsion.Tool
                 Play();
             }
 
-            // Joined¸¦ ¿°µÎ¿¡ µÐ ÇÔ¼ö. Áö±ÝÀº PlayNext¿Í ´Ù¸£Áö ¾Ê´Ù.
+            // Joinedï¿½ï¿½ ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ ï¿½Ô¼ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ PlayNextï¿½ï¿½ ï¿½Ù¸ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½.
             public void Complete()
             {
                 Debug.Log($"{Name} complete");

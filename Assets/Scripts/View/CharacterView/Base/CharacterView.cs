@@ -89,29 +89,29 @@ namespace Marsion.CardView
 
         public abstract void Spawn();
 
-        protected virtual void Attack(MyTween.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        protected virtual void Attack(Tool.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
             if (Card.UID != attacker.UID) return;
 
-            MyTween.Task attackTask = new();
+            Clip attackTask = new("AttackTask");
 
-            attackTask.Action = () =>
+            attackTask.Action += () =>
             {
                 FSM.Target = Managers.Client.GetCreature(defendPlayer.ClientID, defender.UID).MonoBehaviour.gameObject;
-                FSM.PushState<CreatureViewAttack>(attackTask.OnComplete);
+                //FSM.PushState<CreatureViewAttack>(attackTask.OnComplete);
             };
 
             sequence.Append(attackTask);
         }
 
-        protected virtual void BeforeDead(MyTween.Sequence sequence)
+        protected virtual void BeforeDead(Tool.Sequence sequence)
         {
             if (!Card.IsDead) return;
 
-            MyTween.Task deadAction = new MyTween.Task();
-            deadAction.Action = () =>
+            Clip deadAction = new Clip("DeadAction");
+            deadAction.Action += () =>
             {
-                FSM.PushState<CreatureViewDead>(deadAction.OnComplete);
+                //FSM.PushState<CreatureViewDead>(deadAction.OnComplete);
             };
 
             sequence.Join(deadAction);

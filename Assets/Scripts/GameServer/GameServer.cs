@@ -25,7 +25,7 @@ namespace Marsion.Server
         private GameData GameData;
         private IGameLogic Logic;
 
-        MyTween.MainSequence ServerSequence;
+        Sequencer ServerSequence;
 
         // Event
         public event Action<NetworkGameData> OnDataUpdated;
@@ -57,7 +57,7 @@ namespace Marsion.Server
                 Managers.Logger.Log<GameServer>("Network is null", colorName: "blue");
             }
 
-            ServerSequence = new MyTween.MainSequence();
+            ServerSequence = new Sequencer();
         }
 
         public void Clear()
@@ -71,11 +71,11 @@ namespace Marsion.Server
         // Flow
         private void StartGame()
         {
-            MyTween.Sequence sequence = new MyTween.Sequence();
+            Sequence sequence = new Sequence();
 
-            MyTween.Task startGameTask = new MyTween.Task(autoComplete: true);
-            MyTween.Task drawCardTask = new MyTween.Task(autoComplete: true);
-            MyTween.Task startTurnTask = new MyTween.Task(autoComplete: true);
+            Clip startGameTask = new Clip(autoComplete: true);
+            Clip drawCardTask = new Task(autoComplete: true);
+            Clip startTurnTask = new Task(autoComplete: true);
 
             startGameTask.Action = () =>
             {

@@ -1,57 +1,64 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace Marsion.Tool
 {
-    public partial class MyTween
+    public class Sequence
     {
-        public class Sequence
+        Queue<Clip> Clips = new Queue<Clip>();
+        public Action OnComplete;
+
+        public void Append(Clip clip)
         {
-            Queue<Task> Tasks = new Queue<Task>();
-            public Action OnComplete;
+            clip.Type = ClipType.Append;
+            clip.OnComplete -= Play;
+            clip.OnComplete += Play;
+            Clips.Enqueue(clip);
+        }
 
-            public void Append(Task task)
+        public void Join(Clip clip)
+        {
+            clip.Type = ClipType.Join;
+            clip.OnComplete -= Play;
+            clip.OnComplete += Play;
+            Clips.Enqueue(clip);
+        }
+
+        public void Play()
+        {
+            if (Clips.Count == 0)
             {
-                task.Type = TaskType.Append;
-                task.OnComplete -= Play;
-                task.OnComplete += Play;
-                Tasks.Enqueue(task);
+                OnComplete?.Invoke();
             }
-
-            public void Join(Task task)
+            else
             {
-                task.Type = TaskType.Join;
-                task.OnComplete -= Play;
-                task.OnComplete += Play;
-                Tasks.Enqueue(task);
-            }
+                var clip = Clips.Dequeue();
+                clip.Play();
 
-            public void Play()
-            {
-                if (Tasks.Count == 0)
+                List<Clip> joinedClips = new List<Clip>();
+
+                Clip nextClip;
+                Clips.TryPeek(out nextClip);
+
+                while (nextClip.Type == ClipType.Join)
                 {
-                    OnComplete?.Invoke();
+                    joinedClips.Add(nextClip);
+
+                    Clips.TryPeek(out nextClip);
                 }
-                else
+
+                foreach (Clip joinedClip in joinedClips)
                 {
-                    var task = Tasks.Dequeue();
-                    task.Action.Invoke();
-
-                    if(Tasks.TryPeek(out var result))
-                    {
-                        if(result.Type == TaskType.Join)
-                        {
-                            Tasks.Dequeue().Action.Invoke();
-                            if (result.AutoComplete)
-                                task.OnComplete?.Invoke();
-                        }
-                    }
-
-                    if(task.AutoComplete)
-                        task.OnComplete?.Invoke();
+                    joinedClip.Play();
                 }
+
+                joinedClips.Clear();
+
+                if (clip.AutoComplete)
+                    clip.Complete();
+
             }
         }
     }

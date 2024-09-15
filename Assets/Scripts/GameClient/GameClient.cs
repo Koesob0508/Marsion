@@ -1,4 +1,4 @@
-﻿using Marsion.CardView;
+using Marsion.CardView;
 using Marsion.Logic;
 using Marsion.Tool;
 using Marsion.UI;
@@ -45,8 +45,8 @@ namespace Marsion.Client
 
         public event UnityAction<bool, Player, string> OnCardPlayed;
         public event UnityAction<bool, Player, Card, int> OnCardSpawned;
-        public event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
-        public event Action<MyTween.Sequence> OnCharacterBeforeDead;
+        public event Action<Sequence, Player, Card, Player, Card> OnStartAttack;
+        public event Action<Sequence> OnCharacterBeforeDead;
         public event UnityAction OnCharacterAfterDead;
 
         public void Init()
@@ -61,7 +61,7 @@ namespace Marsion.Client
                 Managers.Logger.Log<GameClient>("Network is null", colorName: "yellow");
             }
 
-            ClientSequence = new MyTween.MainSequence();
+            ClientSequence = new Sequencer();
 
             Input = new InputManager();
 
@@ -112,10 +112,10 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void StartGameRpc()
         {
-            MyTween.Sequence gameStartSequence = new MyTween.Sequence();
-            MyTween.Task gameStartTask = new MyTween.Task();
+            Sequence gameStartSequence = new Sequence();
+            Clip gameStartTask = new Clip("GameStart");
 
-            gameStartTask.Action = () =>
+            gameStartTask.Action += () =>
             {
                 Managers.Logger.Log<GameClient>("Start game", colorName: "green");
 
@@ -135,7 +135,6 @@ namespace Marsion.Client
                 }
 
                 OnGameStarted?.Invoke();
-                gameStartTask.OnComplete?.Invoke();
             };
 
             gameStartSequence.Append(gameStartTask);
@@ -147,16 +146,15 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void UpdateDataRpc(NetworkGameData networkData)
         {
-            MyTween.Sequence updateSequence = new MyTween.Sequence();
-            MyTween.Task updateTask = new MyTween.Task();
+            Sequence updateSequence = new Sequence();
+            Clip updateTask = new Clip("UpdateClip");
 
-            updateTask.Action = () =>
+            updateTask.Action += () =>
             {
                 _gameData = networkData.gameData;
                 Managers.Logger.Log<GameClient>("Game data updated", colorName:"green");
 
                 OnDataUpdated?.Invoke();
-                updateTask.OnComplete?.Invoke();
             };
 
             updateSequence.Append(updateTask);
@@ -168,10 +166,10 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void EndGameRpc(int clientID)
         {
-            MyTween.Sequence gameEndSequence = new MyTween.Sequence();
-            MyTween.Task gameEndTask = new MyTween.Task();
+            Sequence gameEndSequence = new Sequence();
+            Clip gameEndTask = new Clip("GameEnd");
 
-            gameEndTask.Action = () =>
+            gameEndTask.Action += () =>
             {
                 Managers.Logger.Log<GameClient>("Game end.");
                 UI_EndGame ui = Managers.UI.ShowPopupUI<UI_EndGame>();
@@ -189,7 +187,6 @@ namespace Marsion.Client
                 }
 
                 OnGameEnded?.Invoke();
-                gameEndTask.OnComplete?.Invoke();
             };
 
 
@@ -202,14 +199,13 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void StartTurnRpc()
         {
-            MyTween.Sequence turnStartSequence = new MyTween.Sequence();
-            MyTween.Task turnStartTask = new MyTween.Task();
+            Sequence turnStartSequence = new Sequence();
+            Clip turnStartTask = new Clip("TurnStart");
 
-            turnStartTask.Action = () =>
+            turnStartTask.Action += () =>
             {
                 Managers.Logger.Log<GameClient>("Turn start", colorName: "green");
                 OnTurnStarted?.Invoke();
-                turnStartTask.OnComplete?.Invoke();
             };
 
             turnStartSequence.Append(turnStartTask);
@@ -221,14 +217,13 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void EndTurnRpc()
         {
-            MyTween.Sequence turnEndSequence = new MyTween.Sequence();
-            MyTween.Task turnEndTask = new MyTween.Task();
+            Sequence turnEndSequence = new Sequence();
+            Clip turnEndTask = new Clip("TurnEnd");
 
-            turnEndTask.Action = () =>
+            turnEndTask.Action += () =>
             {
                 Managers.Logger.Log<GameClient>("Turn end", colorName: "green");
                 OnTurnEnded?.Invoke();
-                turnEndTask.OnComplete?.Invoke();
             };
 
             turnEndSequence.Append(turnEndTask);
@@ -240,14 +235,13 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void DrawCardRpc(ulong clientID, string cardUID)
         {
-            MyTween.Sequence cardDrawSequence = new MyTween.Sequence();
-            MyTween.Task cardDrawTask = new MyTween.Task();
+            Sequence cardDrawSequence = new Sequence();
+            Clip cardDrawTask = new Clip("CardDraw");
 
-            cardDrawTask.Action = () =>
+            cardDrawTask.Action += () =>
             {
                 Managers.Logger.Log<GameClient>("Card draw", colorName: "green");
                 OnCardDrawn?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetHandCard(clientID, cardUID));
-                cardDrawTask.OnComplete?.Invoke();
             };
 
             cardDrawSequence.Append(cardDrawTask);
@@ -259,14 +253,13 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void ChangeManaRpc()
         {
-            MyTween.Sequence changeManaSequence = new MyTween.Sequence();
-            MyTween.Task changeManaTask = new MyTween.Task();
+            Sequence changeManaSequence = new Sequence();
+            Clip changeManaTask = new Clip("ChangeMana");
 
-            changeManaTask.Action = () =>
+            changeManaTask.Action += () =>
             {
                 Managers.Logger.Log<GameClient>("Mana Changed", colorName: "green");
                 OnManaChanged?.Invoke();
-                changeManaTask.OnComplete?.Invoke();
             };
 
             changeManaSequence.Append(changeManaTask);
@@ -278,10 +271,10 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void PlayCardRpc(bool succeeded, ulong clientID, string cardUID)
         {
-            MyTween.Sequence cardPlaySequence = new MyTween.Sequence();
-            MyTween.Task cardPlayTask = new MyTween.Task(autoComplete: true);
+            Sequence cardPlaySequence = new Sequence();
+            Clip cardPlayTask = new Clip("CardPlay", autoComplete: true);
 
-            cardPlayTask.Action = () =>
+            cardPlayTask.Action += () =>
             {
                 Managers.Logger.Log<GameClient>($"Card play succeeded? : {succeeded}", colorName: "green");
                 OnCardPlayed?.Invoke(succeeded, GetGameData().GetPlayer(clientID), cardUID);
@@ -296,14 +289,13 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void SpawnCardRpc(bool succeeded, ulong clientID, string cardUID, int index)
         {
-            MyTween.Sequence cardSpawnSequence = new MyTween.Sequence();
-            MyTween.Task cardSpawnTask = new MyTween.Task();
+            Sequence cardSpawnSequence = new Sequence();
+            Clip cardSpawnTask = new Clip("CardSpawn");
 
-            cardSpawnTask.Action = () =>
+            cardSpawnTask.Action += () =>
             {
                 Managers.Logger.Log<GameClient>($"Card spawn succeeded? : {succeeded}", colorName: "green");
                 OnCardSpawned?.Invoke(succeeded, GetGameData().GetPlayer(clientID), GetGameData().GetFieldCard(clientID, cardUID), index);
-                cardSpawnTask.OnComplete?.Invoke();
             };
 
             cardSpawnSequence.Append(cardSpawnTask);
@@ -315,23 +307,21 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void BeforeDeadCardRpc()
         {
-            MyTween.Sequence beforeDeadSequence = new MyTween.Sequence();
-            MyTween.Task deadLog = new MyTween.Task();
+            Sequence beforeDeadSequence = new Sequence();
+            Clip deadLog = new Clip("DeadLog");
 
-            deadLog.Action = () =>
+            deadLog.Action += () =>
             {
                 Managers.Logger.Log<GameClient>("Card dead");
-                deadLog.OnComplete?.Invoke();
             };
 
             beforeDeadSequence.Append(deadLog);
 
-            MyTween.Task deadTask = new MyTween.Task();
+            Clip deadTask = new Clip("Dead");
 
-            deadTask.Action = () =>
+            deadTask.Action += () =>
             {
                 OnCharacterBeforeDead?.Invoke(beforeDeadSequence);
-                deadTask.OnComplete?.Invoke();
             };
 
             beforeDeadSequence.Append(deadTask);
@@ -343,13 +333,12 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void AfterDeadCardRpc()
         {
-            MyTween.Sequence afterDeadSequence = new MyTween.Sequence();
-            MyTween.Task afterDeadTask = new MyTween.Task();
+            Sequence afterDeadSequence = new Sequence();
+            Clip afterDeadTask = new Clip("AfterDead");
 
-            afterDeadTask.Action = () =>
+            afterDeadTask.Action += () =>
             {
                 OnCharacterAfterDead?.Invoke();
-                afterDeadTask.OnComplete?.Invoke();
             };
 
             afterDeadSequence.Append(afterDeadTask);
@@ -366,13 +355,12 @@ namespace Marsion.Client
             Card attacker = attackPlayer.GetCard(attackerUID);
             Card defender = defendPlayer.GetCard(defenderUID);
 
-            MyTween.Sequence attackSequence = new MyTween.Sequence();
-            MyTween.Task attackLog = new MyTween.Task();
+            Sequence attackSequence = new Sequence();
+            Clip attackLog = new Clip("AttackLog");
 
-            attackLog.Action = () =>
+            attackLog.Action += () =>
             {
                 Managers.Logger.Log<GameClient>("Start Attack");
-                attackLog.OnComplete?.Invoke();
             };
 
             attackSequence.Append(attackLog);
