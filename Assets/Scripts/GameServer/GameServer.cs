@@ -3,24 +3,40 @@ using Marsion.Logic;
 using UnityEngine;
 using System;
 using Marsion.Tool;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.Cryptography;
+using UnityEditor.Timeline;
 
 namespace Marsion.Server
 {
     public class GameServer : NetworkBehaviour, IGameServer
     {
         [Header("Player")]
-        [SerializeField] private DeckSO Player_Deck;
+        [SerializeField] private DeckSO PlayerDeck;
 
         [Header("Enemy")]
-        [SerializeField] private DeckSO Enemy_Deck;
+        [SerializeField] private DeckSO EnemyDeck;
 
         private GameData GameData;
         private IGameLogic Logic;
 
         MyTween.MainSequence ServerSequence;
 
-        // Action
+        // Event
+        public event Action<NetworkGameData> OnDataUpdated;
+
         public event Action OnGameStarted;
+        public event Action<int> OnGameEnded;
+        public event Action OnTurnStarted;
+        public event Action OnTurnEnded;
+
+        public event Action<ulong, string> OnCardDrawn;
+        public event Action OnManaChanged;
+        public event Action<bool, ulong, string> OnCardPlayed;
+        public event Action<bool, ulong, string, int> OnCardSpawned;
+        public event Action<ulong, string, ulong, string> OnStartAttack;
+        public event Action OnBeforeCardDead;
+        public event Action OnAfterCardDead;
 
         public void Init()
         {
@@ -39,12 +55,274 @@ namespace Marsion.Server
             ServerSequence = new MyTween.MainSequence();
         }
 
-        public override void OnNetworkSpawn()
+        public void Clear()
         {
-            base.OnNetworkSpawn();
+            if (Managers.Network != null)
+            {
+                Managers.Network.OnClientConnectedCallback -= ClientConnected;
+            }
+        }
 
-            if (IsHost)
-                Managers.Logger.Log<GameServer>("On network spawn", colorName: "blue");
+        // Flow
+        private void StartGame()
+        {
+            MyTween.Sequence sequence = new MyTween.Sequence();
+
+            MyTween.Task startGameTask = new MyTween.Task(autoComplete: true);
+            MyTween.Task drawCardTask = new MyTween.Task(autoComplete: true);
+            MyTween.Task startTurnTask = new MyTween.Task(autoComplete: true);
+
+            startGameTask.Action = () =>
+            {
+                Managers.Logger.Log<GameServer>("Start game", colorName: "blue");
+
+                GameData = new GameData(2);
+                Logic = new GameLogic();
+                NetworkGameData networkData = new NetworkGameData();
+
+                Logic.SetDeck(GetPlayer(0), PlayerDeck);
+                Logic.SetDeck(GetPlayer(1), EnemyDeck);
+
+                for(int i = 0; i < 2; i++)
+                {
+                    var player = GetPlayer((ulong)i);
+
+                    Logic.SetPortrait(player, i);
+                    Logic.ShuffleDeck(player);
+                    Logic.SetHP(player, 30);
+                }
+
+                GameData.CurrentPlayer = GetPlayer(0);
+
+                networkData.gameData = GameData;
+
+                OnDataUpdated?.Invoke(networkData);
+                OnGameStarted?.Invoke();
+            };
+
+            drawCardTask.Action = () =>
+            {
+                Managers.Logger.Log<GameServer>("Draw initial card", colorName: "blue");
+
+                NetworkGameData networkData = new NetworkGameData();
+
+                for (int i = 0; i < 2; i++)
+                {
+                    var player = GetPlayer((ulong)i);
+
+                    for (int j = 0; j < 3; j++)
+                    {
+                        Card card = Logic.DrawCard(player);
+
+                        networkData.gameData = GameData;
+                        OnDataUpdated?.Invoke(networkData);
+                        OnCardDrawn?.Invoke(player.ClientID, card.UID);
+                    }
+                }
+
+                Card exCard = Logic.DrawCard(GetPlayer(1));
+                OnDataUpdated?.Invoke(networkData);
+                OnCardDrawn?.Invoke(GetPlayer(1).ClientID, exCard.UID);
+            };
+
+            startTurnTask.Action = () =>
+            {
+                StartTurn();
+            };
+
+            sequence.Append(startGameTask);
+            sequence.Append(drawCardTask);
+            sequence.Append(startTurnTask);
+
+            ServerSequence.Append(sequence);
+            ServerSequence.Play();
+        }
+
+        private void EndGame()
+        {
+            Managers.Logger.Log<GameServer>("Game end", colorName: "blue");
+
+            int winner = Logic.GetAlivePlayer();
+
+            OnGameEnded?.Invoke(winner);
+        }
+
+        private void StartTurn()
+        {
+            MyTween.Sequence sequence = new MyTween.Sequence();
+            MyTween.Task startTurnTask = new MyTween.Task(autoComplete: true);
+            MyTween.Task drawCardTask = new MyTween.Task(autoComplete: true);
+            NetworkGameData networkData = new NetworkGameData();
+
+            startTurnTask.Action = () =>
+            {
+                Managers.Logger.Log<GameServer>("Start turn", colorName: "blue");
+
+                GameData.TurnCount++;
+
+                if (CurrentPlayer.MaxMana < 10)
+                    CurrentPlayer.IncreaseMaxMana(1);
+
+                CurrentPlayer.RestoreAllMana();
+
+                networkData.gameData = GameData;
+
+                OnTurnStarted?.Invoke();
+                OnDataUpdated?.Invoke(networkData);
+                OnManaChanged?.Invoke();
+            };
+
+            drawCardTask.Action = () =>
+            {
+                if (GameData.TurnCount != 1)
+                {
+                    Card card = Logic.DrawCard(CurrentPlayer);
+                    networkData.gameData = GameData;
+                    OnDataUpdated?.Invoke(networkData);
+                    OnCardDrawn?.Invoke(CurrentPlayer.ClientID, card.UID);
+                }
+            };
+
+            sequence.Append(startTurnTask);
+            sequence.Append(drawCardTask);
+
+            ServerSequence.Append(sequence);
+            ServerSequence.Play();
+        }
+
+        private void EndTurn()
+        {
+            MyTween.Sequence sequence = new MyTween.Sequence();
+            MyTween.Task endTurnTask = new MyTween.Task(autoComplete: true);
+            MyTween.Task startTurnTask = new MyTween.Task(autoComplete: true);
+
+            endTurnTask.Action = () =>
+            {
+                Managers.Logger.Log<GameLogic>("Turn end", colorName: "blue");
+
+                GameData.CurrentPlayer = CurrentPlayer == GetPlayer(0) ? GetPlayer(1) : GetPlayer(0);
+
+                NetworkGameData networkData = new NetworkGameData();
+                networkData.gameData = GameData;
+
+                OnDataUpdated?.Invoke(networkData);
+                OnTurnEnded?.Invoke();
+            };
+
+            startTurnTask.Action = () =>
+            {
+                StartTurn();
+            };
+
+            sequence.Append(endTurnTask);
+            sequence.Append(startTurnTask);
+
+            ServerSequence.Append(sequence);
+            ServerSequence.Play();
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TurnEndRpc()
+        {
+            EndTurn();
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TryPlayAndSpawnCardRpc(ulong id, string cardUID, int index)
+        {
+            // Player의 턴이 아니라면 false
+            // Field에 넣을 공간이 없다면 false
+            // 현재 Player의 마나가 Card의 마나보다 적다면 false
+
+            MyTween.Sequence sequence = new MyTween.Sequence();
+            MyTween.Task task = new MyTween.Task(autoComplete: true);
+            MyTween.Task updateTask = new MyTween.Task(autoComplete: true);
+            MyTween.Task eventTask = new MyTween.Task(autoComplete: true);
+
+            task.Action = () =>
+            {
+                var player = GetPlayer(id);
+                var card = player.GetCard(cardUID);
+
+                if (!(player.Mana >= card.Mana))
+                {
+                    Managers.Logger.Log<GameLogic>("그럴 수 없어요.", colorName: "blue");
+                    OnCardPlayed?.Invoke(false, player.ClientID, card.UID);
+                    OnCardSpawned?.Invoke(false, player.ClientID, card.UID, index);
+                    return;
+                }
+
+                player.PayMana(card.Mana);
+                player.Hand.Remove(card);
+                player.Field.Insert(index, card);
+
+                NetworkGameData networkData = new NetworkGameData();
+                networkData.gameData = GameData;
+
+                OnDataUpdated?.Invoke(networkData);
+                OnManaChanged?.Invoke();
+                OnCardPlayed?.Invoke(true, player.ClientID, card.UID);
+                OnCardSpawned?.Invoke(true, player.ClientID, card.UID, index);
+            };
+
+            sequence.Append(task);
+
+            ServerSequence.Append(sequence);
+            ServerSequence.Play();
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TryAttackRpc(ulong attackPlayer, string attackerUID, ulong defendPlayer, string defenderUID)
+        {
+            MyTween.Sequence sequence = new MyTween.Sequence();
+            MyTween.Task task = new MyTween.Task();
+
+            task.Action = () =>
+            {
+                Managers.Logger.Log<GameServer>("Try attack", colorName: "blue");
+
+                var attP = GetPlayer(attackPlayer);
+                var att = attP.GetCard(attackerUID);
+                var defP = GetPlayer(defendPlayer);
+                var def = defP.GetCard(defenderUID);
+
+                Logic.Damage(att, def);
+                NetworkGameData networkData = new NetworkGameData();
+                networkData.gameData = GameData;
+
+                OnDataUpdated?.Invoke(networkData);
+                OnStartAttack?.Invoke(attackPlayer, attackerUID, defendPlayer, defenderUID);
+
+                bool result = Logic.CheckDeadCard(GameData.Players);
+
+                networkData.gameData = GameData;
+                OnDataUpdated?.Invoke(networkData);
+                
+                OnBeforeCardDead?.Invoke();
+                OnAfterCardDead?.Invoke();
+
+                //if (result)
+                //    EndGame();
+            };
+
+            sequence.Append(task);
+
+            ServerSequence.Append(sequence);
+            ServerSequence.Play();
+        }
+
+        #region Utils
+
+        private Player CurrentPlayer => GameData.CurrentPlayer;
+
+        private bool AreAllPlayersConnected()
+        {
+            return Managers.Network.ConnectedClientsList.Count == 2;
+        }
+
+        private Player GetPlayer(ulong clientID)
+        {
+            return GameData.GetPlayer(clientID);
         }
 
         private void ClientConnected(ulong clientId)
@@ -70,210 +348,10 @@ namespace Marsion.Server
             {
                 Managers.Logger.Log<GameServer>($"Ready to start", colorName: "blue");
 
-                //SetPlayerPortrait(GameData.Players[0], 0);
-                //SetPlayerDeck(GameData.Players[0], Player_Deck);
-
-                //SetPlayerPortrait(GameData.Players[1], 1);
-                //SetPlayerDeck(GameData.Players[1], Enemy_Deck);
-
-                //// 게임 시작
-                //Logic.StartGame();
-
                 StartGame();
             }
         }
 
-        public void Clear()
-        {
-            if (Managers.Network != null)
-            {
-                Managers.Network.OnClientConnectedCallback -= ClientConnected;
-            }
-        }
-
-        [ServerRpc]
-        public void ClearServerRpc()
-        {
-            Logic.OnGameStarted -= GameStarted;
-            Logic.OnDataUpdated -= DataUpdated;
-            Logic.OnCardDrawn -= CardDrawn;
-        }
-
-        // Flow
-        private void StartGame()
-        {
-            MyTween.Sequence gameStartSequence = new MyTween.Sequence();
-            MyTween.Task gameStartTask = new MyTween.Task();
-
-            gameStartTask.Action = () =>
-            {
-                Managers.Logger.Log<GameServer>("Start game", colorName: "blue");
-
-                GameData = new GameData(2);
-                Logic = new GameLogic(GameData);
-
-                SetPlayerDeck(GetPlayer(0), Player_Deck);
-                SetPlayerDeck(GetPlayer(1), Enemy_Deck);
-
-                for(int i = 0; i < 2; i++)
-                {
-                    var player = GetPlayer((ulong)i);
-
-                    SetPlayerPortrait(player, i);
-                    Logic.ShuffleDeck(player.Deck);
-                    player.Card.SetHP(30);
-                    for (int j = 0; j < 3; j++)
-                        Logic.DrawCard(player);
-                }
-
-                Logic.DrawCard(GetPlayer(1));
-
-                GameData.CurrentPlayer = GetPlayer(0);
-
-                OnGameStarted?.Invoke();
-
-                gameStartTask.OnComplete?.Invoke();
-            };
-
-            gameStartSequence.Append(gameStartTask);
-            ServerSequence.Append(gameStartSequence);
-
-            ServerSequence.Play();
-        }
-
-        private void DataUpdated()
-        {
-            //GameData = Logic.GetGameData();
-            //NetworkGameData networkData = new NetworkGameData();
-            //networkData.gameData = GameData;
-
-            //Managers.Client.UpdateDataRpc(networkData);
-        }
-
-        private void GameStarted()
-        {
-            Managers.Client.StartGameRpc();
-        }
-
-        private void GameEnded(int playerID)
-        {
-            Managers.Client.EndGameRpc(playerID);
-        }
-
-        private void TurnStarted()
-        {
-            Managers.Client.StartTurnRpc();
-        }
-
-        private void TurnEnded()
-        {
-            Managers.Client.EndTurnRpc();
-        }
-
-        private void CardDrawn(Player player, Card card)
-        {
-            Managers.Client.DrawCardRpc(player.ClientID, card.UID);
-        }
-
-        private void ManaChanged()
-        {
-            Managers.Client.ChangeManaRpc();
-        }
-
-        private void CardPlayed(bool succeeded, Player player, Card card)
-        {
-            Managers.Client.PlayCardRpc(succeeded, player.ClientID, card.UID);
-        }
-
-        private void CardSpawned(bool succeeded, Player player, Card card, int index)
-        {
-            Managers.Client.SpawnCardRpc(succeeded, player.ClientID, card.UID, index);
-        }
-
-        private void CardBeforeDead()
-        {
-            Managers.Client.BeforeDeadCardRpc();
-        }
-
-        private void CardAfterDead()
-        {
-            Managers.Client.AfterDeadCardRpc();
-        }
-
-        private void StartAttack(Card attacker, Card defender)
-        {
-            Managers.Client.StartAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
-        }
-
-        
-
-        [Rpc(SendTo.Server)]
-        public void DrawCardRpc(ulong clientID)
-        {
-            Player player = GetPlayer(clientID);
-            Logic.DrawCard(player);
-        }
-
-        [Rpc(SendTo.Server)]
-        public void PlayCardRpc(ulong clientID, string cardUID)
-        {
-            Player player = GetPlayer(clientID);
-            Card card = player.GetCard(cardUID);
-            Logic.PlayCard(player, card);
-        }
-
-        [Rpc(SendTo.Server)]
-        public void TryPlayAndSpawnCardRpc(ulong clientID, string cardUID, int index)
-        {
-            Player player = GetPlayer(clientID);
-            Card card = player.GetCard(cardUID);
-            Logic.TryPlayAndSpawnCard(player, card, index);
-        }
-
-        [Rpc(SendTo.Server)]
-        public void TurnEndRpc()
-        {
-            Logic.EndTurn();
-        }
-
-        [Rpc(SendTo.Server)]
-        public void TryAttackRpc(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
-        {
-            Player attackPlayer = GetPlayer(attackerID);
-            Card attacker = attackPlayer.GetCard(attackerUID);
-            Player defendPlayer = GetPlayer(defenderID);
-            Card defender = defendPlayer.GetCard(defenderUID);
-
-            Logic.TryAttack(attackPlayer, attacker, defendPlayer, defender);
-        }
-
-        private bool AreAllPlayersConnected()
-        {
-            return Managers.Network.ConnectedClientsList.Count == 2;
-        }
-
-        private void SetPlayerPortrait(Player player, int spriteIndex)
-        {
-            player.Portrait = spriteIndex;
-        }
-
-        private void SetPlayerDeck(Player player, DeckSO deck)
-        {
-            player.Deck.Clear();
-
-            foreach (CardSO cardSO in deck.cards)
-            {
-                if (cardSO != null)
-                {
-                    Card card = new Card(player.ClientID, cardSO);
-                    player.Deck.Add(card);
-                }
-            }
-        }
-
-        private Player GetPlayer(ulong clientID)
-        {
-            return GameData.GetPlayer(clientID);
-        }
+        #endregion
     }
 }

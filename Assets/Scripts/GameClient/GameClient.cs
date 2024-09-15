@@ -13,11 +13,7 @@ namespace Marsion.Client
 {
     public class GameClient : NetworkBehaviour, IGameClient
     {
-        #region Resource Fields
-
         public List<Sprite> PortraitSprites;
-
-        #endregion
 
         GameData _gameData;
         MyTween.MainSequence ClientSequence;
@@ -36,8 +32,6 @@ namespace Marsion.Client
 
         public InputManager Input { get; private set; }
 
-        #region Events
-
         public event UnityAction OnDataUpdated;
         public event UnityAction OnGameStarted;
         public event UnityAction OnGameEnded;
@@ -45,84 +39,15 @@ namespace Marsion.Client
         public event UnityAction OnTurnEnded;
         public event UnityAction<Player, Card> OnCardDrawn;
         public event UnityAction OnManaChanged;
+
         public event UnityAction<bool, Player, string> OnCardPlayed;
         public event UnityAction<bool, Player, Card, int> OnCardSpawned;
         public event Action<MyTween.Sequence, Player, Card, Player, Card> OnStartAttack;
         public event Action<MyTween.Sequence> OnCharacterBeforeDead;
         public event UnityAction OnCharacterAfterDead;
 
-        #endregion
-
-        #region Get Operations
-
-        public bool IsMine(Player player)
-        {
-            return _gameData.GetPlayer(ID) == player;
-        }
-
-        public bool IsMine(Card card)
-        {
-            return IsMine(card.PlayerID);
-        }
-
-        public bool IsMine(ulong id)
-        {
-            return ID == id;
-        }
-
-        public bool IsMyTurn()
-        {
-            return IsMine(GetGameData().CurrentPlayer);
-        }
-
-        public GameData GetGameData()
-        {
-            return _gameData;
-        }
-
-        public ICharacterView GetCreature(ulong clientID, string cardUID)
-        {
-            if (IsMine(clientID))
-            {
-                return PlayerField.GetCreature(GetGameData().GetFieldCard(clientID, cardUID));
-            }
-            else
-            {
-                return EnemyField.GetCreature(GetGameData().GetFieldCard(clientID, cardUID));
-            }
-        }
-
-        public Sprite GetPortrait(int index)
-        {
-            return PortraitSprites[index];
-        }
-
-        public Card GetCard(CardType type, ulong clientID, string cardUID)
-        {
-            Card result = null;
-
-            switch(type)
-            {
-                case CardType.Hero:
-                    result = GetGameData().GetPlayer(clientID).Card;
-                    break;
-                case CardType.Field:
-                    result = GetGameData().GetFieldCard(clientID, cardUID);
-                    break;
-            }
-
-            return result;
-        }
-
-        #endregion
-
-        #region Manager Operations
-
         public void Init()
         {
-            Managers.Server.OnGameStarted -= TestStartGameRpc;
-            Managers.Server.OnGameStarted += TestStartGameRpc;
-
             if (Managers.Network != null)
             {
                 Managers.Network.OnClientConnectedCallback -= SetClientID;
@@ -136,6 +61,19 @@ namespace Marsion.Client
             ClientSequence = new MyTween.MainSequence();
 
             Input = new InputManager();
+
+            Managers.Server.OnDataUpdated += UpdateDataRpc;
+            Managers.Server.OnGameStarted += StartGameRpc;
+            Managers.Server.OnGameEnded += EndGameRpc;
+            Managers.Server.OnTurnStarted += StartTurnRpc;
+            Managers.Server.OnTurnEnded += EndTurnRpc;
+            Managers.Server.OnCardDrawn += DrawCardRpc;
+            Managers.Server.OnManaChanged += ChangeManaRpc;
+            Managers.Server.OnCardPlayed += PlayCardRpc;
+            Managers.Server.OnCardSpawned += SpawnCardRpc;
+            Managers.Server.OnStartAttack += StartAttackRpc;
+            Managers.Server.OnBeforeCardDead += BeforeDeadCardRpc;
+            Managers.Server.OnAfterCardDead += AfterDeadCardRpc;
         }
 
         public void Update()
@@ -148,23 +86,9 @@ namespace Marsion.Client
             Managers.Network.OnClientConnectedCallback -= SetClientID;
         }
 
-        #endregion
-
-        #region Client Operations
-
         public void SetClientID(ulong clientID)
         {
             ID = Managers.Network.LocalClientId;
-        }
-
-        public void DrawCard()
-        {
-            Managers.Server.DrawCardRpc(ID);
-        }
-
-        public void PlayCard(Card card)
-        {
-            Managers.Server.PlayCardRpc(ID, card.UID);
         }
 
         public void TryPlayAndSpawnCard(Card card, int index)
@@ -182,16 +106,6 @@ namespace Marsion.Client
             Managers.Server.TryAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
         }
 
-        #endregion
-
-        #region Event Rpcs
-
-        [Rpc(SendTo.ClientsAndHost)]
-        private void TestStartGameRpc()
-        {
-            Managers.Logger.Log<GameClient>("Start game", colorName: "green");
-        }
-
         [Rpc(SendTo.ClientsAndHost)]
         public void StartGameRpc()
         {
@@ -200,14 +114,11 @@ namespace Marsion.Client
 
             gameStartTask.Action = () =>
             {
-                Managers.Logger.Log<GameClient>("Game Start");
+                Managers.Logger.Log<GameClient>("Start game", colorName: "green");
 
-                // 여기에 Start와 관련한 작업이 들어가야한다.
-                // 예를 들면, Player Hero와 Enemy Hero에 대해 Card를 넣는다던지.
-
-                foreach(var player in GetGameData().Players)
+                foreach (var player in GetGameData().Players)
                 {
-                    if(ID == player.ClientID)
+                    if (ID == player.ClientID)
                     {
                         PlayerHero.Init(player.Card);
                         PlayerHero.Spawn();
@@ -239,7 +150,7 @@ namespace Marsion.Client
             updateTask.Action = () =>
             {
                 _gameData = networkData.gameData;
-                Managers.Logger.Log<GameClient>("Game data updated");
+                Managers.Logger.Log<GameClient>("Game data updated", colorName:"green");
 
                 OnDataUpdated?.Invoke();
                 updateTask.OnComplete?.Invoke();
@@ -288,13 +199,12 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void StartTurnRpc()
         {
-            Managers.Logger.Log<GameClient>("Start turn", colorName: "green");
             MyTween.Sequence turnStartSequence = new MyTween.Sequence();
             MyTween.Task turnStartTask = new MyTween.Task();
 
             turnStartTask.Action = () =>
             {
-                Managers.Logger.Log<GameClient>("Turn Start.");
+                Managers.Logger.Log<GameClient>("Turn start", colorName: "green");
                 OnTurnStarted?.Invoke();
                 turnStartTask.OnComplete?.Invoke();
             };
@@ -313,7 +223,7 @@ namespace Marsion.Client
 
             turnEndTask.Action = () =>
             {
-                Managers.Logger.Log<GameClient>("Turn End.");
+                Managers.Logger.Log<GameClient>("Turn end", colorName: "green");
                 OnTurnEnded?.Invoke();
                 turnEndTask.OnComplete?.Invoke();
             };
@@ -332,7 +242,7 @@ namespace Marsion.Client
 
             cardDrawTask.Action = () =>
             {
-                Managers.Logger.Log<GameClient>("Card Draw");
+                Managers.Logger.Log<GameClient>("Card draw", colorName: "green");
                 OnCardDrawn?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetHandCard(clientID, cardUID));
                 cardDrawTask.OnComplete?.Invoke();
             };
@@ -351,7 +261,7 @@ namespace Marsion.Client
 
             changeManaTask.Action = () =>
             {
-                Managers.Logger.Log<GameClient>("Mana Changed");
+                Managers.Logger.Log<GameClient>("Mana Changed", colorName: "green");
                 OnManaChanged?.Invoke();
                 changeManaTask.OnComplete?.Invoke();
             };
@@ -366,13 +276,12 @@ namespace Marsion.Client
         public void PlayCardRpc(bool succeeded, ulong clientID, string cardUID)
         {
             MyTween.Sequence cardPlaySequence = new MyTween.Sequence();
-            MyTween.Task cardPlayTask = new MyTween.Task();
+            MyTween.Task cardPlayTask = new MyTween.Task(autoComplete: true);
 
             cardPlayTask.Action = () =>
             {
-                Managers.Logger.Log<GameClient>("Card Play");
+                Managers.Logger.Log<GameClient>($"Card play succeeded? : {succeeded}", colorName: "green");
                 OnCardPlayed?.Invoke(succeeded, GetGameData().GetPlayer(clientID), cardUID);
-                cardPlayTask.OnComplete?.Invoke();
             };
 
             cardPlaySequence.Append(cardPlayTask);
@@ -389,7 +298,7 @@ namespace Marsion.Client
 
             cardSpawnTask.Action = () =>
             {
-                Managers.Logger.Log<GameClient>("Card Spawn");
+                Managers.Logger.Log<GameClient>($"Card spawn succeeded? : {succeeded}", colorName: "green");
                 OnCardSpawned?.Invoke(succeeded, GetGameData().GetPlayer(clientID), GetGameData().GetFieldCard(clientID, cardUID), index);
                 cardSpawnTask.OnComplete?.Invoke();
             };
@@ -469,6 +378,67 @@ namespace Marsion.Client
 
             ClientSequence.Append(attackSequence);
             ClientSequence.Play();
+        }
+
+        #region Utils
+
+        public bool IsMine(Player player)
+        {
+            return _gameData.GetPlayer(ID) == player;
+        }
+
+        public bool IsMine(Card card)
+        {
+            return IsMine(card.PlayerID);
+        }
+
+        public bool IsMine(ulong id)
+        {
+            return ID == id;
+        }
+
+        public bool IsMyTurn()
+        {
+            return IsMine(GetGameData().CurrentPlayer);
+        }
+
+        public GameData GetGameData()
+        {
+            return _gameData;
+        }
+
+        public ICharacterView GetCreature(ulong clientID, string cardUID)
+        {
+            if (IsMine(clientID))
+            {
+                return PlayerField.GetCreature(GetGameData().GetFieldCard(clientID, cardUID));
+            }
+            else
+            {
+                return EnemyField.GetCreature(GetGameData().GetFieldCard(clientID, cardUID));
+            }
+        }
+
+        public Sprite GetPortrait(int index)
+        {
+            return PortraitSprites[index];
+        }
+
+        public Card GetCard(CardType type, ulong clientID, string cardUID)
+        {
+            Card result = null;
+
+            switch (type)
+            {
+                case CardType.Hero:
+                    result = GetGameData().GetPlayer(clientID).Card;
+                    break;
+                case CardType.Field:
+                    result = GetGameData().GetFieldCard(clientID, cardUID);
+                    break;
+            }
+
+            return result;
         }
 
         #endregion
