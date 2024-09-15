@@ -63,8 +63,6 @@ namespace Marsion.Client
         #region Client Operations
 
         void SetClientID(ulong clientID);
-        void DrawCard();
-        void PlayCard(Card card);
         void TryPlayAndSpawnCard(Card card, int index);
         void TurnEnd();
         void TryAttack(Card attacker, Card defender);

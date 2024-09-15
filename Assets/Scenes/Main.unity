@@ -1668,7 +1668,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ProtocolType: 1
+  m_ProtocolType: 0
   m_MaxPacketQueueSize: 128
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500
@@ -2019,6 +2019,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3025033029764114677, guid: 5708b6395f1e44f458dcb7afcb5d6c6e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9075304338893019992, guid: 5708b6395f1e44f458dcb7afcb5d6c6e, type: 3}
+      propertyPath: IsRelay
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

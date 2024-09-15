@@ -53,6 +53,16 @@ namespace Marsion.CardView
 
                 OnPileChanged?.Invoke(Cards.ToArray());
             }
+            else
+            {
+                foreach (ICardView cardView in Cards)
+                {
+                    if (cardView.Card.UID == cardUID)
+                    {
+                        cardView.MonoBehaviour.gameObject.SetActive(true);
+                    }
+                }
+            }
         }
 
         public void AddCard(ICardView card)

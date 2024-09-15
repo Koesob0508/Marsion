@@ -15,6 +15,12 @@ namespace Marsion.Tool
             public TaskType Type;
             public Action Action;
             public Action OnComplete;
+            public bool AutoComplete = false;
+
+            public Task(bool autoComplete = false)
+            {
+                AutoComplete = autoComplete;
+            }
         }
     }
 }

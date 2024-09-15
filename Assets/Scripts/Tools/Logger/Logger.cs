@@ -64,7 +64,7 @@ namespace Marsion
             {
                 var context = GetTypeName(typeof(T));
                 log = string.Format("[" + context + OpenColor + log + CloseColor + GetTypeName(param), colorName);
-                Debug.Log(log);
+                // Debug.Log(log);
             }
         }
 

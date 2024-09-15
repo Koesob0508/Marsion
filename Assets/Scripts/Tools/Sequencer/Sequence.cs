@@ -36,14 +36,21 @@ namespace Marsion.Tool
                 }
                 else
                 {
-                    Tasks.Dequeue().Action.Invoke();
+                    var task = Tasks.Dequeue();
+                    task.Action.Invoke();
+
                     if(Tasks.TryPeek(out var result))
                     {
                         if(result.Type == TaskType.Join)
                         {
                             Tasks.Dequeue().Action.Invoke();
+                            if (result.AutoComplete)
+                                task.OnComplete?.Invoke();
                         }
                     }
+
+                    if(task.AutoComplete)
+                        task.OnComplete?.Invoke();
                 }
             }
         }
