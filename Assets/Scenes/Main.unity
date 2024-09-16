@@ -821,6 +821,54 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &741019383
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 741019384}
+  - component: {fileID: 741019385}
+  m_Layer: 0
+  m_Name: '@Sequencer'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &741019384
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 741019383}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 925391791}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &741019385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 741019383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ce8ea1408e11a74ebb6695cf23d1d18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsPlaying: 0
+  CurrentSequence: 
+  CurrentClip: 
+  Titles: []
 --- !u!1 &757059110
 GameObject:
   m_ObjectHideFlags: 0
@@ -1065,7 +1113,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 741019384}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &925391792
@@ -1104,6 +1153,7 @@ MonoBehaviour:
   PortraitSprites:
   - {fileID: 21300000, guid: 6b016939c935e7c4eb6acb09e2c44515, type: 3}
   - {fileID: 21300000, guid: 919f5fefd56b9b645934e1d57e904dc8, type: 3}
+  Sequencer: {fileID: 741019385}
   hand: {fileID: 757059111}
   playerField: {fileID: 1583044159}
   enemyField: {fileID: 1417632283}
@@ -1721,8 +1771,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 772264b428b4d094596faf6fd7705320, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player_Deck: {fileID: 11400000, guid: 9b953660440fa84429b661b6ccd0cbe1, type: 2}
-  Enemy_Deck: {fileID: 11400000, guid: 50b9df678b02d974cafc5a937e4e5ed3, type: 2}
+  Sequencer: {fileID: 1478783232}
+  PlayerDeck: {fileID: 11400000, guid: 9b953660440fa84429b661b6ccd0cbe1, type: 2}
+  EnemyDeck: {fileID: 11400000, guid: 50b9df678b02d974cafc5a937e4e5ed3, type: 2}
 --- !u!4 &1267154522
 Transform:
   m_ObjectHideFlags: 0

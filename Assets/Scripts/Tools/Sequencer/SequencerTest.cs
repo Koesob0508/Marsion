@@ -26,7 +26,7 @@ namespace Marsion.Tool
                             .AppendInterval(3f)
                             .AppendCallback(() =>
                             {
-                                Debug.Log($"Test {clipCount} Clip");
+                                Debug.Log($"{clip.Name} on play");
                             })
                             .OnComplete(() =>
                             {
@@ -34,7 +34,7 @@ namespace Marsion.Tool
                             });
                 };
 
-                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence");
+                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence", Sequencer);
                 sequenceCount++;
                 sequence.Append(clip);
 
@@ -51,7 +51,7 @@ namespace Marsion.Tool
                             .AppendInterval(3f)
                             .AppendCallback(() =>
                             {
-                                Debug.Log($"Test {clipCount} Clip");
+                                Debug.Log($"{clip1.Name} on play");
                             })
                             .OnComplete(() =>
                             {
@@ -67,7 +67,7 @@ namespace Marsion.Tool
                             .AppendInterval(3f)
                             .AppendCallback(() =>
                             {
-                                Debug.Log($"Test {clipCount} Clip");
+                                Debug.Log($"{clip2.Name}  on play");
                             })
                             .OnComplete(() =>
                             {
@@ -75,7 +75,7 @@ namespace Marsion.Tool
                             });
                 };
 
-                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence");
+                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence", Sequencer);
                 sequenceCount++;
                 sequence.Append(clip1);
                 sequence.Append(clip2);
@@ -93,7 +93,7 @@ namespace Marsion.Tool
                             .AppendInterval(3f)
                             .AppendCallback(() =>
                             {
-                                Debug.Log($"Test {clipCount} Clip");
+                                Debug.Log($"{clip1.Name}  on play");
                             })
                             .OnComplete(() =>
                             {
@@ -109,7 +109,7 @@ namespace Marsion.Tool
                             .AppendInterval(3f)
                             .AppendCallback(() =>
                             {
-                                Debug.Log($"Test {clipCount} Clip");
+                                Debug.Log($"{clip2.Name}  on play");
                             })
                             .OnComplete(() =>
                             {
@@ -125,7 +125,7 @@ namespace Marsion.Tool
                             .AppendInterval(3f)
                             .AppendCallback(() =>
                             {
-                                Debug.Log($"Test {clipCount} Clip");
+                                Debug.Log($"{clip3.Name}  on play");
                             })
                             .OnComplete(() =>
                             {
@@ -133,7 +133,7 @@ namespace Marsion.Tool
                             });
                 };
 
-                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence");
+                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence", Sequencer);
                 sequenceCount++;
                 sequence.Append(clip1);
                 sequence.Append(clip2);

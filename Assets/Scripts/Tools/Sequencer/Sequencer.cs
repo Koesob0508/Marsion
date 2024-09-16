@@ -12,6 +12,7 @@ namespace Marsion.Tool
         public string CurrentClip;
         public List<string> Titles;
 
+        private Sequence _currentSequence;
         private Queue<Sequence> Sequences;
 
         public void Init()
@@ -26,12 +27,25 @@ namespace Marsion.Tool
             sequence.onClipPlay += SetCurrentClip;
             sequence.OnComplete += CompleteSequence;
             Sequences.Enqueue(sequence);
-            UpdateSequence();
+            UpdateTitles();
         }
 
-        private void UpdateSequence()
+        private void UpdateTitles()
         {
             Titles.Clear();
+
+            if (_currentSequence != null)
+            {
+                Titles.Add($"Sequence : {_currentSequence.Name}");
+
+                if (_currentSequence._currentClip != null)
+                    Titles.Add($"Clip : {_currentSequence._currentClip.Name}");
+
+                foreach (Clip clip in _currentSequence.Clips)
+                {
+                    Titles.Add($"Clip : {clip.Name}");
+                }
+            }
 
             foreach (Sequence sequence in Sequences)
             {
@@ -48,18 +62,14 @@ namespace Marsion.Tool
         {
             if (IsPlaying) return;
 
-            Debug.Log("Sequencer Play");
-
             IsPlaying = true;
 
             if (Sequences.TryDequeue(out var sequence))
             {
+                _currentSequence = sequence;
+                Debug.Log($"{sequence.Name} Play");
                 sequence.Play();
                 SetCurrentSequence(sequence.Name);
-            }
-            else
-            {
-                Debug.Log("Sequence 없다는 오류");
             }
         }
 
@@ -76,7 +86,10 @@ namespace Marsion.Tool
         private void CompleteSequence()
         {
             IsPlaying = false;
-            UpdateSequence();
+            _currentSequence = null;
+            SetCurrentSequence("IDLE");
+            SetCurrentClip("IDLE");
+            UpdateTitles();
         }
 
         private void Update()
@@ -98,12 +111,17 @@ namespace Marsion.Tool
             public event Action<string> onClipPlay;
             public event Action OnComplete;
 
-            public Sequence(string name)
+            public Clip _currentClip { get; private set; }
+
+            public Sequencer Handler { get; private set; }
+
+            public Sequence(string name, Sequencer handler)
             {
                 isPlaying = false;
 
                 ID = Guid.NewGuid().ToString();
                 Name = name;
+                Handler = handler;
 
                 Clips = new Queue<Clip>();
                 Checks = new Dictionary<string, bool>();
@@ -114,7 +132,7 @@ namespace Marsion.Tool
                 clip.OnComplete += () =>
                 {
                     CompleteClip(clip.ID);
-                    Play();
+                    PlayNext();
                 };
 
                 Clips.Enqueue(clip);
@@ -123,21 +141,38 @@ namespace Marsion.Tool
 
             public void Play()
             {
-                if (Clips.Count == 0)
-                    Complete();
-
                 if (isPlaying)
+                {
+                    Debug.Log("Sequence is playing");
                     return;
+                }
 
                 isPlaying = true;
 
                 Clips.TryDequeue(out var clip);
+                _currentClip = clip;
                 clip.Play();
+                Handler.UpdateTitles();
+
                 onClipPlay?.Invoke(clip.Name);
             }
 
+            private void PlayNext()
+            {
+                Debug.Log("Try play next");
+
+                if (Clips.Count == 0)
+                {
+                    return;
+                }
+
+                Play();
+            }
+
+            // Joined를 염두에 둔 함수. 지금은 PlayNext와 다르지 않다.
             public void Complete()
             {
+                Debug.Log($"{Name} complete");
                 OnComplete?.Invoke();
                 Clear();
             }
@@ -151,7 +186,10 @@ namespace Marsion.Tool
 
             private void CompleteClip(string id)
             {
+                Debug.Log("Clip completed");
                 Checks[id] = true;
+                isPlaying = false;
+                _currentClip = null;
 
                 if (CheckEndSequence())
                     Complete();
@@ -186,6 +224,7 @@ namespace Marsion.Tool
 
             public Action Play()
             {
+                Debug.Log($"{Name} play");
                 OnPlay?.Invoke();
 
                 if (IsAutoComplete)
