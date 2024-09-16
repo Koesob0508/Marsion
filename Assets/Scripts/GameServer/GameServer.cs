@@ -1,6 +1,7 @@
 ﻿using Unity.Netcode;
 using Marsion.Logic;
 using UnityEngine;
+using Marsion.Tool;
 
 namespace Marsion.Server
 {
@@ -8,11 +9,14 @@ namespace Marsion.Server
     {
         public bool IsConnected { get; private set; }
 
+        [Header("Sequencer")]
+        [SerializeField] private Sequencer Sequencer;
+
         [Header("Player")]
-        [SerializeField] private DeckSO Player_Deck;
+        [SerializeField] private DeckSO PlayerDeck;
 
         [Header("Enemy")]
-        [SerializeField] private DeckSO Enemy_Deck;
+        [SerializeField] private DeckSO EnemyDeck;
 
         private GameData gameData;
         private IGameLogic Logic;
@@ -203,10 +207,10 @@ namespace Marsion.Server
                 Managers.Logger.Log<GameServer>($"Ready to start");
 
                 SetPlayerPortrait(gameData.Players[0], 0);
-                SetPlayerDeck(gameData.Players[0], Player_Deck);
+                SetPlayerDeck(gameData.Players[0], PlayerDeck);
 
                 SetPlayerPortrait(gameData.Players[1], 1);
-                SetPlayerDeck(gameData.Players[1], Enemy_Deck);
+                SetPlayerDeck(gameData.Players[1], EnemyDeck);
 
                 // 게임 시작
                 Logic.StartGame();

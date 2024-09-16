@@ -21,6 +21,9 @@ namespace Marsion.Client
 
         GameData _gameData;
         MyTween.MainSequence ClientSequence;
+        
+        [Header("Sequencer")]
+        [SerializeField] private Sequencer Sequencer;
 
         [SerializeField] HandView hand;
         [SerializeField] FieldView playerField;
