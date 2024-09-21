@@ -866,6 +866,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsPlaying: 0
+  Name: Client
   CurrentSequence: 
   CurrentClip: 
   Titles: []
@@ -2393,6 +2394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsPlaying: 0
+  Name: Server
   CurrentSequence: 
   CurrentClip: 
   Titles: []

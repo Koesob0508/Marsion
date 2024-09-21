@@ -61,9 +61,6 @@ namespace Marsion.CardView
             Managers.Client.OnStartAttack -= Attack;
             Managers.Client.OnStartAttack += Attack;
 
-            Managers.Client.OnCharacterBeforeDead -= BeforeDead;
-            Managers.Client.OnCharacterBeforeDead += BeforeDead;
-
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
 
@@ -76,7 +73,6 @@ namespace Marsion.CardView
         {
             Managers.Client.OnDataUpdated -= UpdateCard;
             Managers.Client.OnStartAttack -= Attack;
-            Managers.Client.OnCharacterBeforeDead -= BeforeDead;
         }
 
         protected abstract void UpdateCard();
@@ -89,32 +85,43 @@ namespace Marsion.CardView
 
         public abstract void Spawn();
 
-        protected virtual void Attack(Tool.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        protected virtual void Attack(Sequencer.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
             if (Card.UID != attacker.UID) return;
 
-            Clip attackTask = new("AttackTask");
+            Sequencer.Clip startAttackClip = new("StartAttack", false);
 
-            attackTask.Action += () =>
+            startAttackClip.OnPlay += () =>
             {
-                FSM.Target = Managers.Client.GetCreature(defendPlayer.ClientID, defender.UID).MonoBehaviour.gameObject;
-                //FSM.PushState<CreatureViewAttack>(attackTask.OnComplete);
+                FSM.AttackState.Target = Managers.Client.GetCharacter(defendPlayer.ClientID, defender.UID).MonoBehaviour.gameObject;
+                FSM.AttackState.OnComplete += () =>
+                {
+                    Managers.Logger.Log<CharacterView>("Dead check?", colorName:"cyan");
+                    startAttackClip.Complete();
+                };
+
+                FSM.PushState<CreatureViewAttack>();
             };
 
-            sequence.Append(attackTask);
+            sequence.Append(startAttackClip);
         }
 
-        protected virtual void BeforeDead(Tool.Sequence sequence)
+        protected virtual void BeforeDead(Sequencer.Sequence sequence)
         {
             if (!Card.IsDead) return;
 
-            Clip deadAction = new Clip("DeadAction");
-            deadAction.Action += () =>
+            Sequencer.Clip deadAnimClip = new Sequencer.Clip("DeadAnim", false);
+            deadAnimClip.OnPlay += () =>
             {
-                //FSM.PushState<CreatureViewDead>(deadAction.OnComplete);
+                FSM.DeadState.OnComplete += () =>
+                {
+                    deadAnimClip.Complete();
+                };
+
+                FSM.PushState<CreatureViewDead>();
             };
 
-            sequence.Join(deadAction);
+            sequence.Append(deadAnimClip);
         }
 
         public override bool Equals(object obj)

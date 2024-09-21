@@ -3,9 +3,6 @@ using Marsion.Logic;
 using UnityEngine;
 using System;
 using Marsion.Tool;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Security.Cryptography;
-using UnityEditor.Timeline;
 
 namespace Marsion.Server
 {
@@ -25,8 +22,6 @@ namespace Marsion.Server
         private GameData GameData;
         private IGameLogic Logic;
 
-        Sequencer ServerSequence;
-
         // Event
         public event Action<NetworkGameData> OnDataUpdated;
 
@@ -40,8 +35,7 @@ namespace Marsion.Server
         public event Action<bool, ulong, string> OnCardPlayed;
         public event Action<bool, ulong, string, int> OnCardSpawned;
         public event Action<ulong, string, ulong, string> OnStartAttack;
-        public event Action OnBeforeCardDead;
-        public event Action OnAfterCardDead;
+        public event Action OnDeadCard;
 
         public void Init()
         {
@@ -57,7 +51,7 @@ namespace Marsion.Server
                 Managers.Logger.Log<GameServer>("Network is null", colorName: "blue");
             }
 
-            ServerSequence = new Sequencer();
+            Sequencer.Init();
         }
 
         public void Clear()
@@ -71,13 +65,13 @@ namespace Marsion.Server
         // Flow
         private void StartGame()
         {
-            Sequence sequence = new Sequence();
+            Sequencer.Sequence sequence = new Sequencer.Sequence("StartGame", Sequencer);
 
-            Clip startGameTask = new Clip(autoComplete: true);
-            Clip drawCardTask = new Task(autoComplete: true);
-            Clip startTurnTask = new Task(autoComplete: true);
+            Sequencer.Clip startGameClip = new Sequencer.Clip("StartGame");
+            Sequencer.Clip drawCardClip = new Sequencer.Clip("DrawCard");
+            Sequencer.Clip startTurnClip = new Sequencer.Clip("StartTurn");
 
-            startGameTask.Action = () =>
+            startGameClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameServer>("Start game", colorName: "blue");
 
@@ -105,7 +99,7 @@ namespace Marsion.Server
                 OnGameStarted?.Invoke();
             };
 
-            drawCardTask.Action = () =>
+            drawCardClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameServer>("Draw initial card", colorName: "blue");
 
@@ -130,17 +124,16 @@ namespace Marsion.Server
                 OnCardDrawn?.Invoke(GetPlayer(1).ClientID, exCard.UID);
             };
 
-            startTurnTask.Action = () =>
+            startTurnClip.OnPlay += () =>
             {
                 StartTurn();
             };
 
-            sequence.Append(startGameTask);
-            sequence.Append(drawCardTask);
-            sequence.Append(startTurnTask);
+            sequence.Append(startGameClip);
+            sequence.Append(drawCardClip);
+            sequence.Append(startTurnClip);
 
-            ServerSequence.Append(sequence);
-            ServerSequence.Play();
+            Sequencer.Append(sequence);
         }
 
         private void EndGame()
@@ -154,12 +147,12 @@ namespace Marsion.Server
 
         private void StartTurn()
         {
-            MyTween.Sequence sequence = new MyTween.Sequence();
-            MyTween.Task startTurnTask = new MyTween.Task(autoComplete: true);
-            MyTween.Task drawCardTask = new MyTween.Task(autoComplete: true);
+            Sequencer.Sequence sequence = new Sequencer.Sequence("StartTurn", Sequencer);
+            Sequencer.Clip startTurnClip = new Sequencer.Clip("StartTurn");
+            Sequencer.Clip drawCardClip = new Sequencer.Clip("DrawCard");
             NetworkGameData networkData = new NetworkGameData();
 
-            startTurnTask.Action = () =>
+            startTurnClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameServer>("Start turn", colorName: "blue");
 
@@ -177,7 +170,7 @@ namespace Marsion.Server
                 OnManaChanged?.Invoke();
             };
 
-            drawCardTask.Action = () =>
+            drawCardClip.OnPlay += () =>
             {
                 if (GameData.TurnCount != 1)
                 {
@@ -188,20 +181,19 @@ namespace Marsion.Server
                 }
             };
 
-            sequence.Append(startTurnTask);
-            sequence.Append(drawCardTask);
+            sequence.Append(startTurnClip);
+            sequence.Append(drawCardClip);
 
-            ServerSequence.Append(sequence);
-            ServerSequence.Play();
+            Sequencer.Append(sequence);
         }
 
         private void EndTurn()
         {
-            MyTween.Sequence sequence = new MyTween.Sequence();
-            MyTween.Task endTurnTask = new MyTween.Task(autoComplete: true);
-            MyTween.Task startTurnTask = new MyTween.Task(autoComplete: true);
+            Sequencer.Sequence sequence = new Sequencer.Sequence("EndTurn", Sequencer);
+            Sequencer.Clip endTurnClip = new Sequencer.Clip("EndTurn");
+            Sequencer.Clip startTurnClip = new Sequencer.Clip("StartTurn");
 
-            endTurnTask.Action = () =>
+            endTurnClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameLogic>("Turn end", colorName: "blue");
 
@@ -214,16 +206,15 @@ namespace Marsion.Server
                 OnTurnEnded?.Invoke();
             };
 
-            startTurnTask.Action = () =>
+            startTurnClip.OnPlay += () =>
             {
                 StartTurn();
             };
 
-            sequence.Append(endTurnTask);
-            sequence.Append(startTurnTask);
+            sequence.Append(endTurnClip);
+            sequence.Append(startTurnClip);
 
-            ServerSequence.Append(sequence);
-            ServerSequence.Play();
+            Sequencer.Append(sequence);
         }
 
         [Rpc(SendTo.Server)]
@@ -239,19 +230,19 @@ namespace Marsion.Server
             // Field에 넣을 공간이 없다면 false
             // 현재 Player의 마나가 Card의 마나보다 적다면 false
 
-            MyTween.Sequence sequence = new MyTween.Sequence();
-            MyTween.Task task = new MyTween.Task(autoComplete: true);
-            MyTween.Task updateTask = new MyTween.Task(autoComplete: true);
-            MyTween.Task eventTask = new MyTween.Task(autoComplete: true);
+            Sequencer.Sequence sequence = new Sequencer.Sequence("TryPlayAndSpawn", Sequencer);
+            Sequencer.Clip clip = new Sequencer.Clip("TryPlayAndSpawn");
+            Sequencer.Clip updateClip = new Sequencer.Clip("Update");
+            Sequencer.Clip eventClip = new Sequencer.Clip("InvokeEvents");
 
-            task.Action = () =>
+            clip.OnPlay += () =>
             {
                 var player = GetPlayer(id);
                 var card = player.GetCard(cardUID);
 
                 if (!(player.Mana >= card.Mana))
                 {
-                    Managers.Logger.Log<GameLogic>("그럴 수 없어요.", colorName: "blue");
+                    Managers.Logger.Log<GameServer>("그럴 수 없어요.", colorName: "blue");
                     OnCardPlayed?.Invoke(false, player.ClientID, card.UID);
                     OnCardSpawned?.Invoke(false, player.ClientID, card.UID, index);
                     return;
@@ -270,19 +261,19 @@ namespace Marsion.Server
                 OnCardSpawned?.Invoke(true, player.ClientID, card.UID, index);
             };
 
-            sequence.Append(task);
+            sequence.Append(clip);
 
-            ServerSequence.Append(sequence);
-            ServerSequence.Play();
+            Sequencer.Append(sequence);
         }
 
         [Rpc(SendTo.Server)]
         public void TryAttackRpc(ulong attackPlayer, string attackerUID, ulong defendPlayer, string defenderUID)
         {
-            MyTween.Sequence sequence = new MyTween.Sequence();
-            MyTween.Task task = new MyTween.Task();
+            Sequencer.Sequence sequence = new Sequencer.Sequence("TryAttack", Sequencer);
+            Sequencer.Clip tryAttackClip = new Sequencer.Clip("TryAttack");
+            Sequencer.Clip checkDeadClip = new Sequencer.Clip("CheckDead");
 
-            task.Action = () =>
+            tryAttackClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameServer>("Try attack", colorName: "blue");
 
@@ -297,23 +288,26 @@ namespace Marsion.Server
 
                 OnDataUpdated?.Invoke(networkData);
                 OnStartAttack?.Invoke(attackPlayer, attackerUID, defendPlayer, defenderUID);
+            };
 
+            checkDeadClip.OnPlay += () =>
+            {
                 bool result = Logic.CheckDeadCard(GameData.Players);
 
+                NetworkGameData networkData = new NetworkGameData();
                 networkData.gameData = GameData;
                 OnDataUpdated?.Invoke(networkData);
-                
-                OnBeforeCardDead?.Invoke();
-                OnAfterCardDead?.Invoke();
+
+                OnDeadCard?.Invoke();
 
                 //if (result)
                 //    EndGame();
             };
 
-            sequence.Append(task);
+            sequence.Append(tryAttackClip);
+            sequence.Append(checkDeadClip);
 
-            ServerSequence.Append(sequence);
-            ServerSequence.Play();
+            Sequencer.Append(sequence);
         }
 
         #region Utils

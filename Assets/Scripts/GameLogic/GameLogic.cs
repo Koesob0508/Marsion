@@ -15,10 +15,6 @@ namespace Marsion.Logic
 
         #region Interface Operations
 
-        public event UnityAction<Card, Card> OnStartAttack;
-        public event UnityAction OnCardBeforeDead;
-        public event UnityAction OnCardAfterDead;
-
         // Game Operations
         public void SetPortrait(Player player, int index)
         {

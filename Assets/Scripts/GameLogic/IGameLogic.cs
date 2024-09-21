@@ -5,10 +5,6 @@ namespace Marsion.Logic
 {
     public interface IGameLogic
     {
-        event UnityAction<Card, Card> OnStartAttack;
-        event UnityAction OnCardBeforeDead;
-        event UnityAction OnCardAfterDead;
-
         #region Game Logic Operations
 
         void SetPortrait(Player player, int index);

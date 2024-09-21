@@ -31,9 +31,6 @@ namespace Marsion.CardView
             Managers.Client.OnStartAttack -= Attack;
             Managers.Client.OnStartAttack += Attack;
 
-            Managers.Client.OnCharacterBeforeDead -= BeforeDead;
-            Managers.Client.OnCharacterBeforeDead += BeforeDead;
-
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
 

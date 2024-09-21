@@ -19,8 +19,7 @@ namespace Marsion.Server
         event Action<bool, ulong, string> OnCardPlayed;
         event Action<bool, ulong, string, int> OnCardSpawned;
         event Action<ulong, string, ulong, string> OnStartAttack;
-        event Action OnBeforeCardDead;
-        event Action OnAfterCardDead;
+        event Action OnDeadCard;
 
         // Managers
         void Init();

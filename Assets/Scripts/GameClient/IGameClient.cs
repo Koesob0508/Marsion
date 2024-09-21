@@ -32,9 +32,7 @@ namespace Marsion.Client
         event UnityAction OnManaChanged;
         event UnityAction<bool, Player, string> OnCardPlayed;
         event UnityAction<bool, Player, Card, int> OnCardSpawned;
-        event Action<Sequence, Player, Card, Player, Card> OnStartAttack;
-        event Action<Sequence> OnCharacterBeforeDead;
-        event UnityAction OnCharacterAfterDead;
+        event Action<Sequencer.Sequence, Player, Card, Player, Card> OnStartAttack;
 
         #endregion
 
@@ -45,7 +43,7 @@ namespace Marsion.Client
         bool IsMine(ulong id);
         bool IsMyTurn();
         GameData GetGameData();
-        ICharacterView GetCreature(ulong clientID, string cardUID);
+        ICharacterView GetCharacter(ulong clientID, string cardUID);
         Sprite GetPortrait(int index);
 
         Card GetCard(CardType type, ulong clientID, string cardUID);
@@ -55,7 +53,6 @@ namespace Marsion.Client
         #region Manager Operations
 
         void Init();
-        void Update();
         void Clear();
 
         #endregion
@@ -81,8 +78,7 @@ namespace Marsion.Client
         void PlayCardRpc(bool succeeded, ulong clientID, string cardUID);
         void SpawnCardRpc(bool succeeded, ulong clientID, string cardUID, int index);
 
-        void BeforeDeadCardRpc();
-        void AfterDeadCardRpc();
+        void DeadCardRpc();
 
         void StartAttackRpc(ulong attackClientID, string attackerUID, ulong defendClientID, string defenderUID);
 

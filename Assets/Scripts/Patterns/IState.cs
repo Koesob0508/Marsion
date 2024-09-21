@@ -4,7 +4,7 @@ namespace Marsion
 {
     public interface IState
     {
-        Action OnComplete { get; set; }
+        event Action OnComplete;
         bool IsInitialized { get; }
         void OnInitialize();
         void OnEnterState();
