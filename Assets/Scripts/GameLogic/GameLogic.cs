@@ -1,4 +1,4 @@
-﻿using NUnit.Framework.Constraints;
+using NUnit.Framework.Constraints;
 using System;
 using System.Collections.Generic;
 using UnityEngine.Events;

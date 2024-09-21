@@ -1,4 +1,4 @@
-﻿using Marsion.Logic;
+using Marsion.Logic;
 using System;
 using Unity.Netcode;
 
