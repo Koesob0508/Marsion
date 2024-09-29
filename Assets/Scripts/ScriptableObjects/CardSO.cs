@@ -8,6 +8,7 @@ namespace Marsion
     {
         public string Name;
         public int Mana;
+        public GradeType Grade;
         public string FullArtPath;
         public string BoardArtPath;
         public string AbilityExplain;

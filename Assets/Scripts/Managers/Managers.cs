@@ -19,19 +19,20 @@ namespace Marsion
 
         [SerializeField] GameServer _server;
         [SerializeField] GameClient _client;
-
+        [SerializeField] CardManager _card;
         ResourceManager _resource = new ResourceManager();
         UIManager _ui = new UIManager();
+        DeckBuilder _builder = new DeckBuilder();
 
         Logger _logger = new Logger();
 
         public static NetworkManager Network { get { return NetworkManager.Singleton; } }
-
         public static IGameServer Server { get { return Instance._server; } }
         public static IGameClient Client { get { return Instance._client; } }
-
+        public static CardManager Card { get { return Instance._card; } }
         public static ResourceManager Resource { get { return Instance._resource; } }
         public static UIManager UI { get { return Instance._ui; } }
+        public static DeckBuilder Builder { get { return Instance._builder; } }
 
         public static Logger Logger { get { return Instance._logger; } }
 
@@ -57,6 +58,7 @@ namespace Marsion
 
                 s_instance._server.Init();
                 s_instance._client.Init();
+                s_instance._builder.Init();
             }
         }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Marsion.Tool;
 using System;
+using System.Collections.Generic;
 
 namespace Marsion.Client
 {
@@ -19,10 +20,11 @@ namespace Marsion.Client
         IFieldView EnemyField { get; }
         InputManager Input { get; }
 
-        
+
 
         #region Events
 
+        event Action OnSuccessRelay;
         event UnityAction OnDataUpdated;
         event UnityAction OnGameStarted;
         event UnityAction OnGameEnded;
@@ -60,6 +62,7 @@ namespace Marsion.Client
         #region Client Operations
 
         void SetClientID(ulong clientID);
+        void Ready(List<Card> deckSO);
         void TryPlayAndSpawnCard(Card card, int index);
         void TurnEnd();
         void TryAttack(Card attacker, Card defender);

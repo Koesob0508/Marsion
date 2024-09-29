@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Furious Wolf
   Mana: 4
+  Grade: 2
   FullArtPath: Sprites/Cards/furious_wolf
   BoardArtPath: Sprites/CardsBoard/furious_wolf_board
   AbilityExplain: 

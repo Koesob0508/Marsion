@@ -3,21 +3,20 @@ using Marsion.Logic;
 using UnityEngine;
 using System;
 using Marsion.Tool;
+using System.Collections.Generic;
 
 namespace Marsion.Server
 {
     public class GameServer : NetworkBehaviour, IGameServer
     {
         public bool IsConnected { get; private set; }
+        public int ReadyPlayerCount;
 
         [Header("Sequencer")]
         [SerializeField] private Sequencer Sequencer;
 
-        [Header("Player")]
-        [SerializeField] private DeckSO PlayerDeck;
-
-        [Header("Enemy")]
-        [SerializeField] private DeckSO EnemyDeck;
+        private List<Card> FirstPlayerDeck;
+        private List<Card> SecondPlayerDeck;
 
         private GameData GameData;
         private IGameLogic Logic;
@@ -25,6 +24,7 @@ namespace Marsion.Server
         // Event
         public event Action<NetworkGameData> OnDataUpdated;
 
+        public event Action OnStartDeckBuilding;
         public event Action OnGameStarted;
         public event Action<int> OnGameEnded;
         public event Action OnTurnStarted;
@@ -79,8 +79,8 @@ namespace Marsion.Server
                 Logic = new GameLogic();
                 NetworkGameData networkData = new NetworkGameData();
 
-                Logic.SetDeck(GetPlayer(0), PlayerDeck);
-                Logic.SetDeck(GetPlayer(1), EnemyDeck);
+                Logic.SetDeck(GetPlayer(0), FirstPlayerDeck);
+                Logic.SetDeck(GetPlayer(1), SecondPlayerDeck);
 
                 for(int i = 0; i < 2; i++)
                 {
@@ -138,11 +138,21 @@ namespace Marsion.Server
 
         private void EndGame()
         {
-            Managers.Logger.Log<GameServer>("Game end", colorName: "blue");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("EndGame", Sequencer);
+            Sequencer.Clip endGameClip = new Sequencer.Clip("EndGame");
 
-            int winner = Logic.GetAlivePlayer();
+            endGameClip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameServer>("Game end", colorName: "blue");
 
-            OnGameEnded?.Invoke(winner);
+                int winner = Logic.GetAlivePlayer();
+
+                OnGameEnded?.Invoke(winner);
+            };
+
+            sequence.Append(endGameClip);
+
+            Sequencer.Append(sequence);
         }
 
         private void StartTurn()
@@ -215,6 +225,32 @@ namespace Marsion.Server
             sequence.Append(startTurnClip);
 
             Sequencer.Append(sequence);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void ReadyRpc(NetworkCardData[] deck)
+        {
+            List<Card> resultDeck = new List<Card>();
+            List<NetworkCardData> networkDeck = new List<NetworkCardData>(deck);
+
+            foreach(NetworkCardData networkCard in networkDeck)
+            {
+                resultDeck.Add(networkCard.card);
+            }
+
+
+            switch(ReadyPlayerCount)
+            {
+                case 0:
+                    FirstPlayerDeck = resultDeck;
+                    ReadyPlayerCount++;
+                    break;
+                case 1:
+                    SecondPlayerDeck = resultDeck;
+                    ReadyPlayerCount++;
+                    StartGame();
+                    break;
+            }
         }
 
         [Rpc(SendTo.Server)]
@@ -300,8 +336,8 @@ namespace Marsion.Server
 
                 OnDeadCard?.Invoke();
 
-                //if (result)
-                //    EndGame();
+                if (result)
+                    EndGame();
             };
 
             sequence.Append(tryAttackClip);
@@ -347,7 +383,9 @@ namespace Marsion.Server
             {
                 Managers.Logger.Log<GameServer>($"Ready to start", colorName: "blue");
 
-                StartGame();
+                ReadyPlayerCount = 0;
+                // StartGame();
+                OnStartDeckBuilding?.Invoke();
             }
         }
 

@@ -36,7 +36,7 @@ namespace Marsion.CardView
 
             Card = card;
             Text_Attack.text = card.Attack.ToString();
-            Text_Health.text = card.HP.ToString();
+            Text_Health.text = card.Health.ToString();
             CardSprite.sprite = Managers.Resource.Load<Sprite>(card.BoardArtPath);
         }
 
@@ -47,6 +47,7 @@ namespace Marsion.CardView
 
         protected override void UpdateCard()
         {
+            if (Card.UID == null) Debug.Log("Null");
             Card = Managers.Client.GetCard(Type, Card.PlayerID, Card.UID);
         }
     }

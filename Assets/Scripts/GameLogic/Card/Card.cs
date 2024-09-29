@@ -4,19 +4,28 @@ using System;
 
 namespace Marsion
 {
+    public enum GradeType
+    {
+        Basic = 0,
+        Normal = 1,
+        Rare = 2,
+        Epic = 3,
+        Legendary = 4
+    }
+
     [Serializable]
-    public class Card : IDamageable, IServerCard
+    public class Card : IDamageable
     {
         public ulong PlayerID { get; private set; }
         public string UID { get; private set; }
         public string Name { get; private set; }
-        public ICardState State { get; private set; }
+        public GradeType Grade { get; private set; }
         public int Mana { get; private set; }
         public string FullArtPath { get; private set; }
         public string BoardArtPath { get; private set; }
         public string AbilityExplain { get; private set; }
         public int Attack { get; private set; }
-        public int HP { get; private set; }
+        public int Health { get; private set; }
         public bool IsDead { get; private set; }
 
         public Card(ulong playerID)
@@ -31,23 +40,24 @@ namespace Marsion
             PlayerID = playerID;
             UID = Guid.NewGuid().ToString();
             Name = so.Name;
+            Grade = so.Grade;
             Mana = so.Mana;
             FullArtPath = so.FullArtPath;
             BoardArtPath = so.BoardArtPath;
             AbilityExplain = so.AbilityExplain;
             Attack = so.Attack;
-            HP = so.Health;
+            Health = so.Health;
             IsDead = false;
         }
 
         public void SetHP(int amount)
         {
-            HP = amount;
+            Health = amount;
         }
 
         public void Damage(int amount)
         {
-            HP -= amount;
+            Health -= amount;
         }
 
         public void Die()

@@ -26,15 +26,14 @@ namespace Marsion.Logic
             player.Card.SetHP(amount);
         }
 
-        public void SetDeck(Player player, DeckSO deck)
+        public void SetDeck(Player player, List<Card> deck)
         {
             player.Deck.Clear();
 
-            foreach (CardSO cardSO in deck.cards)
+            foreach (Card card in deck)
             {
-                if (cardSO != null)
+                if (card != null)
                 {
-                    Card card = new Card(player.ClientID, cardSO);
                     player.Deck.Add(card);
                 }
             }
@@ -86,14 +85,14 @@ namespace Marsion.Logic
         {
             foreach (Player player in players)
             {
-                if (player.Card.HP <= 0)
+                if (player.Card.Health <= 0)
                 {
                     player.Card.Die();
                 }
 
                 foreach (Card card in player.Field)
                 {
-                    if (card.HP <= 0)
+                    if (card.Health <= 0)
                     {
                         card.Die();
                     }

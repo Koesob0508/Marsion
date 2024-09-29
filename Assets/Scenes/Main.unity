@@ -868,8 +868,8 @@ MonoBehaviour:
   IsPlaying: 0
   Name: Client
   CurrentSequence: 
-  CurrentClip: 
-  Titles: []
+  CurrentClip: []
+  Track: []
 --- !u!1 &757059110
 GameObject:
   m_ObjectHideFlags: 0
@@ -1363,6 +1363,71 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 307
   m_MaxRayIntersections: 0
+--- !u!1 &1163194044
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1163194046}
+  - component: {fileID: 1163194045}
+  m_Layer: 0
+  m_Name: '@CardManager'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1163194045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163194044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5abada30064d8845a8cf707b491becf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Cards:
+  - {fileID: 11400000, guid: a13da4f7687aa7849a35d6e209f1cf76, type: 2}
+  - {fileID: 11400000, guid: f65590dbf9516aa4fb7df1ccab5aae1f, type: 2}
+  - {fileID: 11400000, guid: 715f71a521213fb42b38ca7c7118039e, type: 2}
+  - {fileID: 11400000, guid: ac24110e8d9ebae4aa649926f444fd0e, type: 2}
+  - {fileID: 11400000, guid: d01b9fe3c72ddb14988c13b16ae2cbb2, type: 2}
+  - {fileID: 11400000, guid: 3cd0c2617653e5a4e8f75d2b8d167e8a, type: 2}
+  - {fileID: 11400000, guid: 0b6b470409a836a47b1b94807fd06472, type: 2}
+  - {fileID: 11400000, guid: 80ce861d395014946a04c44bd901e7c9, type: 2}
+  - {fileID: 11400000, guid: 4e8a6c1c784254044b68ef376f43dca7, type: 2}
+  - {fileID: 11400000, guid: 4217ae0b34bdb064a84f95930906f1da, type: 2}
+  - {fileID: 11400000, guid: 797da4d5f47b2544fae02a5a402f9da3, type: 2}
+  - {fileID: 11400000, guid: 327575ee3ac2cee459ed83bea921d7d5, type: 2}
+  - {fileID: 11400000, guid: 10fbcb166aac9eb4591013519a2a9b5c, type: 2}
+  - {fileID: 11400000, guid: 0d7ce48384cc6444aa5b8f1ac59f2b91, type: 2}
+  - {fileID: 11400000, guid: c5c493b2a57bcc24b87b8040987d1d4a, type: 2}
+  - {fileID: 11400000, guid: 0c64609fdd92262439e6a00ff49330ae, type: 2}
+  - {fileID: 11400000, guid: 52a24b076cb0e1945ad4ca082a0029bb, type: 2}
+  - {fileID: 11400000, guid: 8c9b1fd133a83f44bb212050f0b4b29f, type: 2}
+  - {fileID: 11400000, guid: efed020a79d9b0a4db1042178ee33074, type: 2}
+  - {fileID: 11400000, guid: 2014a5cec95662b4aaf587f09117439e, type: 2}
+--- !u!4 &1163194046
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163194044}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1169010919
 GameObject:
   m_ObjectHideFlags: 0
@@ -2349,6 +2414,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _server: {fileID: 1267154521}
   _client: {fileID: 925391793}
+  _card: {fileID: 1163194045}
 --- !u!1 &1478783230
 GameObject:
   m_ObjectHideFlags: 0
@@ -2396,8 +2462,8 @@ MonoBehaviour:
   IsPlaying: 0
   Name: Server
   CurrentSequence: 
-  CurrentClip: 
-  Titles: []
+  CurrentClip: []
+  Track: []
 --- !u!1 &1482196887
 GameObject:
   m_ObjectHideFlags: 0
@@ -3436,6 +3502,7 @@ SceneRoots:
   - {fileID: 1196809806}
   - {fileID: 1267154522}
   - {fileID: 925391791}
+  - {fileID: 1163194046}
   - {fileID: 961739753}
   - {fileID: 1482196891}
   - {fileID: 2089929323}

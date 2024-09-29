@@ -4,6 +4,7 @@ using Marsion.Tool;
 using Marsion.UI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -34,6 +35,7 @@ namespace Marsion.Client
 
         public InputManager Input { get; private set; }
 
+        public event Action OnSuccessRelay;
         public event UnityAction OnDataUpdated;
         public event UnityAction OnGameStarted;
         public event UnityAction OnGameEnded;
@@ -59,8 +61,9 @@ namespace Marsion.Client
             }
 
             Input = new InputManager();
-            Sequencer.Init(); 
+            Sequencer.Init();
 
+            Managers.Server.OnStartDeckBuilding += StartDeckBuildingRpc;
             Managers.Server.OnDataUpdated += UpdateDataRpc;
             Managers.Server.OnGameStarted += StartGameRpc;
             Managers.Server.OnGameEnded += EndGameRpc;
@@ -89,6 +92,21 @@ namespace Marsion.Client
             ID = Managers.Network.LocalClientId;
         }
 
+        public void Ready(List<Card> deckSO)
+        {
+            List<NetworkCardData> deck = new List<NetworkCardData>();
+
+            foreach (var card in deckSO)
+            {
+                NetworkCardData netCard = new NetworkCardData();
+                netCard.card = card;
+                deck.Add(netCard);
+            }
+
+            NetworkCardData[] netDeck = deck.ToArray();
+            Managers.Server.ReadyRpc(netDeck);
+        }
+
         public void TryPlayAndSpawnCard(Card card, int index)
         {
             Managers.Server.TryPlayAndSpawnCardRpc(ID, card.UID, index);
@@ -105,6 +123,15 @@ namespace Marsion.Client
         }
 
         [Rpc(SendTo.ClientsAndHost)]
+        private void StartDeckBuildingRpc()
+        {
+            Managers.Logger.Log<GameClient>("StartBuilding", colorName: "green");
+
+            OnSuccessRelay?.Invoke();
+            Managers.UI.ShowPopupUI<UI_DeckBuilder>();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
         public void StartGameRpc()
         {
             Sequencer.Sequence gameStartSequence = new Sequencer.Sequence("GameStart", Sequencer);
@@ -112,6 +139,7 @@ namespace Marsion.Client
 
             gameStartClip.OnPlay += () =>
             {
+                OnSuccessRelay?.Invoke();
                 Managers.Logger.Log<GameClient>("Start game", colorName: "green");
 
                 foreach (var player in GetGameData().Players)
@@ -177,6 +205,8 @@ namespace Marsion.Client
                         ui.Text_Result.text = "LOSE";
                 }
 
+                Managers.Builder.SetNextSelectSequence(new Queue<int>(Enumerable.Repeat(2, 3)));
+                Managers.Builder.SetSelection();
                 OnGameEnded?.Invoke();
             };
 

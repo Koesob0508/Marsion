@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Fire Element
   Mana: 1
+  Grade: 2
   FullArtPath: Sprites/Cards/fire_element
   BoardArtPath: Sprites/CardsBoard/fire_element_board
   AbilityExplain: 

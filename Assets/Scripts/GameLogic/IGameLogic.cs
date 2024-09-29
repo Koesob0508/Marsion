@@ -11,7 +11,7 @@ namespace Marsion.Logic
 
         void SetHP(Player player, int amount);
 
-        void SetDeck(Player player, DeckSO deck);
+        void SetDeck(Player player, List<Card> deck);
 
         void ShuffleDeck(Player player);
 
