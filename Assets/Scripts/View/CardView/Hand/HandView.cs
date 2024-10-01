@@ -26,6 +26,9 @@ namespace Marsion.CardView
         {
             Managers.Client.OnCardPlayed -= CardPlayed;
             Managers.Client.OnCardPlayed += CardPlayed;
+
+            Managers.Client.OnGameReset -= ResetGame;
+            Managers.Client.OnGameReset += ResetGame;
         }
 
         private void Update()
@@ -36,6 +39,16 @@ namespace Marsion.CardView
         #endregion
 
         #region Operations
+
+        private void ResetGame()
+        {
+            foreach(var card in Cards)
+            {
+                Managers.Resource.Destroy(card.MonoBehaviour.gameObject);
+            }
+
+            Cards.Clear();
+        }
 
         private void CardPlayed(bool succeeded, Player player, string cardUID)
         {

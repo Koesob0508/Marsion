@@ -47,7 +47,7 @@ namespace Marsion.CardView
 
         protected override void UpdateCard()
         {
-            if (Card.UID == null) Debug.Log("Null");
+            if (Card == null) Managers.Logger.Log<CreatureView>(gameObject.name, colorName: "yellow");
             Card = Managers.Client.GetCard(Type, Card.PlayerID, Card.UID);
         }
     }

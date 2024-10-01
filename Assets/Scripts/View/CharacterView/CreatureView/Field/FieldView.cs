@@ -26,6 +26,9 @@ namespace Marsion.CardView
             Managers.Client.OnCardSpawned -= SpawnCard;
             Managers.Client.OnCardSpawned += SpawnCard;
 
+            Managers.Client.OnGameReset -= ResetGame;
+            Managers.Client.OnGameReset += ResetGame;
+
             Creatures = new List<ICreatureView>();
 
             EmptyCreature = Instantiate(EmptyCreaturePrefab, transform);
@@ -35,6 +38,19 @@ namespace Marsion.CardView
         private void Update()
         {
             Sorter.Sort(Creatures.ToArray());
+        }
+
+        private void ResetGame()
+        {
+            RemoveEmptyCard();
+
+            foreach(var creature in Creatures)
+            {
+                creature.Clear();
+                Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+            }
+
+            Creatures.Clear();
         }
 
         public void InsertEmptyCard(float x)

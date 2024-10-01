@@ -6,6 +6,7 @@ namespace Marsion
 {
     public class DeckBuildState
     {
+        public int Count;
         public List<Card> Deck;
         public List<Card> Selections;
         public List<Card> SubSelections;
@@ -46,6 +47,8 @@ namespace Marsion
                 Enumerable.Repeat(1, 29)
             ));
 
+            CurrentState.Count = TypeSequence.Count;
+
             IsComplete = false;
 
             SetSelection();
@@ -73,6 +76,8 @@ namespace Marsion
 
         public void Select(int index)
         {
+            CurrentState.Count--;
+
             switch(Type)
             {
                 case SelectType.Legendary:
@@ -100,6 +105,7 @@ namespace Marsion
         public void SetNextSelectSequence(Queue<int> sequence)
         {
             TypeSequence = sequence;
+            CurrentState.Count = sequence.Count;
         }
 
         private void GenerateSelection()

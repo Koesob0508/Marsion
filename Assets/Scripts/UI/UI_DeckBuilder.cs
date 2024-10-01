@@ -9,7 +9,7 @@ namespace Marsion.UI
     public class UI_DeckBuilder : UI_Popup
     {
         DeckBuildState currentState;
-        
+
         [SerializeField] Button Button_Ready;
 
         [SerializeField] Button_Card Button_Left;
@@ -20,15 +20,16 @@ namespace Marsion.UI
 
         [SerializeField] GameObject Panel_Left;
         [SerializeField] GameObject Panel_LeftExchange;
-        
+
         [SerializeField] GameObject Panel_Center;
         [SerializeField] GameObject Panel_CenterExchange;
 
         [SerializeField] GameObject Panel_Right;
         [SerializeField] GameObject Panel_RightExchange;
-        
+
         [SerializeField] GameObject Panel_Status;
 
+        [SerializeField] TMP_Text Text_Count;
         [SerializeField] TMP_Text Text_State;
         [SerializeField] TMP_Text Text_DeckCount;
 
@@ -68,7 +69,9 @@ namespace Marsion.UI
         {
             currentState = Managers.Builder.State;
 
-            Text_DeckCount.text = $"{currentState.Deck.Count}/30";
+            Text_Count.text = $"³²Àº È½¼ö : {currentState.Count}";
+            Managers.Logger.Log<UI_DeckBuilder>("UpdateState");
+            Text_DeckCount.text = $"{currentState.Deck.Count}";
 
             if (Managers.Builder.IsComplete)
             {
@@ -87,7 +90,7 @@ namespace Marsion.UI
 
         private void InitDeck()
         {
-            foreach(var card in currentState.Deck)
+            foreach (var card in currentState.Deck)
             {
                 AddCard(card);
             }
@@ -103,7 +106,7 @@ namespace Marsion.UI
                 SortContentByCost();
                 Managers.Builder.Select(0);
             });
-            
+
             Button_Center.Button.onClick.AddListener(() =>
             {
                 OnSelect(1);
@@ -172,7 +175,7 @@ namespace Marsion.UI
 
         private void OnSelect(int index)
         {
-            switch(Managers.Builder.Type)
+            switch (Managers.Builder.Type)
             {
                 case DeckBuilder.SelectType.Legendary:
                     AddCard(currentState.Selections[index]);
@@ -189,7 +192,7 @@ namespace Marsion.UI
 
         private void AddCard(Card card)
         {
-            if(contentsDictionary.TryGetValue(card.Name, out var value))
+            if (contentsDictionary.TryGetValue(card.Name, out var value))
             {
                 value.GetComponent<Content_Card>().IncreaseCount();
             }

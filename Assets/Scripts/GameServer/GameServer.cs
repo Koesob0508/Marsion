@@ -9,14 +9,15 @@ namespace Marsion.Server
 {
     public class GameServer : NetworkBehaviour, IGameServer
     {
-        public bool IsConnected { get; private set; }
         public int ReadyPlayerCount;
 
         [Header("Sequencer")]
         [SerializeField] private Sequencer Sequencer;
 
-        private List<Card> FirstPlayerDeck;
-        private List<Card> SecondPlayerDeck;
+        private ulong FirstPlayerClientID = 0;
+        private ulong SecondPlayerClientID = 1;
+        private List<Card> HostDeck;
+        private List<Card> GuestDeck;
 
         private GameData GameData;
         private IGameLogic Logic;
@@ -27,6 +28,7 @@ namespace Marsion.Server
         public event Action OnStartDeckBuilding;
         public event Action OnGameStarted;
         public event Action<int> OnGameEnded;
+        public event Action OnResetGame;
         public event Action OnTurnStarted;
         public event Action OnTurnEnded;
 
@@ -54,6 +56,16 @@ namespace Marsion.Server
             Sequencer.Init();
         }
 
+        private void ResetGame()
+        {
+            ReadyPlayerCount = 0;
+            Sequencer.Init();
+            HostDeck.Clear();
+            GuestDeck.Clear();
+            GameData = null;
+            Logic = null;
+        }
+
         public void Clear()
         {
             if (Managers.Network != null)
@@ -79,8 +91,8 @@ namespace Marsion.Server
                 Logic = new GameLogic();
                 NetworkGameData networkData = new NetworkGameData();
 
-                Logic.SetDeck(GetPlayer(0), FirstPlayerDeck);
-                Logic.SetDeck(GetPlayer(1), SecondPlayerDeck);
+                Logic.SetDeck(GetPlayer(0), HostDeck);
+                Logic.SetDeck(GetPlayer(1), GuestDeck);
 
                 for(int i = 0; i < 2; i++)
                 {
@@ -91,7 +103,7 @@ namespace Marsion.Server
                     Logic.SetHP(player, 30);
                 }
 
-                GameData.CurrentPlayer = GetPlayer(0);
+                GameData.CurrentPlayer = GetPlayer(FirstPlayerClientID);
 
                 networkData.gameData = GameData;
 
@@ -119,9 +131,9 @@ namespace Marsion.Server
                     }
                 }
 
-                Card exCard = Logic.DrawCard(GetPlayer(1));
+                Card exCard = Logic.DrawCard(GetPlayer(SecondPlayerClientID));
                 OnDataUpdated?.Invoke(networkData);
-                OnCardDrawn?.Invoke(GetPlayer(1).ClientID, exCard.UID);
+                OnCardDrawn?.Invoke(GetPlayer(SecondPlayerClientID).ClientID, exCard.UID);
             };
 
             startTurnClip.OnPlay += () =>
@@ -140,6 +152,7 @@ namespace Marsion.Server
         {
             Sequencer.Sequence sequence = new Sequencer.Sequence("EndGame", Sequencer);
             Sequencer.Clip endGameClip = new Sequencer.Clip("EndGame");
+            Sequencer.Clip resetServerClip = new Sequencer.Clip("ResetServer");
 
             endGameClip.OnPlay += () =>
             {
@@ -150,7 +163,15 @@ namespace Marsion.Server
                 OnGameEnded?.Invoke(winner);
             };
 
+            resetServerClip.OnPlay += () =>
+            {
+                ResetGame();
+
+                OnResetGame?.Invoke();
+            };
+
             sequence.Append(endGameClip);
+            sequence.Append(resetServerClip);
 
             Sequencer.Append(sequence);
         }
@@ -182,13 +203,10 @@ namespace Marsion.Server
 
             drawCardClip.OnPlay += () =>
             {
-                if (GameData.TurnCount != 1)
-                {
-                    Card card = Logic.DrawCard(CurrentPlayer);
-                    networkData.gameData = GameData;
-                    OnDataUpdated?.Invoke(networkData);
-                    OnCardDrawn?.Invoke(CurrentPlayer.ClientID, card.UID);
-                }
+                Card card = Logic.DrawCard(CurrentPlayer);
+                networkData.gameData = GameData;
+                OnDataUpdated?.Invoke(networkData);
+                OnCardDrawn?.Invoke(CurrentPlayer.ClientID, card.UID);
             };
 
             sequence.Append(startTurnClip);
@@ -228,7 +246,7 @@ namespace Marsion.Server
         }
 
         [Rpc(SendTo.Server)]
-        public void ReadyRpc(NetworkCardData[] deck)
+        public void ReadyRpc(NetworkCardData[] deck, RpcParams rpcParams = default)
         {
             List<Card> resultDeck = new List<Card>();
             List<NetworkCardData> networkDeck = new List<NetworkCardData>(deck);
@@ -238,16 +256,24 @@ namespace Marsion.Server
                 resultDeck.Add(networkCard.card);
             }
 
-
-            switch(ReadyPlayerCount)
+            switch(rpcParams.Receive.SenderClientId)
             {
                 case 0:
-                    FirstPlayerDeck = resultDeck;
+                    HostDeck = resultDeck;
+                    break;
+                case 1:
+                    GuestDeck = resultDeck;
+                    break;
+            }
+
+            switch (ReadyPlayerCount)
+            {
+                case 0:
+                    FirstPlayerClientID = rpcParams.Receive.SenderClientId;
                     ReadyPlayerCount++;
                     break;
                 case 1:
-                    SecondPlayerDeck = resultDeck;
-                    ReadyPlayerCount++;
+                    SecondPlayerClientID = rpcParams.Receive.SenderClientId;
                     StartGame();
                     break;
             }

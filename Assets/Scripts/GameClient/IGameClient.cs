@@ -28,6 +28,7 @@ namespace Marsion.Client
         event UnityAction OnDataUpdated;
         event UnityAction OnGameStarted;
         event UnityAction OnGameEnded;
+        event Action OnGameReset;
         event UnityAction OnTurnStarted;
         event UnityAction OnTurnEnded;
         event UnityAction<Player, Card> OnCardDrawn;

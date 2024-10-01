@@ -39,6 +39,7 @@ namespace Marsion.Client
         public event UnityAction OnDataUpdated;
         public event UnityAction OnGameStarted;
         public event UnityAction OnGameEnded;
+        public event Action OnGameReset;
         public event UnityAction OnTurnStarted;
         public event UnityAction OnTurnEnded;
         public event UnityAction<Player, Card> OnCardDrawn;
@@ -67,6 +68,7 @@ namespace Marsion.Client
             Managers.Server.OnDataUpdated += UpdateDataRpc;
             Managers.Server.OnGameStarted += StartGameRpc;
             Managers.Server.OnGameEnded += EndGameRpc;
+            Managers.Server.OnResetGame += ResetGameRpc;
             Managers.Server.OnTurnStarted += StartTurnRpc;
             Managers.Server.OnTurnEnded += EndTurnRpc;
             Managers.Server.OnCardDrawn += DrawCardRpc;
@@ -213,6 +215,22 @@ namespace Marsion.Client
 
             gameEndSequence.Append(gameEndClip);
             Sequencer.Append(gameEndSequence);
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        public void ResetGameRpc()
+        {
+            Sequencer.Sequence resetSequence = new Sequencer.Sequence("GameReset", Sequencer);
+            Sequencer.Clip resetClipSequence = new Sequencer.Clip("GameReset");
+
+            resetClipSequence.OnPlay += () =>
+            {
+                Sequencer.Init();
+                OnGameReset?.Invoke();
+            };
+
+            resetSequence.Append(resetClipSequence);
+            Sequencer.Append(resetSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]

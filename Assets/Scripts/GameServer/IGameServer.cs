@@ -13,6 +13,7 @@ namespace Marsion.Server
 
         event Action OnGameStarted;
         event Action<int> OnGameEnded;
+        event Action OnResetGame;
         event Action OnTurnStarted;
         event Action OnTurnEnded;
         
@@ -28,7 +29,7 @@ namespace Marsion.Server
         void Clear();
 
         // Rpc
-        void ReadyRpc(NetworkCardData[] deck);
+        void ReadyRpc(NetworkCardData[] deck, RpcParams rpcParams = default);
         void TurnEndRpc();
         void TryPlayAndSpawnCardRpc(ulong id, string cardUID, int index);
         void TryAttackRpc(ulong attackPlayer, string attackerUID, ulong defendPlayer, string defenderUID);
