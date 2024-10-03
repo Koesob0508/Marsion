@@ -78,11 +78,30 @@ namespace Marsion.Logic
 
     public class NetworkCardData : INetworkSerializable
     {
-        public string cardUID;
+        public Card card;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref cardUID);
+            if (serializer.IsReader)
+            {
+                int size = 0;
+                serializer.SerializeValue(ref size);
+                if (size > 0)
+                {
+                    byte[] bytes = new byte[size];
+                    serializer.SerializeValue(ref bytes);
+                    card = NetworkTool.Deserialize<Card>(bytes);
+                }
+            }
+
+            if (serializer.IsWriter)
+            {
+                byte[] bytes = NetworkTool.Serialize(card);
+                int size = bytes.Length;
+                serializer.SerializeValue(ref size);
+                if (size > 0)
+                    serializer.SerializeValue(ref bytes);
+            }
         }
     }
 }

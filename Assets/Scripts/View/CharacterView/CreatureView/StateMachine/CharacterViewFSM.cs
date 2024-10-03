@@ -6,13 +6,11 @@ namespace Marsion.CardView
     public class CharacterViewFSM : BaseStateMachine
     {
         private new ICharacterView Handler { get; }
-        private CreatureViewSpawn SpawnState { get; }
-        private CreatureViewIdle IdleState { get; }
-        private CreatureViewSelect SelectState { get; }
-        private CreatureViewAttack AttackState { get; }
-        private CreatureViewDead DeadState { get; }
-
-        public GameObject Target;
+        public CreatureViewSpawn SpawnState { get; }
+        public CreatureViewIdle IdleState { get; }
+        public CreatureViewSelect SelectState { get; }
+        public CreatureViewAttack AttackState { get; }
+        public CreatureViewDead DeadState { get; }
 
         public CharacterViewFSM(ICharacterView handler = null) : base(handler)
         {

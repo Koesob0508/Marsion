@@ -60,11 +60,10 @@ namespace Marsion
 
         public void Update() => Current?.OnUpdate();
 
-        public void PushState<T>(Action onComplete = null, bool isSilent = false) where T : IState
+        public void PushState<T>(bool isSilent = false) where T : IState
         {
             var stateType = typeof(T);
             var state = register[stateType];
-            state.OnComplete = onComplete;
 
             PushState(state, isSilent);
         }

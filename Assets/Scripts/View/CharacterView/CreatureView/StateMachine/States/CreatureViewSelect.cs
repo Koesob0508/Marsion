@@ -48,7 +48,6 @@ namespace Marsion.CardView
 
                 if (Handler.Card.PlayerID != target.Card.PlayerID)
                 {
-                    FSM.Target = foundObject;
                     FSM.PopState();
                     Managers.Client.TryAttack(Handler.Card, foundObject.GetComponent<ICharacterView>().Card);
                 }

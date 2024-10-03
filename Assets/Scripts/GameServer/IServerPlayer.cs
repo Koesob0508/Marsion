@@ -1,6 +1,6 @@
 ﻿namespace Marsion
 {
-    public interface IServerCard
+    public interface IServerPlayer
     {
 
     }

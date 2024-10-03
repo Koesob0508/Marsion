@@ -7,7 +7,7 @@ namespace Marsion.CardView
         public bool IsInitialized { get; }
         protected ICharacterView Handler { get; }
         protected CharacterViewFSM FSM { get; }
-        public Action OnComplete { get; set; }
+        public event Action OnComplete;
 
         protected BaseCreatureViewState(ICharacterView handler, CharacterViewFSM fsm)
         {
@@ -28,5 +28,11 @@ namespace Marsion.CardView
         public virtual void OnClear() { }
 
         public virtual void OnNextState(IState Next) { }
+
+        protected void Complete()
+        {
+            OnComplete?.Invoke();
+            OnComplete = null;
+        }
     }
 }

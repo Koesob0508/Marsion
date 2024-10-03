@@ -12,6 +12,8 @@ namespace Marsion.CardView
         Vector3 OriginalPosition;
         Quaternion OriginalRotation;
 
+        public GameObject Target;
+
         public CreatureViewAttack(ICharacterView handler, CharacterViewFSM fsm) : base(handler, fsm) { }
 
         public override void OnEnterState()
@@ -20,7 +22,7 @@ namespace Marsion.CardView
             OriginalPosition = Handler.Transform.position;
             OriginalRotation = Handler.Transform.rotation;
 
-            Vector3 directionToTarget = (FSM.Target.transform.position - (Handler.Transform.position + new Vector3(0f, 0f, -2f))).normalized;
+            Vector3 directionToTarget = (Target.transform.position - (Handler.Transform.position + new Vector3(0f, 0f, -2f))).normalized;
 
             Quaternion targetRotation;
 
@@ -32,11 +34,11 @@ namespace Marsion.CardView
             attackSequence = DOTween.Sequence().Pause()
                 .Append(Handler.Transform.DOMove(Handler.Transform.position + new Vector3(0f, 0f, -2f), 0.5f).SetEase(Ease.InCubic))
                 .Append(Handler.Transform.DORotateQuaternion(targetRotation, 0.2f).SetEase(Ease.InOutQuad))
-                .Append(Handler.Transform.DOMove(FSM.Target.transform.position, 0.2f).SetEase(Ease.InExpo))
+                .Append(Handler.Transform.DOMove(Target.transform.position, 0.2f).SetEase(Ease.InExpo))
                 .OnComplete(() =>
                 {
                     Handler.UpdateStatus();
-                    FSM.Target.GetComponent<ICharacterView>().UpdateStatus();
+                    Target.GetComponent<ICharacterView>().UpdateStatus();
                 });
 
             backSequence = DOTween.Sequence().Pause()
@@ -53,8 +55,7 @@ namespace Marsion.CardView
                 .Append(backSequence)
                 .OnComplete(() =>
                 {
-                    OnComplete?.Invoke();
-                    OnComplete = null;
+                    Complete();
                 });
 
             mainSequence.Play();

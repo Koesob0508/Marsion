@@ -13,9 +13,13 @@ MonoBehaviour:
   m_Name: Green Dragon
   m_EditorClassIdentifier: 
   Name: Green Dragon
-  Mana: 7
+  Mana: 1
+  Grade: 4
   FullArtPath: Sprites/Cards/dragon_green
   BoardArtPath: Sprites/CardsBoard/dragon_green_board
   AbilityExplain: Taunt
   Attack: 4
   Health: 12
+  Abilities:
+  - {fileID: 11400000, guid: fe4728c9b371d2b4c996ad379ca72f33, type: 2}
+  - {fileID: 11400000, guid: bb09d89108a520c4b9a40c64cc66218e, type: 2}

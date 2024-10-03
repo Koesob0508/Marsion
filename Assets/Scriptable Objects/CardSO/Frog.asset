@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Frog
   Mana: 2
+  Grade: 3
   FullArtPath: Sprites/Cards/frog
   BoardArtPath: Sprites/CardsBoard/frog_board
   AbilityExplain: 

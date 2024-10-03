@@ -56,8 +56,6 @@ namespace Marsion
 
         public T ShowPopupUI<T>(string name = null) where T : UI_Popup
         {
-            Managers.Logger.Log<UIManager>("Show popup");
-
             if (string.IsNullOrEmpty(name)) { name = typeof(T).Name; }
 
             GameObject go = Managers.Resource.Instantiate($"Prefabs/UI/Popup/{name}");

@@ -14,39 +14,50 @@ namespace Marsion
 {
     public class UI_Relay : UI_Scene
     {
+        [SerializeField] bool IsRelay;
         [SerializeField] TMP_InputField inputField;
         [SerializeField] GameObject panel;
 
         public override void Init()
         {
-            Managers.Client.OnGameStarted -= HidePanel;
-            Managers.Client.OnGameStarted += HidePanel;
-        }
-
-        public void OnDisable()
-        {
-            Managers.Client.OnGameStarted -= HidePanel;
+            Managers.Client.OnSuccessRelay -= HidePanel;
+            Managers.Client.OnSuccessRelay += HidePanel;
         }
 
         public async void OnClickHost()
         {
             Managers.Logger.Log<UI_Relay>("Start Host");
 
-            inputField.text = await StartHostWithRelay(2);
+            if(IsRelay)
+            {
+                inputField.text = await StartHostWithRelay(2);
+            }
+            else
+            {
+                Managers.Network.StartHost();
+                inputField.text = "Host";
+            }
         }
 
         public async void OnClickGuest()
         {
-            bool result = await StartClientWithRelay(inputField.text);
-
-            Managers.Logger.Log<UI_Relay>($"Try connect with join code : {inputField.text}.");
-
-            if (result)
+            if(IsRelay)
             {
-                Managers.Logger.Log<UI_Relay>("Connection succeed.");
+                bool result = await StartClientWithRelay(inputField.text);
+
+                Managers.Logger.Log<UI_Relay>($"Try connect with join code : {inputField.text}.");
+
+                if (result)
+                {
+                    Managers.Logger.Log<UI_Relay>("Connection succeed.");
+                }
+                else
+                    Managers.Logger.Log<UI_Relay>("Connection failed.");
             }
             else
-                Managers.Logger.Log<UI_Relay>("Connection failed.");
+            {
+                Managers.Network.StartClient();
+            }
         }
 
         private void HidePanel()

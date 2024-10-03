@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Marsion.UI
 {
@@ -7,9 +8,27 @@ namespace Marsion.UI
     {
         public TMP_Text Text_Result;
 
+        IMouseInput Input;
+
+        public override void Init()
+        {
+            base.Init();
+
+            Input = GetComponent<IMouseInput>();
+
+            Input.OnPointerClick += OnClick;
+        }
+
         public override void ClosePopupUI()
         {
             base.ClosePopupUI();
+        }
+
+        private void OnClick(PointerEventData eventData)
+        {
+            ClosePopupUI();
+
+            Managers.UI.ShowPopupUI<UI_DeckBuilder>();
         }
     }
 }

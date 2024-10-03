@@ -821,6 +821,55 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &741019383
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 741019384}
+  - component: {fileID: 741019385}
+  m_Layer: 0
+  m_Name: '@Sequencer'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &741019384
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 741019383}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 925391791}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &741019385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 741019383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ce8ea1408e11a74ebb6695cf23d1d18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsPlaying: 0
+  Name: Client
+  CurrentSequence: 
+  CurrentClip: []
+  Track: []
 --- !u!1 &757059110
 GameObject:
   m_ObjectHideFlags: 0
@@ -1065,7 +1114,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 741019384}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &925391792
@@ -1104,6 +1154,7 @@ MonoBehaviour:
   PortraitSprites:
   - {fileID: 21300000, guid: 6b016939c935e7c4eb6acb09e2c44515, type: 3}
   - {fileID: 21300000, guid: 919f5fefd56b9b645934e1d57e904dc8, type: 3}
+  Sequencer: {fileID: 741019385}
   hand: {fileID: 757059111}
   playerField: {fileID: 1583044159}
   enemyField: {fileID: 1417632283}
@@ -1312,6 +1363,71 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 307
   m_MaxRayIntersections: 0
+--- !u!1 &1163194044
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1163194046}
+  - component: {fileID: 1163194045}
+  m_Layer: 0
+  m_Name: '@CardManager'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1163194045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163194044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5abada30064d8845a8cf707b491becf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Cards:
+  - {fileID: 11400000, guid: a13da4f7687aa7849a35d6e209f1cf76, type: 2}
+  - {fileID: 11400000, guid: f65590dbf9516aa4fb7df1ccab5aae1f, type: 2}
+  - {fileID: 11400000, guid: 715f71a521213fb42b38ca7c7118039e, type: 2}
+  - {fileID: 11400000, guid: ac24110e8d9ebae4aa649926f444fd0e, type: 2}
+  - {fileID: 11400000, guid: d01b9fe3c72ddb14988c13b16ae2cbb2, type: 2}
+  - {fileID: 11400000, guid: 3cd0c2617653e5a4e8f75d2b8d167e8a, type: 2}
+  - {fileID: 11400000, guid: 0b6b470409a836a47b1b94807fd06472, type: 2}
+  - {fileID: 11400000, guid: 80ce861d395014946a04c44bd901e7c9, type: 2}
+  - {fileID: 11400000, guid: 4e8a6c1c784254044b68ef376f43dca7, type: 2}
+  - {fileID: 11400000, guid: 4217ae0b34bdb064a84f95930906f1da, type: 2}
+  - {fileID: 11400000, guid: 797da4d5f47b2544fae02a5a402f9da3, type: 2}
+  - {fileID: 11400000, guid: 327575ee3ac2cee459ed83bea921d7d5, type: 2}
+  - {fileID: 11400000, guid: 10fbcb166aac9eb4591013519a2a9b5c, type: 2}
+  - {fileID: 11400000, guid: 0d7ce48384cc6444aa5b8f1ac59f2b91, type: 2}
+  - {fileID: 11400000, guid: c5c493b2a57bcc24b87b8040987d1d4a, type: 2}
+  - {fileID: 11400000, guid: 0c64609fdd92262439e6a00ff49330ae, type: 2}
+  - {fileID: 11400000, guid: 52a24b076cb0e1945ad4ca082a0029bb, type: 2}
+  - {fileID: 11400000, guid: 8c9b1fd133a83f44bb212050f0b4b29f, type: 2}
+  - {fileID: 11400000, guid: efed020a79d9b0a4db1042178ee33074, type: 2}
+  - {fileID: 11400000, guid: 2014a5cec95662b4aaf587f09117439e, type: 2}
+--- !u!4 &1163194046
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163194044}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1169010919
 GameObject:
   m_ObjectHideFlags: 0
@@ -1618,7 +1734,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ProtocolType: 1
+  m_ProtocolType: 0
   m_MaxPacketQueueSize: 128
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500
@@ -1721,8 +1837,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 772264b428b4d094596faf6fd7705320, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player_Deck: {fileID: 11400000, guid: 9b953660440fa84429b661b6ccd0cbe1, type: 2}
-  Enemy_Deck: {fileID: 11400000, guid: 50b9df678b02d974cafc5a937e4e5ed3, type: 2}
+  Sequencer: {fileID: 1478783232}
+  PlayerDeck: {fileID: 11400000, guid: 9b953660440fa84429b661b6ccd0cbe1, type: 2}
+  EnemyDeck: {fileID: 11400000, guid: 50b9df678b02d974cafc5a937e4e5ed3, type: 2}
 --- !u!4 &1267154522
 Transform:
   m_ObjectHideFlags: 0
@@ -1735,7 +1852,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1478783231}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1279558733
@@ -1967,6 +2085,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3025033029764114677, guid: 5708b6395f1e44f458dcb7afcb5d6c6e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9075304338893019992, guid: 5708b6395f1e44f458dcb7afcb5d6c6e, type: 3}
+      propertyPath: IsRelay
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -2292,6 +2414,56 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _server: {fileID: 1267154521}
   _client: {fileID: 925391793}
+  _card: {fileID: 1163194045}
+--- !u!1 &1478783230
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1478783231}
+  - component: {fileID: 1478783232}
+  m_Layer: 0
+  m_Name: '@Sequencer'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1478783231
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478783230}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1267154522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1478783232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478783230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ce8ea1408e11a74ebb6695cf23d1d18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsPlaying: 0
+  Name: Server
+  CurrentSequence: 
+  CurrentClip: []
+  Track: []
 --- !u!1 &1482196887
 GameObject:
   m_ObjectHideFlags: 0
@@ -3330,6 +3502,7 @@ SceneRoots:
   - {fileID: 1196809806}
   - {fileID: 1267154522}
   - {fileID: 925391791}
+  - {fileID: 1163194046}
   - {fileID: 961739753}
   - {fileID: 1482196891}
   - {fileID: 2089929323}

@@ -8,13 +8,13 @@ namespace Marsion.CardView
     {
         [SerializeField] CreatureView EmptyCreaturePrefab;
         [SerializeField] CreatureView CreatureViewPrefab;
-        [SerializeField] List<ICreatureView> Creatures;
 
         const int MAX_CARD_COUNT = 7;
 
         [SerializeField] bool IsMine;
 
         CreatureView EmptyCreature;
+        public List<ICreatureView> Creatures;
         bool IsExistEmptyCard => Creatures.Exists(x => (Object)x == EmptyCreature);
         public bool IsFullField => Creatures.Count >= MAX_CARD_COUNT && !IsExistEmptyCard;
         public int EmptyCreatureIndex => Creatures.FindIndex(x => (Object)x == EmptyCreature);
@@ -26,8 +26,8 @@ namespace Marsion.CardView
             Managers.Client.OnCardSpawned -= SpawnCard;
             Managers.Client.OnCardSpawned += SpawnCard;
 
-            Managers.Client.OnCharacterAfterDead -= RemoveDeadCreature;
-            Managers.Client.OnCharacterAfterDead += RemoveDeadCreature;
+            Managers.Client.OnGameReset -= ResetGame;
+            Managers.Client.OnGameReset += ResetGame;
 
             Creatures = new List<ICreatureView>();
 
@@ -38,6 +38,19 @@ namespace Marsion.CardView
         private void Update()
         {
             Sorter.Sort(Creatures.ToArray());
+        }
+
+        private void ResetGame()
+        {
+            RemoveEmptyCard();
+
+            foreach(var creature in Creatures)
+            {
+                creature.Clear();
+                Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+            }
+
+            Creatures.Clear();
         }
 
         public void InsertEmptyCard(float x)

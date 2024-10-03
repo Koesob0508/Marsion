@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using Unity.Netcode;
+using UnityEngine;
 
 namespace Marsion
 {
@@ -8,5 +10,14 @@ namespace Marsion
         public string title;
 
         public CardSO[] cards;
+
+        public DeckSO(List<CardSO> cardList)
+        {
+            cards = new CardSO[30];
+            for (int i = 0; i < cards.Length; i++)
+            {
+                cards[i] = cardList[i];
+            }
+        }
     }
 }

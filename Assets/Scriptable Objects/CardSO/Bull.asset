@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Bull
   Mana: 1
+  Grade: 2
   FullArtPath: Sprites/Cards/bull
   BoardArtPath: Sprites/CardsBoard/bull_board
   AbilityExplain: Rush

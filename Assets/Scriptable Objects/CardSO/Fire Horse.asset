@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Fire Horse
   Mana: 5
+  Grade: 3
   FullArtPath: Sprites/Cards/fire_horse
   BoardArtPath: Sprites/CardsBoard/fire_horse_board
   AbilityExplain: 

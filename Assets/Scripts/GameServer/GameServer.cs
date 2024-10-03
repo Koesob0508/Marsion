@@ -1,83 +1,69 @@
-﻿using Unity.Netcode;
+using Unity.Netcode;
 using Marsion.Logic;
 using UnityEngine;
+using System;
+using Marsion.Tool;
+using System.Collections.Generic;
 
 namespace Marsion.Server
 {
     public class GameServer : NetworkBehaviour, IGameServer
     {
-        public bool IsConnected { get; private set; }
+        public int ReadyPlayerCount;
 
-        [Header("Player")]
-        [SerializeField] private DeckSO Player_Deck;
+        [Header("Sequencer")]
+        [SerializeField] private Sequencer Sequencer;
 
-        [Header("Enemy")]
-        [SerializeField] private DeckSO Enemy_Deck;
+        private ulong FirstPlayerClientID = 0;
+        private ulong SecondPlayerClientID = 1;
+        private List<Card> HostDeck;
+        private List<Card> GuestDeck;
 
-        private GameData gameData;
+        private GameData GameData;
         private IGameLogic Logic;
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
+        // Event
+        public event Action<NetworkGameData> OnDataUpdated;
 
-            if(IsHost)
-            {
-                Managers.Logger.Log<GameServer>("Init Server");
+        public event Action OnStartDeckBuilding;
+        public event Action OnGameStarted;
+        public event Action<int> OnGameEnded;
+        public event Action OnResetGame;
+        public event Action OnTurnStarted;
+        public event Action OnTurnEnded;
 
-                int playerCount = 2;
-                gameData = new GameData(playerCount);
-                Logic = new GameLogic(gameData);
-
-                Logic.OnDataUpdated -= DataUpdated;
-                Logic.OnDataUpdated += DataUpdated;
-                
-                Logic.OnGameStarted -= GameStarted;
-                Logic.OnGameStarted += GameStarted;
-
-                Logic.OnGameEnded -= GameEnded;
-                Logic.OnGameEnded += GameEnded;
-
-                Logic.OnTurnStarted -= TurnStarted;
-                Logic.OnTurnStarted += TurnStarted;
-
-                Logic.OnTurnEnded -= TurnEnded;
-                Logic.OnTurnEnded += TurnEnded;
-
-                Logic.OnCardDrawn -= CardDrawn;
-                Logic.OnCardDrawn += CardDrawn;
-
-                Logic.OnManaChanged -= ManaChanged;
-                Logic.OnManaChanged += ManaChanged;
-
-                Logic.OnCardPlayed -= CardPlayed;
-                Logic.OnCardPlayed += CardPlayed;
-
-                Logic.OnCardSpawned -= CardSpawned;
-                Logic.OnCardSpawned += CardSpawned;
-
-                Logic.OnStartAttack -= StartAttack;
-                Logic.OnStartAttack += StartAttack;
-
-                Logic.OnCardBeforeDead -= CardBeforeDead;
-                Logic.OnCardBeforeDead += CardBeforeDead;
-
-                Logic.OnCardAfterDead -= CardAfterDead;
-                Logic.OnCardAfterDead += CardAfterDead;
-            }
-        }
+        public event Action<ulong, string> OnCardDrawn;
+        public event Action OnManaChanged;
+        public event Action<bool, ulong, string> OnCardPlayed;
+        public event Action<bool, ulong, string, int> OnCardSpawned;
+        public event Action<ulong, string, ulong, string> OnStartAttack;
+        public event Action OnDeadCard;
 
         public void Init()
         {
             if (Managers.Network != null)
             {
+                Managers.Logger.Log<GameServer>("Init server", colorName: "blue");
+
                 Managers.Network.OnClientConnectedCallback -= ClientConnected;
                 Managers.Network.OnClientConnectedCallback += ClientConnected;
             }
             else
             {
-                Managers.Logger.Log<GameServer>("Network is null", colorName: "yellow");
+                Managers.Logger.Log<GameServer>("Network is null", colorName: "blue");
             }
+
+            Sequencer.Init();
+        }
+
+        private void ResetGame()
+        {
+            ReadyPlayerCount = 0;
+            Sequencer.Init();
+            HostDeck.Clear();
+            GuestDeck.Clear();
+            GameData = null;
+            Logic = null;
         }
 
         public void Clear()
@@ -88,23 +74,323 @@ namespace Marsion.Server
             }
         }
 
-        [ServerRpc]
-        public void ClearServerRpc()
+        // Flow
+        private void StartGame()
         {
-            Logic.OnGameStarted -= GameStarted;
-            Logic.OnDataUpdated -= DataUpdated;
-            Logic.OnCardDrawn -= CardDrawn;
+            Sequencer.Sequence sequence = new Sequencer.Sequence("StartGame", Sequencer);
+
+            Sequencer.Clip startGameClip = new Sequencer.Clip("StartGame");
+            Sequencer.Clip drawCardClip = new Sequencer.Clip("DrawCard");
+            Sequencer.Clip startTurnClip = new Sequencer.Clip("StartTurn");
+
+            startGameClip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameServer>("Start game", colorName: "blue");
+
+                GameData = new GameData(2);
+                Logic = new GameLogic();
+                NetworkGameData networkData = new NetworkGameData();
+
+                Logic.SetDeck(GetPlayer(0), HostDeck);
+                Logic.SetDeck(GetPlayer(1), GuestDeck);
+
+                for(int i = 0; i < 2; i++)
+                {
+                    var player = GetPlayer((ulong)i);
+
+                    Logic.SetPortrait(player, i);
+                    Logic.ShuffleDeck(player);
+                    Logic.SetHP(player, 30);
+                }
+
+                GameData.CurrentPlayer = GetPlayer(FirstPlayerClientID);
+
+                networkData.gameData = GameData;
+
+                OnDataUpdated?.Invoke(networkData);
+                OnGameStarted?.Invoke();
+            };
+
+            drawCardClip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameServer>("Draw initial card", colorName: "blue");
+
+                NetworkGameData networkData = new NetworkGameData();
+
+                for (int i = 0; i < 2; i++)
+                {
+                    var player = GetPlayer((ulong)i);
+
+                    for (int j = 0; j < 3; j++)
+                    {
+                        Card card = Logic.DrawCard(player);
+
+                        networkData.gameData = GameData;
+                        OnDataUpdated?.Invoke(networkData);
+                        OnCardDrawn?.Invoke(player.ClientID, card.UID);
+                    }
+                }
+
+                Card exCard = Logic.DrawCard(GetPlayer(SecondPlayerClientID));
+                OnDataUpdated?.Invoke(networkData);
+                OnCardDrawn?.Invoke(GetPlayer(SecondPlayerClientID).ClientID, exCard.UID);
+            };
+
+            startTurnClip.OnPlay += () =>
+            {
+                StartTurn();
+            };
+
+            sequence.Append(startGameClip);
+            sequence.Append(drawCardClip);
+            sequence.Append(startTurnClip);
+
+            Sequencer.Append(sequence);
         }
 
-        /// <summary>
-        ///     Server에서 발생하는 이벤트 처리
-        /// </summary>
-        /// <param name="clientId"></param>
-        #region Server Flow
+        private void EndGame()
+        {
+            Sequencer.Sequence sequence = new Sequencer.Sequence("EndGame", Sequencer);
+            Sequencer.Clip endGameClip = new Sequencer.Clip("EndGame");
+            Sequencer.Clip resetServerClip = new Sequencer.Clip("ResetServer");
+
+            endGameClip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameServer>("Game end", colorName: "blue");
+
+                int winner = Logic.GetAlivePlayer();
+
+                OnGameEnded?.Invoke(winner);
+            };
+
+            resetServerClip.OnPlay += () =>
+            {
+                ResetGame();
+
+                OnResetGame?.Invoke();
+            };
+
+            sequence.Append(endGameClip);
+            sequence.Append(resetServerClip);
+
+            Sequencer.Append(sequence);
+        }
+
+        private void StartTurn()
+        {
+            Sequencer.Sequence sequence = new Sequencer.Sequence("StartTurn", Sequencer);
+            Sequencer.Clip startTurnClip = new Sequencer.Clip("StartTurn");
+            Sequencer.Clip drawCardClip = new Sequencer.Clip("DrawCard");
+            NetworkGameData networkData = new NetworkGameData();
+
+            startTurnClip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameServer>("Start turn", colorName: "blue");
+
+                GameData.TurnCount++;
+
+                if (CurrentPlayer.MaxMana < 10)
+                    CurrentPlayer.IncreaseMaxMana(1);
+
+                CurrentPlayer.RestoreAllMana();
+
+                networkData.gameData = GameData;
+
+                OnTurnStarted?.Invoke();
+                OnDataUpdated?.Invoke(networkData);
+                OnManaChanged?.Invoke();
+            };
+
+            drawCardClip.OnPlay += () =>
+            {
+                Card card = Logic.DrawCard(CurrentPlayer);
+                networkData.gameData = GameData;
+                OnDataUpdated?.Invoke(networkData);
+                OnCardDrawn?.Invoke(CurrentPlayer.ClientID, card.UID);
+            };
+
+            sequence.Append(startTurnClip);
+            sequence.Append(drawCardClip);
+
+            Sequencer.Append(sequence);
+        }
+
+        private void EndTurn()
+        {
+            Sequencer.Sequence sequence = new Sequencer.Sequence("EndTurn", Sequencer);
+            Sequencer.Clip endTurnClip = new Sequencer.Clip("EndTurn");
+            Sequencer.Clip startTurnClip = new Sequencer.Clip("StartTurn");
+
+            endTurnClip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameLogic>("Turn end", colorName: "blue");
+
+                GameData.CurrentPlayer = CurrentPlayer == GetPlayer(0) ? GetPlayer(1) : GetPlayer(0);
+
+                NetworkGameData networkData = new NetworkGameData();
+                networkData.gameData = GameData;
+
+                OnDataUpdated?.Invoke(networkData);
+                OnTurnEnded?.Invoke();
+            };
+
+            startTurnClip.OnPlay += () =>
+            {
+                StartTurn();
+            };
+
+            sequence.Append(endTurnClip);
+            sequence.Append(startTurnClip);
+
+            Sequencer.Append(sequence);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void ReadyRpc(NetworkCardData[] deck, RpcParams rpcParams = default)
+        {
+            List<Card> resultDeck = new List<Card>();
+            List<NetworkCardData> networkDeck = new List<NetworkCardData>(deck);
+
+            foreach(NetworkCardData networkCard in networkDeck)
+            {
+                resultDeck.Add(networkCard.card);
+            }
+
+            switch(rpcParams.Receive.SenderClientId)
+            {
+                case 0:
+                    HostDeck = resultDeck;
+                    break;
+                case 1:
+                    GuestDeck = resultDeck;
+                    break;
+            }
+
+            switch (ReadyPlayerCount)
+            {
+                case 0:
+                    FirstPlayerClientID = rpcParams.Receive.SenderClientId;
+                    ReadyPlayerCount++;
+                    break;
+                case 1:
+                    SecondPlayerClientID = rpcParams.Receive.SenderClientId;
+                    StartGame();
+                    break;
+            }
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TurnEndRpc()
+        {
+            EndTurn();
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TryPlayAndSpawnCardRpc(ulong id, string cardUID, int index)
+        {
+            // Player의 턴이 아니라면 false
+            // Field에 넣을 공간이 없다면 false
+            // 현재 Player의 마나가 Card의 마나보다 적다면 false
+
+            Sequencer.Sequence sequence = new Sequencer.Sequence("TryPlayAndSpawn", Sequencer);
+            Sequencer.Clip clip = new Sequencer.Clip("TryPlayAndSpawn");
+            Sequencer.Clip updateClip = new Sequencer.Clip("Update");
+            Sequencer.Clip eventClip = new Sequencer.Clip("InvokeEvents");
+
+            clip.OnPlay += () =>
+            {
+                var player = GetPlayer(id);
+                var card = player.GetCard(cardUID);
+
+                if (!(player.Mana >= card.Mana))
+                {
+                    Managers.Logger.Log<GameServer>("그럴 수 없어요.", colorName: "blue");
+                    OnCardPlayed?.Invoke(false, player.ClientID, card.UID);
+                    OnCardSpawned?.Invoke(false, player.ClientID, card.UID, index);
+                    return;
+                }
+
+                player.PayMana(card.Mana);
+                player.Hand.Remove(card);
+                player.Field.Insert(index, card);
+
+                card.OnPlay?.Invoke();
+
+                NetworkGameData networkData = new NetworkGameData();
+                networkData.gameData = GameData;
+
+                OnDataUpdated?.Invoke(networkData);
+                OnManaChanged?.Invoke();
+                OnCardPlayed?.Invoke(true, player.ClientID, card.UID);
+                OnCardSpawned?.Invoke(true, player.ClientID, card.UID, index);
+            };
+
+            sequence.Append(clip);
+
+            Sequencer.Append(sequence);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TryAttackRpc(ulong attackPlayer, string attackerUID, ulong defendPlayer, string defenderUID)
+        {
+            Sequencer.Sequence sequence = new Sequencer.Sequence("TryAttack", Sequencer);
+            Sequencer.Clip tryAttackClip = new Sequencer.Clip("TryAttack");
+            Sequencer.Clip checkDeadClip = new Sequencer.Clip("CheckDead");
+
+            tryAttackClip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameServer>("Try attack", colorName: "blue");
+
+                var attP = GetPlayer(attackPlayer);
+                var att = attP.GetCard(attackerUID);
+                var defP = GetPlayer(defendPlayer);
+                var def = defP.GetCard(defenderUID);
+
+                Logic.Damage(att, def);
+                NetworkGameData networkData = new NetworkGameData();
+                networkData.gameData = GameData;
+
+                OnDataUpdated?.Invoke(networkData);
+                OnStartAttack?.Invoke(attackPlayer, attackerUID, defendPlayer, defenderUID);
+            };
+
+            checkDeadClip.OnPlay += () =>
+            {
+                bool result = Logic.CheckDeadCard(GameData.Players);
+
+                NetworkGameData networkData = new NetworkGameData();
+                networkData.gameData = GameData;
+                OnDataUpdated?.Invoke(networkData);
+
+                OnDeadCard?.Invoke();
+
+                if (result)
+                    EndGame();
+            };
+
+            sequence.Append(tryAttackClip);
+            sequence.Append(checkDeadClip);
+
+            Sequencer.Append(sequence);
+        }
+
+        #region Utils
+
+        private Player CurrentPlayer => GameData.CurrentPlayer;
+
+        private bool AreAllPlayersConnected()
+        {
+            return Managers.Network.ConnectedClientsList.Count == 2;
+        }
+
+        private Player GetPlayer(ulong clientID)
+        {
+            return GameData.GetPlayer(clientID);
+        }
 
         private void ClientConnected(ulong clientId)
         {
-            Managers.Logger.Log<GameServer>("Client connected");
+            Managers.Logger.Log<GameServer>("Client connected", colorName: "blue");
 
             if (!IsHost)
             {
@@ -116,181 +402,19 @@ namespace Marsion.Server
             CheckConnectionRpc();
         }
 
-        #endregion
-
-        /// <summary>
-        ///     Logic에서 발생한 이벤트를 Client로 전달해주는 역할하는 메서드들 (중복 구현)
-        /// </summary>
-        #region Event Rpcs
-        private void DataUpdated()
-        {
-            gameData = Logic.GetGameData();
-            NetworkGameData networkData = new NetworkGameData();
-            networkData.gameData = gameData;
-
-            Managers.Client.UpdateDataRpc(networkData);
-        }
-
-        private void GameStarted()
-        {
-            Managers.Client.StartGameRpc();
-        }
-
-        private void GameEnded(int playerID)
-        {
-            Managers.Client.EndGameRpc(playerID);
-        }
-
-        private void TurnStarted()
-        {
-            Managers.Client.StartTurnRpc();
-        }
-
-        private void TurnEnded()
-        {
-            Managers.Client.EndTurnRpc();
-        }
-
-        private void CardDrawn(Player player, Card card)
-        {
-            Managers.Client.DrawCardRpc(player.ClientID, card.UID);
-        }
-
-        private void ManaChanged()
-        {
-            Managers.Client.ChangeManaRpc();
-        }
-
-        private void CardPlayed(bool succeeded, Player player, Card card)
-        {
-            Managers.Client.PlayCardRpc(succeeded, player.ClientID, card.UID);
-        }
-
-        private void CardSpawned(bool succeeded, Player player, Card card, int index)
-        {
-            Managers.Client.SpawnCardRpc(succeeded, player.ClientID, card.UID, index);
-        }
-
-        private void CardBeforeDead()
-        {
-            Managers.Client.BeforeDeadCardRpc();
-        }
-
-        private void CardAfterDead()
-        {
-            Managers.Client.AfterDeadCardRpc();
-        }
-
-        private void StartAttack(Card attacker, Card defender)
-        {
-            Managers.Client.StartAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
-        }
-
-        #endregion
-
-        /// <summary>
-        ///     Server Manager가 처리해야할 작업
-        /// </summary>
-        #region Operations
-
         [Rpc(SendTo.Server)]
         private void CheckConnectionRpc()
         {
-            Managers.Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsList.Count}");
+            Managers.Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsList.Count}", colorName: "blue");
 
             if (AreAllPlayersConnected())
             {
-                Managers.Logger.Log<GameServer>($"Ready to start");
+                Managers.Logger.Log<GameServer>($"Ready to start", colorName: "blue");
 
-                SetPlayerPortrait(gameData.Players[0], 0);
-                SetPlayerDeck(gameData.Players[0], Player_Deck);
-
-                SetPlayerPortrait(gameData.Players[1], 1);
-                SetPlayerDeck(gameData.Players[1], Enemy_Deck);
-
-                // 게임 시작
-                Logic.StartGame();
+                ReadyPlayerCount = 0;
+                // StartGame();
+                OnStartDeckBuilding?.Invoke();
             }
-        }
-
-        [Rpc(SendTo.Server)]
-        public void DrawCardRpc(ulong clientID)
-        {
-            Player player = GetPlayer(clientID);
-            Logic.DrawCard(player);
-        }
-
-        [Rpc(SendTo.Server)]
-        public void PlayCardRpc(ulong clientID, string cardUID)
-        {
-            Player player = GetPlayer(clientID);
-            Card card = player.GetCard(cardUID);
-            Logic.PlayCard(player, card);
-        }
-
-        [Rpc(SendTo.Server)]
-        public void TryPlayAndSpawnCardRpc(ulong clientID, string cardUID, int index)
-        {
-            Player player = GetPlayer(clientID);
-            Card card = player.GetCard(cardUID);
-            Logic.TryPlayAndSpawnCard(player, card, index);
-        }
-
-        [Rpc(SendTo.Server)]
-        public void TurnEndRpc()
-        {
-            Logic.EndTurn();
-        }
-
-        [Rpc(SendTo.Server)]
-        public void TryAttackRpc(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
-        {
-            Player attackPlayer = GetPlayer(attackerID);
-            Card attacker = attackPlayer.GetCard(attackerUID);
-            Player defendPlayer = GetPlayer(defenderID);
-            Card defender = defendPlayer.GetCard(defenderUID);
-
-            Logic.TryAttack(attackPlayer, attacker, defendPlayer, defender);
-        }
-
-        private bool AreAllPlayersConnected()
-        {
-            return Managers.Network.ConnectedClientsList.Count == 2;
-        }
-
-        private void SetPlayerPortrait(Player player, int spriteIndex)
-        {
-            player.Portrait = spriteIndex;
-        }
-
-        private void SetPlayerDeck(Player player, DeckSO deck)
-        {
-            player.Deck.Clear();
-
-            foreach (CardSO cardSO in deck.cards)
-            {
-                if (cardSO != null)
-                {
-                    Card card = new Card(player.ClientID, cardSO);
-                    player.Deck.Add(card);
-                }
-            }
-        }
-
-        private Player GetPlayer(ulong clientID)
-        {
-            if (gameData == null) Managers.Logger.Log<GameServer>("Game data is null");
-            if (gameData.Players[clientID] == null) Managers.Logger.Log<GameServer>("Players is null");
-            return gameData.Players[clientID];
-        }
-
-        #endregion
-
-        #region Buttons
-        [Rpc(SendTo.Server)]
-        public void DrawButtonRpc(ulong clientID)
-        {
-            Logic.DrawCard(GetPlayer(clientID));
         }
 
         #endregion

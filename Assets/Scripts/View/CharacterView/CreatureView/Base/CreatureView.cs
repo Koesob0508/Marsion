@@ -31,15 +31,12 @@ namespace Marsion.CardView
             Managers.Client.OnStartAttack -= Attack;
             Managers.Client.OnStartAttack += Attack;
 
-            Managers.Client.OnCharacterBeforeDead -= BeforeDead;
-            Managers.Client.OnCharacterBeforeDead += BeforeDead;
-
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
 
             Card = card;
             Text_Attack.text = card.Attack.ToString();
-            Text_Health.text = card.HP.ToString();
+            Text_Health.text = card.Health.ToString();
             CardSprite.sprite = Managers.Resource.Load<Sprite>(card.BoardArtPath);
         }
 
@@ -50,6 +47,7 @@ namespace Marsion.CardView
 
         protected override void UpdateCard()
         {
+            if (Card == null) Managers.Logger.Log<CreatureView>(gameObject.name, colorName: "yellow");
             Card = Managers.Client.GetCard(Type, Card.PlayerID, Card.UID);
         }
     }

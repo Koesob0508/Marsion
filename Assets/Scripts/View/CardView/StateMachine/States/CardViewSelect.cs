@@ -52,11 +52,10 @@ namespace Marsion.CardView
                 if(eventData.button == PointerEventData.InputButton.Left && IsAreaDetected() && !Managers.Client.PlayerField.IsFullField)
                 {
                     Managers.Client.TryPlayAndSpawnCard(Handler.Card, Managers.Client.PlayerField.EmptyCreatureIndex);
-                    //Handler.MonoBehaviour.gameObject.SetActive(false);
                 }
                 else
                 {
-                    Managers.Logger.Log<CardViewSelect>("Remove Card");
+                    Managers.Logger.Log<CardViewSelect>("조건 불충족", colorName: "green");
                     Managers.Client.PlayerField.RemoveEmptyCard();
                 }
 

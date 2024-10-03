@@ -23,7 +23,7 @@ namespace Marsion.Logic
         {
             if (Players[clientID] == null)
             {
-                Managers.Logger.LogWarning<GameData>("");
+                Managers.Logger.LogWarning<GameData>("Get player result is null.");
                 
                 return null;
             }
@@ -35,32 +35,12 @@ namespace Marsion.Logic
 
         public Card GetHandCard(ulong clientID, string cardUID)
         {
-            foreach (Card card in GetPlayer(clientID).Hand)
-            {
-                if (card.UID == cardUID)
-                {
-                    return card;
-                }
-            }
-
-            Managers.Logger.Log<GameData>("Hand card is null.");
-
-            return null;
+            return GetPlayer(clientID).GetCard(cardUID);
         }
 
         public Card GetFieldCard(ulong clientID, string cardUID)
         {
-            foreach (Card card in GetPlayer(clientID).Field)
-            {
-                if (card.UID == cardUID)
-                {
-                    return card;
-                }
-            }
-
-            Managers.Logger.Log<GameData>("Field card is null.");
-
-            return null;
+            return GetPlayer(clientID).GetCard(cardUID);
         }
     }
 }

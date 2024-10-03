@@ -61,22 +61,18 @@ namespace Marsion.CardView
             Managers.Client.OnStartAttack -= Attack;
             Managers.Client.OnStartAttack += Attack;
 
-            Managers.Client.OnCharacterBeforeDead -= BeforeDead;
-            Managers.Client.OnCharacterBeforeDead += BeforeDead;
-
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
 
             Card = card;
             Text_Attack.text = card.Attack.ToString();
-            Text_Health.text = card.HP.ToString();
+            Text_Health.text = card.Health.ToString();
         }
 
         public virtual void Clear()
         {
             Managers.Client.OnDataUpdated -= UpdateCard;
             Managers.Client.OnStartAttack -= Attack;
-            Managers.Client.OnCharacterBeforeDead -= BeforeDead;
         }
 
         protected abstract void UpdateCard();
@@ -84,37 +80,48 @@ namespace Marsion.CardView
         public virtual void UpdateStatus()
         {
             Text_Attack.text = Card.Attack.ToString();
-            Text_Health.text = Card.HP.ToString();
+            Text_Health.text = Card.Health.ToString();
         }
 
         public abstract void Spawn();
 
-        protected virtual void Attack(MyTween.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        protected virtual void Attack(Sequencer.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
             if (Card.UID != attacker.UID) return;
 
-            MyTween.Task attackTask = new();
+            Sequencer.Clip startAttackClip = new("StartAttack", false);
 
-            attackTask.Action = () =>
+            startAttackClip.OnPlay += () =>
             {
-                FSM.Target = Managers.Client.GetCreature(defendPlayer.ClientID, defender.UID).MonoBehaviour.gameObject;
-                FSM.PushState<CreatureViewAttack>(attackTask.OnComplete);
+                FSM.AttackState.Target = Managers.Client.GetCharacter(defendPlayer.ClientID, defender.UID).MonoBehaviour.gameObject;
+                FSM.AttackState.OnComplete += () =>
+                {
+                    Managers.Logger.Log<CharacterView>("Dead check?", colorName:"cyan");
+                    startAttackClip.Complete();
+                };
+
+                FSM.PushState<CreatureViewAttack>();
             };
 
-            sequence.Append(attackTask);
+            sequence.Append(startAttackClip);
         }
 
-        protected virtual void BeforeDead(MyTween.Sequence sequence)
+        protected virtual void BeforeDead(Sequencer.Sequence sequence)
         {
             if (!Card.IsDead) return;
 
-            MyTween.Task deadAction = new MyTween.Task();
-            deadAction.Action = () =>
+            Sequencer.Clip deadAnimClip = new Sequencer.Clip("DeadAnim", false);
+            deadAnimClip.OnPlay += () =>
             {
-                FSM.PushState<CreatureViewDead>(deadAction.OnComplete);
+                FSM.DeadState.OnComplete += () =>
+                {
+                    deadAnimClip.Complete();
+                };
+
+                FSM.PushState<CreatureViewDead>();
             };
 
-            sequence.Join(deadAction);
+            sequence.Append(deadAnimClip);
         }
 
         public override bool Equals(object obj)

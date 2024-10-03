@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Fish
   Mana: 2
+  Grade: 3
   FullArtPath: Sprites/Cards/fish
   BoardArtPath: Sprites/CardsBoard/fish_board
   AbilityExplain: 
