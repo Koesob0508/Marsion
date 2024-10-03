@@ -1,4 +1,5 @@
 ﻿using Marsion.Logic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Marsion
@@ -14,5 +15,6 @@ namespace Marsion
         public string AbilityExplain;
         public int Attack;
         public int Health;
+        public List<CardAbility> Abilities;
     }
 }

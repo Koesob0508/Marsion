@@ -1,6 +1,7 @@
 ﻿
 using Marsion.Logic;
 using System;
+using System.Collections.Generic;
 
 namespace Marsion
 {
@@ -27,6 +28,10 @@ namespace Marsion
         public int Attack { get; private set; }
         public int Health { get; private set; }
         public bool IsDead { get; private set; }
+        public List<CardAbility> Abilities { get; private set; }
+
+        public Action OnPlay;
+        public Action OnLastWill;
 
         public Card(ulong playerID)
         {
@@ -48,6 +53,7 @@ namespace Marsion
             Attack = so.Attack;
             Health = so.Health;
             IsDead = false;
+            Abilities = so.Abilities;
         }
 
         public void SetHP(int amount)

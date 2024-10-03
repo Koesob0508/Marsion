@@ -314,6 +314,8 @@ namespace Marsion.Server
                 player.Hand.Remove(card);
                 player.Field.Insert(index, card);
 
+                card.OnPlay?.Invoke();
+
                 NetworkGameData networkData = new NetworkGameData();
                 networkData.gameData = GameData;
 
