@@ -8,7 +8,7 @@ namespace Marsion.UI
 {
     public class UI_DeckBuilder : UI_Popup
     {
-        DeckBuildState currentState;
+        DraftState currentState;
 
         [SerializeField] Button Button_Ready;
 
@@ -67,25 +67,25 @@ namespace Marsion.UI
 
         private void UpdateState()
         {
-            currentState = Managers.Builder.State;
+            //currentState = Managers.Builder.State;
 
-            Text_Count.text = $"남은 횟수 : {currentState.Count}";
-            Managers.Logger.Log<UI_DeckBuilder>("UpdateState");
-            Text_DeckCount.text = $"{currentState.Deck.Count}";
+            //Text_Count.text = $"남은 횟수 : {currentState.Count}";
+            //Managers.Logger.Log<UI_DeckBuilder>("UpdateState");
+            //Text_DeckCount.text = $"{currentState.Deck.Count}";
 
-            if (Managers.Builder.IsComplete)
-            {
-                Panel_Left.SetActive(false);
-                Panel_Center.SetActive(false);
-                Panel_Right.SetActive(false);
-                Panel_Status.SetActive(true);
+            //if (Managers.Builder.IsComplete)
+            //{
+            //    Panel_Left.SetActive(false);
+            //    Panel_Center.SetActive(false);
+            //    Panel_Right.SetActive(false);
+            //    Panel_Status.SetActive(true);
 
-                Button_Ready.interactable = true;
-            }
-            else
-            {
-                Button_Ready.interactable = false;
-            }
+            //    Button_Ready.interactable = true;
+            //}
+            //else
+            //{
+            //    Button_Ready.interactable = false;
+            //}
         }
 
         private void InitDeck()
@@ -100,44 +100,44 @@ namespace Marsion.UI
 
         private void InitSelections()
         {
-            Button_Left.Button.onClick.AddListener(() =>
-            {
-                OnSelect(0);
-                SortContentByCost();
-                Managers.Builder.Select(0);
-            });
+            //Button_Left.Button.onClick.AddListener(() =>
+            //{
+            //    OnSelect(0);
+            //    SortContentByCost();
+            //    Managers.Builder.Select(0);
+            //});
 
-            Button_Center.Button.onClick.AddListener(() =>
-            {
-                OnSelect(1);
-                SortContentByCost();
-                Managers.Builder.Select(1);
-            });
+            //Button_Center.Button.onClick.AddListener(() =>
+            //{
+            //    OnSelect(1);
+            //    SortContentByCost();
+            //    Managers.Builder.Select(1);
+            //});
 
-            Button_Right.Button.onClick.AddListener(() =>
-            {
-                OnSelect(2);
-                SortContentByCost();
-                Managers.Builder.Select(2);
-            });
+            //Button_Right.Button.onClick.AddListener(() =>
+            //{
+            //    OnSelect(2);
+            //    SortContentByCost();
+            //    Managers.Builder.Select(2);
+            //});
         }
 
         private void UpdateSelections()
         {
-            UpdateState();
+            //UpdateState();
 
-            switch (Managers.Builder.Type)
-            {
-                case DeckBuilder.SelectType.Legendary:
-                    SetOneSelection();
-                    break;
-                case DeckBuilder.SelectType.Table:
-                    SetOneSelection();
-                    break;
-                case DeckBuilder.SelectType.Exchange:
-                    SetExchangeSelection();
-                    break;
-            }
+            //switch (Managers.Builder.Type)
+            //{
+            //    case DeckBuilder.SelectType.Legendary:
+            //        SetOneSelection();
+            //        break;
+            //    case DeckBuilder.SelectType.Table:
+            //        SetOneSelection();
+            //        break;
+            //    case DeckBuilder.SelectType.Exchange:
+            //        SetExchangeSelection();
+            //        break;
+            //}
         }
 
         private void SetOneSelection()
@@ -175,19 +175,19 @@ namespace Marsion.UI
 
         private void OnSelect(int index)
         {
-            switch (Managers.Builder.Type)
-            {
-                case DeckBuilder.SelectType.Legendary:
-                    AddCard(currentState.Selections[index]);
-                    break;
-                case DeckBuilder.SelectType.Table:
-                    AddCard(currentState.Selections[index]);
-                    break;
-                case DeckBuilder.SelectType.Exchange:
-                    RemoveCard(currentState.SubSelections[index]);
-                    AddCard(currentState.Selections[index]);
-                    break;
-            }
+            //switch (Managers.Builder.Type)
+            //{
+            //    case DeckBuilder.SelectType.Legendary:
+            //        AddCard(currentState.Selections[index]);
+            //        break;
+            //    case DeckBuilder.SelectType.Table:
+            //        AddCard(currentState.Selections[index]);
+            //        break;
+            //    case DeckBuilder.SelectType.Exchange:
+            //        RemoveCard(currentState.SubSelections[index]);
+            //        AddCard(currentState.Selections[index]);
+            //        break;
+            //}
         }
 
         private void AddCard(Card card)
@@ -235,9 +235,9 @@ namespace Marsion.UI
 
         public void Ready()
         {
-            Text_State.text = "상대를 기다리는 중!";
-            Button_Ready.interactable = false;
-            Managers.Builder.Ready();
+            //Text_State.text = "상대를 기다리는 중!";
+            //Button_Ready.interactable = false;
+            //Managers.Builder.Ready();
         }
     }
 }

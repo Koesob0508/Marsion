@@ -18,7 +18,7 @@ namespace Marsion
         }
 
         [SerializeField] MarsNetwork _network;
-        [SerializeField] GameServer _server;
+        [SerializeField] ServerManager _server;
         [SerializeField] GameClient _client;
 
         ResourceManager _resource = new ResourceManager();
@@ -29,7 +29,7 @@ namespace Marsion
         Logger _logger = new Logger();
 
         public static MarsNetwork Network { get { return Instance._network; } }
-        public static IGameServer Server { get { return Instance._server; } }
+        public static ServerManager Server { get { return Instance._server; } }
         public static IGameClient Client { get { return Instance._client; } }
         public static CardManager Card { get { return Instance._card; } }
         public static ResourceManager Resource { get { return Instance._resource; } }

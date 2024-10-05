@@ -8,7 +8,6 @@ namespace Marsion.Server
     {
         // Event
         event Action OnStartDeckBuilding;
-        event Action<ulong> OnUpdateDeckBuildingState;
 
         event Action<SerializedGameData> OnDataUpdated;
 

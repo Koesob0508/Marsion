@@ -7,7 +7,7 @@ namespace Marsion
     {
         public override void Register()
         {
-            Managers.Server.OnTurnStarted += Activate;
+            Managers.Server.GameServer.OnTurnStarted += Activate;
         }
 
         public override void Activate()
@@ -17,7 +17,7 @@ namespace Marsion
 
         public override void Clear()
         {
-            Managers.Server.OnTurnStarted -= Activate;
+            Managers.Server.GameServer.OnTurnStarted -= Activate;
         }
     }
 }

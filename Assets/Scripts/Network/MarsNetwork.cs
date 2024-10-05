@@ -15,6 +15,8 @@ namespace Marsion
 
         private bool IsConnected = false;
 
+        public NetworkManager NetworkManager => network;
+
         // ID of this client (if host, will be same than ServerID), changes for every reconnection, assigned by Netcode
         public ulong ClientID { get { return network.LocalClientId; } }
         public ulong ServerID { get { return NetworkManager.ServerClientId; } }

@@ -65,21 +65,20 @@ namespace Marsion.Client
             Input = new InputManager();
             Sequencer.Init();
 
-            Managers.Server.OnStartDeckBuilding += StartDeckBuildingRpc;
-            Managers.Server.OnUpdateDeckBuildingState += UpdateDeckBuildingRpc;
+            Managers.Server.GameServer.OnStartDeckBuilding += StartDeckBuildingRpc;
 
-            Managers.Server.OnDataUpdated += UpdateDataRpc;
-            Managers.Server.OnGameStarted += StartGameRpc;
-            Managers.Server.OnGameEnded += EndGameRpc;
-            Managers.Server.OnResetGame += ResetGameRpc;
-            Managers.Server.OnTurnStarted += StartTurnRpc;
-            Managers.Server.OnTurnEnded += EndTurnRpc;
-            Managers.Server.OnCardDrawn += DrawCardRpc;
-            Managers.Server.OnManaChanged += ChangeManaRpc;
-            Managers.Server.OnCardPlayed += PlayCardRpc;
-            Managers.Server.OnCardSpawned += SpawnCardRpc;
-            Managers.Server.OnStartAttack += StartAttackRpc;
-            Managers.Server.OnDeadCard += DeadCardRpc;
+            Managers.Server.GameServer.OnDataUpdated += UpdateDataRpc;
+            Managers.Server.GameServer.OnGameStarted += StartGameRpc;
+            Managers.Server.GameServer.OnGameEnded += EndGameRpc;
+            Managers.Server.GameServer.OnResetGame += ResetGameRpc;
+            Managers.Server.GameServer.OnTurnStarted += StartTurnRpc;
+            Managers.Server.GameServer.OnTurnEnded += EndTurnRpc;
+            Managers.Server.GameServer.OnCardDrawn += DrawCardRpc;
+            Managers.Server.GameServer.OnManaChanged += ChangeManaRpc;
+            Managers.Server.GameServer.OnCardPlayed += PlayCardRpc;
+            Managers.Server.GameServer.OnCardSpawned += SpawnCardRpc;
+            Managers.Server.GameServer.OnStartAttack += StartAttackRpc;
+            Managers.Server.GameServer.OnDeadCard += DeadCardRpc;
         }
 
         private void Update()
@@ -109,22 +108,22 @@ namespace Marsion.Client
             }
 
             SerializedCardData[] netDeck = deck.ToArray();
-            Managers.Server.ReadyRpc(netDeck);
+            Managers.Server.GameServer.ReadyRpc(netDeck);
         }
 
         public void TryPlayAndSpawnCard(Card card, int index)
         {
-            Managers.Server.TryPlayAndSpawnCardRpc(ID, card.UID, index);
+            Managers.Server.GameServer.TryPlayAndSpawnCardRpc(ID, card.UID, index);
         }
 
         public void TurnEnd()
         {
-            Managers.Server.TurnEndRpc();
+            Managers.Server.GameServer.TurnEndRpc();
         }
 
         public void TryAttack(Card attacker, Card defender)
         {
-            Managers.Server.TryAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
+            Managers.Server.GameServer.TryAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
         }
 
         [Rpc(SendTo.ClientsAndHost)]

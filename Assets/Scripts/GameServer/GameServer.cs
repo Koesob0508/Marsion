@@ -23,13 +23,10 @@ namespace Marsion.Server
         private GameData GameData;
         private IGameLogic Logic;
 
-        public DeckBuilder DeckBuilder;
-
         // Event
         public event Action<SerializedGameData> OnDataUpdated;
 
         public event Action OnStartDeckBuilding;
-        public event Action<ulong> OnUpdateDeckBuildingState;
 
         public event Action OnGameStarted;
         public event Action<int> OnGameEnded;
@@ -46,21 +43,7 @@ namespace Marsion.Server
 
         public void Init()
         {
-            if (Managers.Network != null)
-            {
-                Managers.Logger.Log<GameServer>("Init server", colorName: "#FFA500");
-
-                Managers.Network.OnClientJoin -= ClientConnected;
-                Managers.Network.OnClientJoin += ClientConnected;
-            }
-            else
-            {
-                Managers.Logger.Log<GameServer>("Network is null", colorName: "#FFA500");
-            }
-
             Sequencer.Init();
-
-            DeckBuilder.Init();
         }
 
         private void ResetGame()
@@ -75,10 +58,6 @@ namespace Marsion.Server
 
         public void Clear()
         {
-            if (Managers.Network != null)
-            {
-                Managers.Network.OnClientJoin -= ClientConnected;
-            }
         }
 
         // Flow
@@ -166,9 +145,6 @@ namespace Marsion.Server
                 Managers.Logger.Log<GameServer>("Game end", colorName: "#FFA500");
 
                 int winner = Logic.GetAlivePlayer();
-
-                DeckBuilder.SetNextSelectSequence(new Queue<int>(Enumerable.Repeat(2, 3)));
-                DeckBuilder.SetSelection();
 
                 OnGameEnded?.Invoke(winner);
             };
@@ -399,22 +375,8 @@ namespace Marsion.Server
             return GameData.GetPlayer(clientID);
         }
 
-        private void ClientConnected(ulong clientId)
-        {
-            Managers.Logger.Log<GameServer>("Client connected", colorName: "#FFA500");
-
-            if (!IsHost)
-            {
-                Clear();
-                gameObject.SetActive(false);
-                return;
-            }
-
-            CheckConnectionRpc();
-        }
-
         [Rpc(SendTo.Server)]
-        private void CheckConnectionRpc()
+        public void CheckConnectionRpc()
         {
             Managers.Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsCount}", colorName: "#FFA500");
 

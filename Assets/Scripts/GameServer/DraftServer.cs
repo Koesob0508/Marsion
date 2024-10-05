@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace Marsion
 {
-    public class DeckBuildState
+    public class DraftState
     {
         public int Count;
         public List<Card> Deck;
         public List<Card> Selections;
         public List<Card> SubSelections;
 
-        public DeckBuildState()
+        public DraftState()
         {
             Deck = new List<Card>();
             Selections = new List<Card>();
@@ -19,7 +19,7 @@ namespace Marsion
         }
     }
 
-    public class DeckBuilder
+    public class DraftServer
     {
         public enum SelectType
         {
@@ -28,8 +28,8 @@ namespace Marsion
             Exchange = 2
         }
 
-        DeckBuildState CurrentState;
-        public DeckBuildState State => CurrentState;
+        DraftState CurrentState;
+        public DraftState State => CurrentState;
 
         public SelectType Type;
         public Queue<int> TypeSequence;
@@ -39,7 +39,7 @@ namespace Marsion
 
         public void Init()
         {
-            CurrentState = new DeckBuildState();
+            CurrentState = new DraftState();
 
             TypeSequence = new Queue<int>(Enumerable.Concat(
                 new[] { 0 },
@@ -57,7 +57,7 @@ namespace Marsion
         {
             if (TypeSequence.TryDequeue(out var result))
             {
-                Managers.Logger.Log<DeckBuilder>("Set Sequence", colorName: "yellow");
+                Managers.Logger.Log<DraftServer>("Set Sequence", colorName: "yellow");
                 SelectType[] types = (SelectType[])Enum.GetValues(typeof(SelectType));
                 Type = types[result];
 
