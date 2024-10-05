@@ -5,8 +5,10 @@ using UnityEngine;
 namespace Marsion
 {
     [CreateAssetMenu(fileName = "CardSO", menuName = "Marsion/CardSO")]
-    public class CardSO : ScriptableObject
+    public class CardSO : ScriptableObject, IIdentifiable
     {
+        [SerializeField] private string id;
+        public string ID => id;
         public string Name;
         public int Mana;
         public GradeType Grade;

@@ -10,12 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be6885c7f25a094da563978b92e01cb, type: 3}
-  m_Name: Crab
+  m_Name: Blue Dragon
   m_EditorClassIdentifier: 
-  Name: Crab
+  id: 3
+  Name: Blue Dragon
   Mana: 1
-  FullArtPath: Sprites/Cards/crab
-  BoardArtPath: Sprites/CardsBoard/crab_board
-  AbilityExplain: Hide
-  Attack: 2
-  Health: 2
+  Grade: 4
+  FullArtPath: Sprites/Cards/dragon_blue
+  BoardArtPath: Sprites/CardsBoard/dragon_blue_board
+  AbilityExplain: Rush
+  Attack: 7
+  Health: 7
+  Abilities:
+  - {fileID: 11400000, guid: fe4728c9b371d2b4c996ad379ca72f33, type: 2}
+  - {fileID: 11400000, guid: bb09d89108a520c4b9a40c64cc66218e, type: 2}

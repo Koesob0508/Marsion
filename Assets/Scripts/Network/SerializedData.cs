@@ -47,7 +47,7 @@ namespace Marsion.Logic
         }
     }
 
-    public class NetworkGameData : INetworkSerializable
+    public class SerializedGameData : INetworkSerializable
     {
         public GameData gameData;
 
@@ -76,31 +76,61 @@ namespace Marsion.Logic
         }
     }
 
-    public class NetworkCardData : INetworkSerializable
+    public class SerializedCardData : INetworkSerializable
     {
-        public Card card;
+        public string UID;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            if (serializer.IsReader)
-            {
-                int size = 0;
-                serializer.SerializeValue(ref size);
-                if (size > 0)
-                {
-                    byte[] bytes = new byte[size];
-                    serializer.SerializeValue(ref bytes);
-                    card = NetworkTool.Deserialize<Card>(bytes);
-                }
-            }
+            serializer.SerializeValue(ref UID);
+        }
+    }
 
+    public class SerializedDeckBuildState : INetworkSerializable
+    {
+        public string[] deck;
+        public string[] selections;
+        public string[] subSelections;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            // Serialize deck array
+            SerializeStringArray(ref deck, serializer);
+            // Serialize selections array
+            SerializeStringArray(ref selections, serializer);
+            // Serialize subSelections array
+            SerializeStringArray(ref subSelections, serializer);
+        }
+
+        private void SerializeStringArray<T>(ref string[] array, BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            // If serializing, write the length of the array
             if (serializer.IsWriter)
             {
-                byte[] bytes = NetworkTool.Serialize(card);
-                int size = bytes.Length;
-                serializer.SerializeValue(ref size);
-                if (size > 0)
-                    serializer.SerializeValue(ref bytes);
+                int length = array != null ? array.Length : 0;
+                serializer.SerializeValue(ref length);
+
+                // Serialize each element of the array
+                for (int i = 0; i < length; i++)
+                {
+                    string element = array[i];
+                    serializer.SerializeValue(ref element);
+                }
+            }
+            else // If deserializing, read the length and allocate array
+            {
+                int length = 0;
+                serializer.SerializeValue(ref length);
+
+                array = new string[length];
+
+                // Deserialize each element of the array
+                for (int i = 0; i < length; i++)
+                {
+                    string element = null;
+                    serializer.SerializeValue(ref element);
+                    array[i] = element;
+                }
             }
         }
     }

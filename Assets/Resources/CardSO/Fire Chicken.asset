@@ -10,13 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be6885c7f25a094da563978b92e01cb, type: 3}
-  m_Name: Fish
+  m_Name: Fire Chicken
   m_EditorClassIdentifier: 
-  Name: Fish
-  Mana: 2
-  Grade: 3
-  FullArtPath: Sprites/Cards/fish
-  BoardArtPath: Sprites/CardsBoard/fish_board
+  id: 8
+  Name: Fire Chicken
+  Mana: 6
+  Grade: 0
+  FullArtPath: Sprites/Cards/fire_chicken
+  BoardArtPath: Sprites/CardsBoard/fire_chicken_board
   AbilityExplain: 
-  Attack: 2
-  Health: 2
+  Attack: 7
+  Health: 6
+  Abilities: []

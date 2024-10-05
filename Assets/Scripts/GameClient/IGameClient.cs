@@ -25,6 +25,7 @@ namespace Marsion.Client
         #region Events
 
         event Action OnSuccessRelay;
+        event Action OnDeckBuildingUpdated;
         event UnityAction OnDataUpdated;
         event UnityAction OnGameStarted;
         event UnityAction OnGameEnded;
@@ -72,7 +73,7 @@ namespace Marsion.Client
 
         #region Event Rpcs
 
-        void UpdateDataRpc(NetworkGameData networkData);
+        void UpdateDataRpc(SerializedGameData networkData);
         void StartGameRpc();
         void EndGameRpc(int clientID);
         void StartTurnRpc();

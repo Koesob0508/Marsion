@@ -8,8 +8,9 @@ namespace Marsion.Server
     {
         // Event
         event Action OnStartDeckBuilding;
+        event Action<ulong> OnUpdateDeckBuildingState;
 
-        event Action<NetworkGameData> OnDataUpdated;
+        event Action<SerializedGameData> OnDataUpdated;
 
         event Action OnGameStarted;
         event Action<int> OnGameEnded;
@@ -29,7 +30,7 @@ namespace Marsion.Server
         void Clear();
 
         // Rpc
-        void ReadyRpc(NetworkCardData[] deck, RpcParams rpcParams = default);
+        void ReadyRpc(SerializedCardData[] deck, RpcParams rpcParams = default);
         void TurnEndRpc();
         void TryPlayAndSpawnCardRpc(ulong id, string cardUID, int index);
         void TryAttackRpc(ulong attackPlayer, string attackerUID, ulong defendPlayer, string defenderUID);

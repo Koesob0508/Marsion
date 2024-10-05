@@ -4,10 +4,8 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class CardManager : MonoBehaviour
+    public class CardManager
     {
-        public List<CardSO> Cards;
-
         public List<Card> FindByGrade(int grade, int count = 1, bool allowDuplicate = false, List<Card> cards = null)
         {
             List<Card> result = new List<Card>();
@@ -17,9 +15,9 @@ namespace Marsion
             {
                 copiedCards = new List<Card>();
 
-                foreach(var cardSO in Cards)
+                foreach(var cardData in Managers.Data.CardList)
                 {
-                    copiedCards.Add(new Card(Managers.Client.ID, cardSO));
+                    copiedCards.Add(new Card(Managers.Client.ID, cardData));
                 }
             }
             else
@@ -64,7 +62,7 @@ namespace Marsion
             {
                 copiedCards = new List<Card>();
 
-                foreach (var cardSO in Cards)
+                foreach (var cardSO in Managers.Data.CardList)
                 {
                     copiedCards.Add(new Card(Managers.Client.ID, cardSO));
                 }

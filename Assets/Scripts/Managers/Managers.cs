@@ -17,22 +17,24 @@ namespace Marsion
             }
         }
 
+        [SerializeField] MarsNetwork _network;
         [SerializeField] GameServer _server;
         [SerializeField] GameClient _client;
-        [SerializeField] CardManager _card;
+
         ResourceManager _resource = new ResourceManager();
+        DataManager _data = new DataManager();
         UIManager _ui = new UIManager();
-        DeckBuilder _builder = new DeckBuilder();
+        CardManager _card = new CardManager();
 
         Logger _logger = new Logger();
 
-        public static NetworkManager Network { get { return NetworkManager.Singleton; } }
+        public static MarsNetwork Network { get { return Instance._network; } }
         public static IGameServer Server { get { return Instance._server; } }
         public static IGameClient Client { get { return Instance._client; } }
         public static CardManager Card { get { return Instance._card; } }
         public static ResourceManager Resource { get { return Instance._resource; } }
+        public static DataManager Data { get { return Instance._data; } }
         public static UIManager UI { get { return Instance._ui; } }
-        public static DeckBuilder Builder { get { return Instance._builder; } }
 
         public static Logger Logger { get { return Instance._logger; } }
 
@@ -56,9 +58,10 @@ namespace Marsion
                 DontDestroyOnLoad(obj);
                 s_instance = obj.GetComponent<Managers>();
 
+                s_instance._network.Init();
                 s_instance._server.Init();
                 s_instance._client.Init();
-                s_instance._builder.Init();
+                s_instance._data.Init();
             }
         }
 

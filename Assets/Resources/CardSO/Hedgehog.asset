@@ -10,12 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be6885c7f25a094da563978b92e01cb, type: 3}
-  m_Name: Imp
+  m_Name: Hedgehog
   m_EditorClassIdentifier: 
-  Name: Imp
-  Mana: 1
-  FullArtPath: Sprites/Cards/imp
-  BoardArtPath: Sprites/CardsBoard/imp_board
+  id: 17
+  Name: Hedgehog
+  Mana: 2
+  Grade: 0
+  FullArtPath: Sprites/Cards/hedgehog
+  BoardArtPath: Sprites/CardsBoard/hedgehog_board
   AbilityExplain: 
-  Attack: 1
-  Health: 1
+  Attack: 4
+  Health: 2
+  Abilities: []

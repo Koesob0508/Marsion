@@ -42,8 +42,8 @@ namespace Marsion.UI
             Managers.Client.OnGameStarted -= GameStart;
             Managers.Client.OnGameStarted += GameStart;
 
-            Managers.Builder.OnUpdateDeckBuildingState -= UpdateSelections;
-            Managers.Builder.OnUpdateDeckBuildingState += UpdateSelections;
+            Managers.Client.OnDeckBuildingUpdated -= UpdateSelections;
+            Managers.Client.OnDeckBuildingUpdated += UpdateSelections;
 
             contentsDictionary = new Dictionary<string, GameObject>();
 
@@ -56,7 +56,7 @@ namespace Marsion.UI
         private void Clear()
         {
             Managers.Client.OnGameStarted -= GameStart;
-            Managers.Builder.OnUpdateDeckBuildingState -= UpdateSelections;
+            Managers.Client.OnDeckBuildingUpdated -= UpdateSelections;
         }
 
         private void GameStart()

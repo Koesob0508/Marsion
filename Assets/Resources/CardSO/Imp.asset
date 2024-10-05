@@ -10,13 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be6885c7f25a094da563978b92e01cb, type: 3}
-  m_Name: Fire Fox
+  m_Name: Imp
   m_EditorClassIdentifier: 
-  Name: Fire Fox
-  Mana: 2
-  Grade: 3
-  FullArtPath: Sprites/Cards/fire_fox
-  BoardArtPath: Sprites/CardsBoard/fire_fox_board
+  id: 19
+  Name: Imp
+  Mana: 1
+  Grade: 0
+  FullArtPath: Sprites/Cards/imp
+  BoardArtPath: Sprites/CardsBoard/imp_board
   AbilityExplain: 
-  Attack: 4
-  Health: 2
+  Attack: 1
+  Health: 1
+  Abilities: []

@@ -10,12 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7be6885c7f25a094da563978b92e01cb, type: 3}
-  m_Name: Bear
+  m_Name: Gorilla
   m_EditorClassIdentifier: 
-  Name: Bear
-  Mana: 1
-  FullArtPath: Sprites/Cards/bear
-  BoardArtPath: Sprites/CardsBoard/bear_board
+  id: 15
+  Name: Gorilla
+  Mana: 4
+  Grade: 0
+  FullArtPath: Sprites/Cards/gorilla
+  BoardArtPath: Sprites/CardsBoard/gorilla_board
   AbilityExplain: 
-  Attack: 2
-  Health: 3
+  Attack: 5
+  Health: 7
+  Abilities: []

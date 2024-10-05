@@ -37,7 +37,6 @@ namespace Marsion
         
         public Action OnUpdateDeckBuildingState;
 
-
         public void Init()
         {
             CurrentState = new DeckBuildState();
