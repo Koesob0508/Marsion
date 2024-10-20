@@ -15,14 +15,21 @@ namespace Marsion.UI
 
         public Button Button;
 
-        public void Setup(Card card)
+        public void Setup(string soID)
         {
-            Text_Name.text = card.Name;
-            Text_Mana.text = card.Mana.ToString();
-            Text_AbilityExplain.text = card.AbilityExplain;
-            Text_Attack.text = card.Attack.ToString();
-            Text_Health.text = card.Health.ToString();
-            Image_Sprite.sprite = Managers.Resource.Load<Sprite>(card.FullArtPath);
+            if (Managers.Data.CardDictionary.TryGetValue(soID, out var cardSO))
+            {
+                Text_Name.text = cardSO.Name;
+                Text_Mana.text = cardSO.Mana.ToString();
+                Text_AbilityExplain.text = cardSO.AbilityExplain;
+                Text_Attack.text = cardSO.Attack.ToString();
+                Text_Health.text = cardSO.Health.ToString();
+                Image_Sprite.sprite = Managers.Resource.Load<Sprite>(cardSO.FullArtPath);
+            }
+            else
+            {
+                Managers.Logger.LogWarning<Button_Card>($"ID : {soID} CardSO not found", colorName: ColorCodes.ContentUI);
+            }
         }
     }
 }

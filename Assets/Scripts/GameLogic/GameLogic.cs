@@ -66,10 +66,10 @@ namespace Marsion.Logic
                 card = player.Deck[0];
                 player.Deck.RemoveAt(0);
                 player.Hand.Add(card);
-                foreach(var ability in card.Abilities)
-                {
-                    ability.Register();
-                }
+                //foreach(var ability in card.Abilities)
+                //{
+                //    ability.Register();
+                //}
             }
             else
             {

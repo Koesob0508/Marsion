@@ -1,7 +1,7 @@
 ﻿
 using Marsion.Logic;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace Marsion
 {
@@ -14,7 +14,6 @@ namespace Marsion
         Legendary = 4
     }
 
-    [Serializable]
     public class Card : IDamageable
     {
         public ulong PlayerID { get; private set; }
@@ -28,10 +27,10 @@ namespace Marsion
         public int Attack { get; private set; }
         public int Health { get; private set; }
         public bool IsDead { get; private set; }
-        public List<CardAbility> Abilities { get; private set; }
+        //public List<CardAbility> Abilities { get; private set; }
 
-        public Action OnPlay;
-        public Action OnLastWill;
+        [JsonIgnore] public Action OnPlay;
+        [JsonIgnore] public Action OnLastWill;
 
         public Card(ulong playerID)
         {
@@ -53,7 +52,41 @@ namespace Marsion
             Attack = so.Attack;
             Health = so.Health;
             IsDead = false;
-            Abilities = so.Abilities;
+            //Abilities = so.Abilities;
+        }
+
+        [JsonConstructor]
+        public Card(ulong playerID, string uID, string name, GradeType grade, int mana, string fullArtPath, string boardArtPath, string abilityExplain, int attack, int health, bool isDead) : this(playerID)
+        {
+            UID = uID;
+            Name = name;
+            Grade = grade;
+            Mana = mana;
+            FullArtPath = fullArtPath;
+            BoardArtPath = boardArtPath;
+            AbilityExplain = abilityExplain;
+            Attack = attack;
+            Health = health;
+            IsDead = isDead;
+        }
+
+        // 깊은 복사를 위한 생성자 추가
+        public Card(Card original)
+        {
+            PlayerID = original.PlayerID;
+            UID = original.UID; // UID는 고유 식별자로 복사
+            Name = original.Name;
+            Grade = original.Grade;
+            Mana = original.Mana;
+            FullArtPath = original.FullArtPath;
+            BoardArtPath = original.BoardArtPath;
+            AbilityExplain = original.AbilityExplain;
+            Attack = original.Attack;
+            Health = original.Health;
+            IsDead = original.IsDead;
+
+            // Abilities를 깊은 복사하려면 Abilities 리스트가 필요함
+            // Abilities = original.Abilities.Select(ability => new CardAbility(ability)).ToList(); // CardAbility 클래스에 복사 생성자 필요
         }
 
         public void SetHP(int amount)

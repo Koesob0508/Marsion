@@ -23,11 +23,11 @@ namespace Marsion.CardView
 
         private void Start()
         {
-            Managers.Client.OnCardSpawned -= SpawnCard;
-            Managers.Client.OnCardSpawned += SpawnCard;
+            Managers.Client.Game.OnCardSpawned -= SpawnCard;
+            Managers.Client.Game.OnCardSpawned += SpawnCard;
 
-            Managers.Client.OnGameReset -= ResetGame;
-            Managers.Client.OnGameReset += ResetGame;
+            Managers.Client.Game.OnGameReset -= ResetGame;
+            Managers.Client.Game.OnGameReset += ResetGame;
 
             Creatures = new List<ICreatureView>();
 
@@ -77,7 +77,7 @@ namespace Marsion.CardView
 
         private void SpawnCard(bool succeeded, Player player, Card card, int index)
         {
-            if (Managers.Client.IsMine(player) != IsMine) return;
+            if (Managers.Client.Game.IsMine(player) != IsMine) return;
 
             if(succeeded)
             {

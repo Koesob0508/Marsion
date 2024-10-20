@@ -18,6 +18,10 @@ namespace Marsion.Tool
 
         public void Init()
         {
+            Managers.Logger.Log<Sequence>($"Sequence initialized", colorName: ColorCodes.Yellow);
+
+            gameObject.SetActive(true);
+
             IsPlaying = false;
             Track = new List<string>();
             Sequences = new Queue<Sequence>();

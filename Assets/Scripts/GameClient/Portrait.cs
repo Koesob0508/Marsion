@@ -9,23 +9,25 @@ namespace Marsion.Client
 
         private void Start()
         {
-            Managers.Client.OnGameStarted -= SetPortrait;
-            Managers.Client.OnGameStarted += SetPortrait;
+            //Managers.Client.Game.OnGameStarted -= SetPortrait;
+            //Managers.Client.Game.OnGameStarted += SetPortrait;
+
+            Managers.Client.GameEx.OnGameStarted += SetPortrait;
         }
 
         private void SetPortrait()
         {
-            foreach(var player in Managers.Client.GetGameData().Players)
+            foreach(var player in Managers.Client.GameEx.Data.Players)
             {
                 // Player
                 if(player.ClientID == Managers.Client.ID)
                 {
-                    Player_Sprite.sprite = Managers.Client.GetPortrait(player.Portrait);
+                    //Player_Sprite.sprite = Managers.Data.PortraitDictionary[player.Portrait].Sprite;
                 }
                 // Enemy
                 else
                 {
-                    Enemy_Sprite.sprite = Managers.Client.GetPortrait(player.Portrait);
+                    //Enemy_Sprite.sprite = Managers.Data.PortraitList[player.Portrait].Sprite;
                 }
             }
         }

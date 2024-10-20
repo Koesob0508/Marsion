@@ -1,8 +1,9 @@
-﻿using System.Runtime.InteropServices.WindowsRuntime;
+﻿using Marsion.Logic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Netcode;
 using UnityEngine.Rendering.Universal;
 
-namespace Marsion.Logic
+namespace Marsion
 {
     public class SerializedData
     {
@@ -13,30 +14,38 @@ namespace Marsion.Logic
         public SerializedData(FastBufferReader r) { reader = r; data = null; }
         public SerializedData(INetworkSerializable d) { data = d; }
 
+        public int GetInt()
+        {
+            reader.ReadValueSafe(out int value);
+            return value;
+        }
+
         public string GetString()
         {
-            reader.ReadValueSafe(out string msg);
-            return msg;
+            reader.ReadValueSafe(out string value);
+            return value;
         }
 
         public T Get<T>() where T : INetworkSerializable, new()
         {
-            if(data != null)
-            {
-                return (T)data;
-            }
-            else if(bytes != null)
-            {
-                data = NetworkTool.NetDeserialize<T>(bytes);
-                return (T)data;
-            }
-            else
-            {
-                reader.ReadNetworkSerializable(out T val);
-                data = val;
-                return val;
+            reader.ReadNetworkSerializable(out T val);
+            return val;
 
-            }
+            //if (data != null)
+            //{
+            //    return (T)data;
+            //}
+            //else if (bytes != null)
+            //{
+            //    data = NetworkTool.NetworkDeserialize<T>(bytes);
+            //    return (T)data;
+            //}
+            //else
+            //{
+            //    reader.ReadNetworkSerializable(out T val);
+            //    data = val;
+            //    return val;
+            //}
         }
 
         public void PreRead()
@@ -47,17 +56,41 @@ namespace Marsion.Logic
         }
     }
 
+    public class SerializedUlong : INetworkSerializable
+    {
+        public ulong value;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref value);
+        }
+    }
+
+    public class SerializedString : INetworkSerializable
+    {
+        public string value;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref value);
+        }
+    }
+
     public class SerializedGameData : INetworkSerializable
     {
         public GameData gameData;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            if(serializer.IsReader)
+            // 역직렬화
+            if (serializer.IsReader)
             {
+                // 먼저 크기를 읽습니다.
                 int size = 0;
                 serializer.SerializeValue(ref size);
-                if(size > 0)
+
+                // 크기가 0보다 큰 경우 바이트 배열을 읽습니다.
+                if (size > 0)
                 {
                     byte[] bytes = new byte[size];
                     serializer.SerializeValue(ref bytes);
@@ -65,16 +98,24 @@ namespace Marsion.Logic
                 }
             }
 
-            if(serializer.IsWriter)
+            // 직렬화
+            if (serializer.IsWriter)
             {
                 byte[] bytes = NetworkTool.Serialize(gameData);
                 int size = bytes.Length;
+
+                // 크기를 먼저 직렬화합니다.
                 serializer.SerializeValue(ref size);
+
+                // 크기가 0보다 큰 경우 바이트 배열을 직렬화합니다.
                 if (size > 0)
+                {
                     serializer.SerializeValue(ref bytes);
+                }
             }
         }
     }
+
 
     public class SerializedCardData : INetworkSerializable
     {
@@ -86,14 +127,18 @@ namespace Marsion.Logic
         }
     }
 
-    public class SerializedDeckBuildState : INetworkSerializable
+    public class SerializedDraftState : INetworkSerializable
     {
+        public bool isComplete;
+        public int count;
         public string[] deck;
         public string[] selections;
         public string[] subSelections;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
+            serializer.SerializeValue(ref isComplete);
+            serializer.SerializeValue(ref count);
             // Serialize deck array
             SerializeStringArray(ref deck, serializer);
             // Serialize selections array
@@ -131,6 +176,22 @@ namespace Marsion.Logic
                     serializer.SerializeValue(ref element);
                     array[i] = element;
                 }
+            }
+        }
+    }
+
+    public class StringContainer : INetworkSerializable
+    {
+        public string SomeText;
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            if (serializer.IsWriter)
+            {
+                serializer.GetFastBufferWriter().WriteValueSafe(SomeText);
+            }
+            else
+            {
+                serializer.GetFastBufferReader().ReadValueSafe(out SomeText);
             }
         }
     }

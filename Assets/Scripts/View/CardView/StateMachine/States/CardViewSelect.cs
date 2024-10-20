@@ -31,9 +31,9 @@ namespace Marsion.CardView
             FollowCursor();
 
             if (IsAreaDetected())
-                Managers.Client.PlayerField.InsertEmptyCard(GetMouseWorldPosition().x);
+                Managers.Client.Game.PlayerField.InsertEmptyCard(GetMouseWorldPosition().x);
             else
-                Managers.Client.PlayerField.RemoveEmptyCard();
+                Managers.Client.Game.PlayerField.RemoveEmptyCard();
         }
 
         public override void OnExitState()
@@ -49,14 +49,14 @@ namespace Marsion.CardView
         {
             if (FSM.IsCurrent(this))
             {
-                if(eventData.button == PointerEventData.InputButton.Left && IsAreaDetected() && !Managers.Client.PlayerField.IsFullField)
+                if(eventData.button == PointerEventData.InputButton.Left && IsAreaDetected() && !Managers.Client.Game.PlayerField.IsFullField)
                 {
-                    Managers.Client.TryPlayAndSpawnCard(Handler.Card, Managers.Client.PlayerField.EmptyCreatureIndex);
+                    Managers.Client.Game.TryPlayAndSpawnCard(Handler.Card, Managers.Client.Game.PlayerField.EmptyCreatureIndex);
                 }
                 else
                 {
                     Managers.Logger.Log<CardViewSelect>("조건 불충족", colorName: "green");
-                    Managers.Client.PlayerField.RemoveEmptyCard();
+                    Managers.Client.Game.PlayerField.RemoveEmptyCard();
                 }
 
                 FSM.PopState();

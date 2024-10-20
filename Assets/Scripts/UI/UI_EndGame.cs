@@ -28,7 +28,7 @@ namespace Marsion.UI
         {
             ClosePopupUI();
 
-            Managers.UI.ShowPopupUI<UI_DeckBuilder>();
+            Managers.UI.ShowPopupUI<UI_DraftPanel>();
         }
     }
 }

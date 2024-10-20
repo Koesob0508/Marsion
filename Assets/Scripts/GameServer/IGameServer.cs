@@ -7,8 +7,6 @@ namespace Marsion.Server
     public interface IGameServer
     {
         // Event
-        event Action OnStartDeckBuilding;
-
         event Action<SerializedGameData> OnDataUpdated;
 
         event Action OnGameStarted;
@@ -29,9 +27,10 @@ namespace Marsion.Server
         void Clear();
 
         // Rpc
-        void ReadyRpc(SerializedCardData[] deck, RpcParams rpcParams = default);
+        void ReadyRpc(ulong id, StringContainer[] deck);
         void TurnEndRpc();
         void TryPlayAndSpawnCardRpc(ulong id, string cardUID, int index);
         void TryAttackRpc(ulong attackPlayer, string attackerUID, ulong defendPlayer, string defenderUID);
+        //void CheckConnectionRpc();
     }
 }

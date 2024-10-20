@@ -13,19 +13,14 @@ namespace Marsion.Client
     /// </summary>
     public interface IGameClient
     {
-        ulong ID { get; }
         ulong EnemyID { get; }
         IHandView Hand { get; }
         IFieldView PlayerField { get; }
         IFieldView EnemyField { get; }
-        InputManager Input { get; }
-
-
 
         #region Events
 
         event Action OnSuccessRelay;
-        event Action OnDeckBuildingUpdated;
         event UnityAction OnDataUpdated;
         event UnityAction OnGameStarted;
         event UnityAction OnGameEnded;
@@ -63,8 +58,7 @@ namespace Marsion.Client
 
         #region Client Operations
 
-        void SetClientID(ulong clientID);
-        void Ready(List<Card> deckSO);
+        void Ready(List<string> deckSO);
         void TryPlayAndSpawnCard(Card card, int index);
         void TurnEnd();
         void TryAttack(Card attacker, Card defender);

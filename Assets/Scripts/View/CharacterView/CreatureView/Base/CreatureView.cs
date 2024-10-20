@@ -25,11 +25,11 @@ namespace Marsion.CardView
 
             if (IsEmpty) return;
 
-            Managers.Client.OnDataUpdated -= UpdateCard;
-            Managers.Client.OnDataUpdated += UpdateCard;
+            Managers.Client.Game.OnDataUpdated -= UpdateCard;
+            Managers.Client.Game.OnDataUpdated += UpdateCard;
 
-            Managers.Client.OnStartAttack -= Attack;
-            Managers.Client.OnStartAttack += Attack;
+            Managers.Client.Game.OnStartAttack -= Attack;
+            Managers.Client.Game.OnStartAttack += Attack;
 
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
@@ -48,7 +48,7 @@ namespace Marsion.CardView
         protected override void UpdateCard()
         {
             if (Card == null) Managers.Logger.Log<CreatureView>(gameObject.name, colorName: "yellow");
-            Card = Managers.Client.GetCard(Type, Card.PlayerID, Card.UID);
+            Card = Managers.Client.Game.GetCard(Type, Card.PlayerID, Card.UID);
         }
     }
 }

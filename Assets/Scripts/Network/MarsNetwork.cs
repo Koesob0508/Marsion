@@ -17,27 +17,49 @@ namespace Marsion
 
         public NetworkManager NetworkManager => network;
 
+        private const int messageSize = 1024 * 1024;
+        public static int MessageSizeMax { get { return messageSize; } }
+
         // ID of this client (if host, will be same than ServerID), changes for every reconnection, assigned by Netcode
         public ulong ClientID { get { return network.LocalClientId; } }
         public ulong ServerID { get { return NetworkManager.ServerClientId; } }
         public bool IsServer { get { return network.IsServer; } }
         public bool IsClient { get { return network.IsClient; } }
         public bool IsHost { get { return IsClient && IsServer; } }
+        public bool IsOnline { get { return IsActive(); } }
+        public IReadOnlyList<ulong> ConnectedClientIDs { get { return network.ConnectedClientsIds; } }
         public int ConnectedClientsCount { get { return network.ConnectedClientsList.Count; } }
 
+        public MarsNetwork Get()
+        {
+            return this;
+        }
+
+        public bool IsActive()
+        {
+            return network.IsServer || network.IsClient;
+        }
+
+        public IReadOnlyList<ulong> GetClientIDs()
+        {
+            return network.ConnectedClientsIds;
+        }
+
+        public NetworkMessaging Messaging { get { return messaging; } }
+
         // Server & Client events
-        public event Action OnConnect;    //Event when self connect, happens before onReady, before sending any data
-        public event Action OnDisconnect; //Event when self disconnect
+        public event Action OnConnect;    // 네트워크 접속 그 자체를 의미하는 이벤트
+        public event Action OnDisconnect; // 네트워크 연결 끊김에 대한 이벤트
 
         // Server only events
-        public event Action<ulong> OnClientJoin;  //Server event when any client connect
-        public event Action<ulong> OnClientQuit;  //Server event when any client disconnect
+        public event Action<ulong> OnClientJoin;  // Host, Server 기준에서 새로운 Client 연결 이벤트
+        public event Action<ulong> OnClientQuit;  // Host, Server 기준에서 Client 종료 이벤트
         // public event Action<ulong> OnClientReady; //Server event when any client become ready
-
-
 
         public void Init()
         {
+            Managers.Logger.Log<MarsNetwork>("Network initialized", colorName: ColorCodes.Server);
+
             network = GetComponent<NetworkManager>();
             transport = GetComponent<MarsTransport>();
             messaging = new NetworkMessaging(this);

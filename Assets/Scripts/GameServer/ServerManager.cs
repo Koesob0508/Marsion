@@ -8,41 +8,56 @@ namespace Marsion
 
     public class ServerManager : MonoBehaviour
     {
-        [SerializeField] GameServer _gameServer;
-        public GameServer GameServer => _gameServer;
-        public DraftServer DraftServer;
+        public GameServer Game;
+        public GameServerEx GameEx;
+        public DraftServer Draft;
 
         public void Init()
         {
-            Managers.Logger.Log<ServerManager>("Initialized", colorName: "#FFA500");
+            Managers.Logger.Log<ServerManager>("Server Manager initialized", colorName: ColorCodes.Server);
 
-            Managers.Network.OnClientJoin -= ClientConnected;
-            Managers.Network.OnClientJoin += ClientConnected;
-
-            GameServer.Init();
-
-            DraftServer = new DraftServer();
-            DraftServer.Init();
+            Managers.Network.OnConnect += OnConnect;
+            Managers.Network.OnClientJoin += OnClientJoin;
         }
 
-        private void Clear()
+        private void OnConnect()
         {
-            GameServer.Clear();
-            Managers.Network.OnClientJoin -= ClientConnected;
-        }
-
-        private void ClientConnected(ulong clientID)
-        {
-            Managers.Logger.Log<ServerManager>($"Client(ID:{clientID}) connected", colorName: "#FFA500");
-
-            if(!Managers.Network.IsHost)
+            if (!Managers.Network.IsHost)
             {
+                Managers.Logger.Log<ServerManager>("This is not host client", colorName: ColorCodes.Server);
+
                 Clear();
                 gameObject.SetActive(false);
                 return;
             }
 
-            GameServer.CheckConnectionRpc();
+            Draft = new DraftServer();
+            Draft.Init();
+
+            //Game.Init();
+            GameEx.Init();
+
+            RegisterClient(Managers.Network.ClientID);
+        }
+
+        private void Clear()
+        {
+            Managers.Logger.Log<ServerManager>("Server Manager cleared", colorName: ColorCodes.Server);
+
+            Game.Clear();
+            Managers.Network.OnClientJoin -= OnClientJoin;
+        }
+
+        private void OnClientJoin(ulong clientID)
+        {
+            RegisterClient(clientID);
+        }
+
+        private void RegisterClient(ulong clientID)
+        {
+            Managers.Logger.Log<ServerManager>($"Client(ID : {clientID}) regist", colorName: ColorCodes.Server);
+
+            Draft.AddState(clientID);
         }
     }
 }

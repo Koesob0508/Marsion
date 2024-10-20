@@ -5,11 +5,14 @@ using System;
 using Marsion.Tool;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 
 namespace Marsion.Server
 {
-    public class GameServer : NetworkBehaviour, IGameServer
+    public class GameServer : NetworkBehaviour
     {
+        private GameData GameData;
+
         public int ReadyPlayerCount;
 
         [Header("Sequencer")]
@@ -20,13 +23,10 @@ namespace Marsion.Server
         private List<Card> HostDeck;
         private List<Card> GuestDeck;
 
-        private GameData GameData;
         private IGameLogic Logic;
 
         // Event
         public event Action<SerializedGameData> OnDataUpdated;
-
-        public event Action OnStartDeckBuilding;
 
         public event Action OnGameStarted;
         public event Action<int> OnGameEnded;
@@ -43,6 +43,8 @@ namespace Marsion.Server
 
         public void Init()
         {
+            Managers.Logger.Log<GameServer>($"Game Server initialized", colorName: ColorCodes.Server);
+
             Sequencer.Init();
         }
 
@@ -58,6 +60,7 @@ namespace Marsion.Server
 
         public void Clear()
         {
+
         }
 
         // Flow
@@ -71,7 +74,7 @@ namespace Marsion.Server
 
             startGameClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameServer>("Start game", colorName: "#FFA500");
+                Managers.Logger.Log<GameServer>("Start game", colorName: ColorCodes.Server);
 
                 GameData = new GameData(2);
                 Logic = new GameLogic();
@@ -232,18 +235,24 @@ namespace Marsion.Server
         }
 
         [Rpc(SendTo.Server)]
-        public void ReadyRpc(SerializedCardData[] deck, RpcParams rpcParams = default)
+        public void ReadyRpc(ulong id, StringContainer[] deck)
         {
+            Managers.Logger.Log<GameServer>($"Client({id}) ready", colorName: ColorCodes.Server);
             List<Card> resultDeck = new List<Card>();
-            List<SerializedCardData> networkDeck = new List<SerializedCardData>(deck);
 
-            foreach(SerializedCardData networkCard in networkDeck)
+            foreach(var soID in deck)
             {
-                //Managers.Data.CardDictionary.TryGetValue(networkCard.)
-                //resultDeck.Add(networkCard.card);
+                if(Managers.Data.CardDictionary.TryGetValue(soID.SomeText, out var cardSO))
+                {
+                    resultDeck.Add(new Card(id, cardSO));
+                }
+                else
+                {
+                    Managers.Logger.LogWarning<GameServer>($"ID : {soID} CardSO not found", colorName: ColorCodes.Server);
+                }
             }
 
-            switch(rpcParams.Receive.SenderClientId)
+            switch(id)
             {
                 case 0:
                     HostDeck = resultDeck;
@@ -256,11 +265,11 @@ namespace Marsion.Server
             switch (ReadyPlayerCount)
             {
                 case 0:
-                    FirstPlayerClientID = rpcParams.Receive.SenderClientId;
+                    FirstPlayerClientID = id;
                     ReadyPlayerCount++;
                     break;
                 case 1:
-                    SecondPlayerClientID = rpcParams.Receive.SenderClientId;
+                    SecondPlayerClientID = id;
                     StartGame();
                     break;
             }
@@ -375,20 +384,18 @@ namespace Marsion.Server
             return GameData.GetPlayer(clientID);
         }
 
-        [Rpc(SendTo.Server)]
-        public void CheckConnectionRpc()
-        {
-            Managers.Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsCount}", colorName: "#FFA500");
+        //[Rpc(SendTo.Server)]
+        //public void CheckConnectionRpc()
+        //{
+        //    Managers.Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsCount}", colorName: "#FFA500");
 
-            if (AreAllPlayersConnected())
-            {
-                Managers.Logger.Log<GameServer>($"Ready to start", colorName: "#FFA500");
+        //    if (AreAllPlayersConnected())
+        //    {
+        //        Managers.Logger.Log<GameServer>($"Ready to start", colorName: "#FFA500");
 
-                ReadyPlayerCount = 0;
-                // StartGame();
-                OnStartDeckBuilding?.Invoke();
-            }
-        }
+        //        ReadyPlayerCount = 0;
+        //    }
+        //}
 
         #endregion
     }

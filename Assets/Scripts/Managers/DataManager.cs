@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Marsion
 {
@@ -11,15 +12,19 @@ namespace Marsion
         private Dictionary<Type, IDictionary> dataDictionaries;
 
         public List<CardSO> CardList { get { return GetList<CardSO>(); } }
+        public List<PortraitSO> PortraitList { get { return GetList<PortraitSO>(); } }
         public Dictionary<string, CardSO> CardDictionary { get { return GetDictionary<CardSO>(); } }
+        public Dictionary<string, PortraitSO> PortraitDictionary { get { return GetDictionary<PortraitSO>(); } }
 
         // 데이터 초기화 메서드
         public void Init()
         {
-            dataLists = new Dictionary<Type, IList>();
-            dataDictionaries = new Dictionary<Type, IDictionary>();
+            Managers.Logger.Log<DataManager>("Data initialized", colorName: ColorCodes.CommonManager);
+            dataLists = new();
+            dataDictionaries = new();
 
             Load<CardSO>("CardSO");
+            Load<PortraitSO>("PortraitSO");
         }
 
         // 제네릭 Load 메서드 (Object 타입을 상속하는 경우에 대응)

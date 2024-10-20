@@ -1,126 +1,203 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
+using Unity.Netcode;
+using UnityEngine;
 
 namespace Marsion
 {
-    public class DraftState
+    public enum SelectType
     {
-        public int Count;
-        public List<Card> Deck;
-        public List<Card> Selections;
-        public List<Card> SubSelections;
-
-        public DraftState()
-        {
-            Deck = new List<Card>();
-            Selections = new List<Card>();
-            SubSelections = new List<Card>();
-        }
+        Legendary = 0,
+        Table = 1,
+        Exchange = 2
     }
 
     public class DraftServer
     {
-        public enum SelectType
-        {
-            Legendary = 0,
-            Table = 1,
-            Exchange = 2
-        }
-
-        DraftState CurrentState;
-        public DraftState State => CurrentState;
-
-        public SelectType Type;
-        public Queue<int> TypeSequence;
-        public bool IsComplete;
+        private Dictionary<ushort, Action<ulong, SerializedData>> Commands;
+        private Dictionary<ulong, DraftState> DraftDictionary;
+        private Queue<int> InitialTypeSequence;
         
-        public Action OnUpdateDeckBuildingState;
+        private NetworkMessaging Messaging { get { return Managers.Network.Messaging; } }
+
+        public Action OnUpdateDraftState;
 
         public void Init()
         {
-            CurrentState = new DraftState();
+            Managers.Logger.Log<DraftServer>($"Draft Server initialized", colorName: ColorCodes.Server);
 
-            TypeSequence = new Queue<int>(Enumerable.Concat(
+            Commands = new();
+            DraftDictionary = new();
+            InitialTypeSequence = new Queue<int>(Enumerable.Concat(
                 new[] { 0 },
-                Enumerable.Repeat(1, 29)
+                Enumerable.Repeat(1, 5)
             ));
 
-            CurrentState.Count = TypeSequence.Count;
+            RegisterCommand(DraftCommand.ClientStartDraft, OnReceiveStartDraft);
+            RegisterCommand(DraftCommand.ClientSelect, OnReceiveSelect);
+            RegisterCommand(DraftCommand.ClientReady, OnReceiveReady);
 
-            IsComplete = false;
-
-            SetSelection();
+            Messaging.SubscribeMessage("DraftClient", OnReceiveCommand);
         }
 
-        public void SetSelection()
+        private void RegisterCommand(ushort type, Action<ulong, SerializedData> callback)
         {
-            if (TypeSequence.TryDequeue(out var result))
+            Commands.Add(type, callback);
+        }
+
+        private void OnReceiveCommand(ulong clientID, FastBufferReader reader)
+        {
+            reader.ReadValueSafe(out ushort tag);
+            SerializedData sdata = new SerializedData(reader);
+            ExecuteCommand(tag, clientID, sdata);
+        }
+
+        private void ExecuteCommand(ushort tag, ulong clientID, SerializedData sdata)
+        {
+            bool found = Commands.TryGetValue(tag, out var command);
+            if (found)
+                command.Invoke(clientID, sdata);
+        }
+
+        #region OnReceive
+
+        private void OnReceiveStartDraft(ulong clientID, SerializedData sdata)
+        {
+            Managers.Logger.Log<DraftServer>($"Start Draft from Client : {clientID}", colorName: ColorCodes.Server);
+
+            SendInitState(clientID);
+            SendStartDraft(clientID);
+        }
+
+        private void OnReceiveSelect(ulong clientID, SerializedData sdata)
+        {
+            Managers.Logger.Log<DraftServer>($"Select from Client : {clientID}", colorName: ColorCodes.Server);
+
+            int index = sdata.GetInt();
+
+            Managers.Logger.Log<DraftServer>($"Client {clientID} select {index}", colorName: ColorCodes.Server);
+
+            if(DraftDictionary.TryGetValue(clientID, out var state))
             {
-                Managers.Logger.Log<DraftServer>("Set Sequence", colorName: "yellow");
-                SelectType[] types = (SelectType[])Enum.GetValues(typeof(SelectType));
-                Type = types[result];
-
-                GenerateSelection();
-
-                IsComplete = false;
+                state.Select(index);
             }
             else
             {
-                TypeSequence.Clear();
+                Managers.Logger.LogWarning<DraftServer>($"Client {clientID} has not state", colorName: ColorCodes.Server);
+            }
 
-                IsComplete = true;
+            SendUdpateState(clientID);
+        }
+
+        private void OnReceiveReady(ulong clientID, SerializedData sdata)
+        {
+            Managers.Logger.Log<DraftServer>($"Ready from Client : {clientID}", colorName: ColorCodes.Server);
+
+            DraftDictionary.TryGetValue(clientID, out var state);
+
+            Managers.Server.GameEx.Ready(clientID, state.CurrentDeck);
+        }
+
+        #endregion
+
+        #region Send
+
+        private void SendInitState(ulong clientID)
+        {
+            if (DraftDictionary.TryGetValue(clientID, out var state))
+            {
+                SerializedDraftState sdata = new();
+                sdata.isComplete = state.IsComplete;
+                sdata.count = state.Count;
+                sdata.deck = state.CurrentDeck.ToArray();
+                sdata.selections = state.CurrentSelections.ToArray();
+                sdata.subSelections = state.CurrentSubSelections.ToArray();
+
+                Send(clientID, DraftCommand.ServerInitState, sdata, NetworkDelivery.ReliableSequenced);
             }
         }
 
-        public void Select(int index)
+        private void SendStartDraft(ulong clientID)
         {
-            CurrentState.Count--;
+            Send(clientID, DraftCommand.ServerStartDraft);
+        }
 
-            switch(Type)
+        private void SendUdpateState(ulong clientID)
+        {
+            if (DraftDictionary.TryGetValue(clientID, out var state))
             {
-                case SelectType.Legendary:
-                    CurrentState.Deck.Add(CurrentState.Selections[index]);
-                    break;
-                case SelectType.Table:
-                    CurrentState.Deck.Add(CurrentState.Selections[index]);
-                    break;
-                case SelectType.Exchange:
-                    CurrentState.Deck.Remove(CurrentState.SubSelections[index]);
-                    CurrentState.Deck.Add(CurrentState.Selections[index]);
-                    break;
+                SerializedDraftState sdata = new();
+                sdata.isComplete = state.IsComplete;
+                sdata.count = state.Count;
+                sdata.deck = state.CurrentDeck.ToArray();
+                sdata.selections = state.CurrentSelections.ToArray();
+                sdata.subSelections = state.CurrentSubSelections.ToArray();
+
+                Send(clientID, DraftCommand.ServerUpdateState, sdata, NetworkDelivery.ReliableSequenced);
             }
-
-            SetSelection();
-
-            OnUpdateDeckBuildingState?.Invoke();
-        }
-
-        public void Ready()
-        {
-            Managers.Client.Ready(CurrentState.Deck);
-        }
-
-        public void SetNextSelectSequence(Queue<int> sequence)
-        {
-            TypeSequence = sequence;
-            CurrentState.Count = sequence.Count;
-        }
-
-        private void GenerateSelection()
-        {
-            switch (Type)
+            else
             {
-                case SelectType.Legendary:
-                    CurrentState.Selections = Managers.Card.FindByGrade(4, 3);
-                    break;
-                case SelectType.Table:
-                    CurrentState.Selections = Managers.Card.FindExcludeGrade(4, 3);
-                    break;
-                case SelectType.Exchange:
-                    CurrentState.SubSelections = Managers.Card.FindExcludeGrade(4, 3, cards: CurrentState.Deck);
-                    CurrentState.Selections = Managers.Card.FindExcludeGrade(4, 3);
-                    break;
+                Managers.Logger.LogWarning<DraftServer>($"Client({clientID}) has not draft state", colorName: ColorCodes.Server);
+            }
+        }
+
+        // Generic send
+        private void Send(ulong target, ushort tag)
+        {
+            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
+            writer.WriteValueSafe(tag);
+            Messaging.Send("DraftServer", target, writer, NetworkDelivery.ReliableSequenced);
+            writer.Dispose();
+        }
+
+        private void Send(ulong target, ushort tag, INetworkSerializable data, NetworkDelivery delivery)
+        {
+            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
+            writer.WriteValueSafe(tag);
+            writer.WriteNetworkSerializable(data);
+            Messaging.Send("DraftServer", target, writer, delivery);
+            writer.Dispose();
+        }
+
+        #endregion
+
+
+
+        // Operations
+
+        public bool GetDeck(ulong clientID, out List<string> draftedDeck)
+        {
+            if(DraftDictionary.TryGetValue(clientID, out var state))
+            {
+                draftedDeck = state.CurrentDeck;
+                return true;
+            }
+            else
+            {
+                Managers.Logger.Log<DraftServer>($"Client({clientID}) has not state", colorName: ColorCodes.Server);
+                draftedDeck = null;
+                return false;
+            }
+        }
+
+        public void AddState(ulong clientID)
+        {
+            if(!DraftDictionary.ContainsKey(clientID))
+            {
+                var state = new DraftState(InitialTypeSequence);
+                state.SetSelection();
+                DraftDictionary.Add(clientID, state);
+
+                SerializedUlong sdata = new();
+                sdata.value = clientID;
+
+                //OnStartDraft(clientID);
+            }
+            else
+            {
+                Managers.Logger.Log<DraftServer>($"Client(ID : {clientID}) Draft State already exists", colorName: ColorCodes.Server);
             }
         }
     }
