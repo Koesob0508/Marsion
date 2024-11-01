@@ -3,30 +3,29 @@ using UnityEngine;
 
 namespace Marsion.Tool
 {
-    [System.Serializable]
     public class MyDictionary<K, V>
     {
-        [SerializeField]
-        private List<K> keys = new List<K>();
+        public List<K> Keys = new List<K>();
 
-        [SerializeField]
-        private List<V> values = new List<V>();
+        public List<V> Values = new List<V>();
+
+        public int Count => Keys.Count;
 
         // Dictionary에 새로운 키-값 쌍을 추가합니다.
         public void Add(K key, V value)
         {
-            keys.Add(key);
-            values.Add(value);
+            Keys.Add(key);
+            Values.Add(value);
         }
 
         // 키에 해당하는 값을 Dictionary에서 제거합니다.
         public bool Remove(K key)
         {
-            int index = keys.IndexOf(key);
+            int index = Keys.IndexOf(key);
             if (index >= 0)
             {
-                keys.RemoveAt(index);
-                values.RemoveAt(index);
+                Keys.RemoveAt(index);
+                Values.RemoveAt(index);
                 return true;
             }
             return false; // 키를 찾지 못한 경우
@@ -36,9 +35,9 @@ namespace Marsion.Tool
         public Dictionary<K, V> ToDictionary()
         {
             Dictionary<K, V> dict = new Dictionary<K, V>();
-            for (int i = 0; i < keys.Count; i++)
+            for (int i = 0; i < Keys.Count; i++)
             {
-                dict[keys[i]] = values[i];
+                dict[Keys[i]] = Values[i];
             }
             return dict;
         }
@@ -46,10 +45,10 @@ namespace Marsion.Tool
         // 키에 해당하는 값이 있는지 확인하고, 값을 반환합니다.
         public bool TryGetValue(K key, out V value)
         {
-            int index = keys.IndexOf(key);
+            int index = Keys.IndexOf(key);
             if (index >= 0)
             {
-                value = values[index];
+                value = Values[index];
                 return true;
             }
             value = default(V);
@@ -59,8 +58,8 @@ namespace Marsion.Tool
         // Dictionary를 비웁니다.
         public void Clear()
         {
-            keys.Clear();
-            values.Clear();
+            Keys.Clear();
+            Values.Clear();
         }
     }
 }

@@ -56,7 +56,7 @@ namespace Marsion.CardView
         {
             if (FSM.IsCurrent(this) && eventData.button == PointerEventData.InputButton.Left)
             {
-                if(Managers.Client.IsMyTurn())
+                if(Managers.Client.Game.IsMyTurn())
                 {
                     FSM.PopState();
 
@@ -76,7 +76,7 @@ namespace Marsion.CardView
         {
             if (FSM.IsCurrent(this) && eventData.button == PointerEventData.InputButton.Left)
             {
-                if(Managers.Client.IsMyTurn())
+                if(Managers.Client.Game.IsMyTurn())
                 {
                     FSM.PopState();
 

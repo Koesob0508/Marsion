@@ -4,42 +4,43 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class CardManager : MonoBehaviour
+    public class CardManager
     {
-        public List<CardSO> Cards;
-
-        public List<Card> FindByGrade(int grade, int count = 1, bool allowDuplicate = false, List<Card> cards = null)
+        public List<string> FindByGrade(int grade, int count = 1, bool allowDuplicate = false, List<string> cards = null)
         {
-            List<Card> result = new List<Card>();
-            List<Card> copiedCards;
+            List<string> result = new List<string>();
+            List<string> copiedCards;
 
             if (cards == null)
             {
-                copiedCards = new List<Card>();
+                copiedCards = new List<string>();
 
-                foreach(var cardSO in Cards)
+                foreach(var cardData in Managers.Data.CardList)
                 {
-                    copiedCards.Add(new Card(Managers.Client.ID, cardSO));
+                    copiedCards.Add(cardData.ID);
                 }
             }
             else
             {
-                copiedCards = new List<Card>(cards);
+                copiedCards = new List<string>(cards);
             }
 
             ShuffleList(copiedCards);
 
             while (result.Count < count)
             {
-                Card selected = null;
+                string selected = null;
 
-                foreach (var card in copiedCards)
+                foreach (var cardID in copiedCards)
                 {
-                    if ((int)card.Grade == grade)
+                    if(Managers.Data.GetDictionary<CardSO>().TryGetValue(cardID, out var cardSO))
                     {
-                        selected = card;
-                        result.Add(selected);
-                        break;
+                        if ((int)cardSO.Grade == grade)
+                        {
+                            selected = cardID;
+                            result.Add(selected);
+                            break;
+                        }
                     }
                 }
 
@@ -55,38 +56,41 @@ namespace Marsion
             return result;
         }
 
-        public List<Card> FindExcludeGrade(int grade, int count = 1, bool allowDuplicate = false, List<Card> cards = null)
+        public List<string> FindExcludeGrade(int grade, int count = 1, bool allowDuplicate = false, List<string> pile = null)
         {
-            List<Card> result = new List<Card>();
-            List<Card> copiedCards;
+            List<string> result = new List<string>();
+            List<string> copiedCards;
 
-            if (cards == null)
+            if (pile == null)
             {
-                copiedCards = new List<Card>();
+                copiedCards = new List<string>();
 
-                foreach (var cardSO in Cards)
+                foreach (var cardSO in Managers.Data.CardList)
                 {
-                    copiedCards.Add(new Card(Managers.Client.ID, cardSO));
+                    copiedCards.Add(cardSO.ID);
                 }
             }
             else
             {
-                copiedCards = new List<Card>(cards);
+                copiedCards = new List<string>(pile);
             }
 
             ShuffleList(copiedCards);
 
             while (result.Count < count)
             {
-                Card selected = null;
+                string selected = null;
 
-                foreach (var card in copiedCards)
+                foreach (var cardID in copiedCards)
                 {
-                    if ((int)card.Grade != grade)
+                    if(Managers.Data.GetDictionary<CardSO>().TryGetValue(cardID, out var card))
                     {
-                        selected = card;
-                        result.Add(selected);
-                        break;
+                        if ((int)card.Grade != grade)
+                        {
+                            selected = cardID;
+                            result.Add(selected);
+                            break;
+                        }
                     }
                 }
 

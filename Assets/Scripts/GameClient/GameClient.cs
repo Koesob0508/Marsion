@@ -5,6 +5,7 @@ using Marsion.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -12,11 +13,11 @@ using UnityEngine.Events;
 
 namespace Marsion.Client
 {
-    public class GameClient : NetworkBehaviour, IGameClient
+    public class GameClient : NetworkBehaviour
     {
         public List<Sprite> PortraitSprites;
 
-        GameData _gameData;
+        private GameData Data;
         
         [Header("Sequencer")]
         [SerializeField] Sequencer Sequencer;
@@ -32,8 +33,6 @@ namespace Marsion.Client
         public IHandView Hand { get => hand; }
         public IFieldView PlayerField { get => playerField; }
         public IFieldView EnemyField { get => enemyField; }
-
-        public InputManager Input { get; private set; }
 
         public event Action OnSuccessRelay;
         public event UnityAction OnDataUpdated;
@@ -51,86 +50,68 @@ namespace Marsion.Client
 
         public void Init()
         {
-            if (Managers.Network != null)
-            {
-                Managers.Network.OnClientConnectedCallback -= SetClientID;
-                Managers.Network.OnClientConnectedCallback += SetClientID;
-            }
-            else
-            {
-                Managers.Logger.Log<GameClient>("Network is null", colorName: "yellow");
-            }
+            Managers.Logger.Log<GameClient>($"Game Client initialized", colorName: ColorCodes.Client);
 
-            Input = new InputManager();
             Sequencer.Init();
 
-            Managers.Server.OnStartDeckBuilding += StartDeckBuildingRpc;
-            Managers.Server.OnDataUpdated += UpdateDataRpc;
-            Managers.Server.OnGameStarted += StartGameRpc;
-            Managers.Server.OnGameEnded += EndGameRpc;
-            Managers.Server.OnResetGame += ResetGameRpc;
-            Managers.Server.OnTurnStarted += StartTurnRpc;
-            Managers.Server.OnTurnEnded += EndTurnRpc;
-            Managers.Server.OnCardDrawn += DrawCardRpc;
-            Managers.Server.OnManaChanged += ChangeManaRpc;
-            Managers.Server.OnCardPlayed += PlayCardRpc;
-            Managers.Server.OnCardSpawned += SpawnCardRpc;
-            Managers.Server.OnStartAttack += StartAttackRpc;
-            Managers.Server.OnDeadCard += DeadCardRpc;
-        }
-
-        private void Update()
-        {
-            Input.Update();
+            Managers.Server.Game.OnDataUpdated += UpdateDataRpc;
+            Managers.Server.Game.OnGameStarted += StartGameRpc;
+            Managers.Server.Game.OnGameEnded += EndGameRpc;
+            Managers.Server.Game.OnResetGame += ResetGameRpc;
+            Managers.Server.Game.OnTurnStarted += StartTurnRpc;
+            Managers.Server.Game.OnTurnEnded += EndTurnRpc;
+            Managers.Server.Game.OnCardDrawn += DrawCardRpc;
+            Managers.Server.Game.OnManaChanged += ChangeManaRpc;
+            Managers.Server.Game.OnCardPlayed += PlayCardRpc;
+            Managers.Server.Game.OnCardSpawned += SpawnCardRpc;
+            Managers.Server.Game.OnStartAttack += StartAttackRpc;
+            Managers.Server.Game.OnDeadCard += DeadCardRpc;
         }
 
         public void Clear()
         {
-            Managers.Network.OnClientConnectedCallback -= SetClientID;
+
         }
 
-        public void SetClientID(ulong clientID)
-        {
-            ID = Managers.Network.LocalClientId;
-        }
 
-        public void Ready(List<Card> deckSO)
-        {
-            List<NetworkCardData> deck = new List<NetworkCardData>();
 
-            foreach (var card in deckSO)
+        public void Ready(List<string> deck)
+        {
+            //List<SerializedCardData> deck = new List<SerializedCardData>();
+
+            //foreach (var card in deckSO)
+            //{
+            //    SerializedCardData netCard = new SerializedCardData();
+            //    netCard.UID = card.UID;
+            //    deck.Add(netCard);
+            //}
+
+            //SerializedCardData[] netDeck = deck.ToArray();
+
+            List<StringContainer> sdata = new();
+            foreach (var id in deck)
             {
-                NetworkCardData netCard = new NetworkCardData();
-                netCard.card = card;
-                deck.Add(netCard);
+                StringContainer container = new();
+                container.SomeText = id;
+                sdata.Add(container);
             }
 
-            NetworkCardData[] netDeck = deck.ToArray();
-            Managers.Server.ReadyRpc(netDeck);
+            Managers.Server.Game.ReadyRpc(ID, sdata.ToArray());
         }
 
         public void TryPlayAndSpawnCard(Card card, int index)
         {
-            Managers.Server.TryPlayAndSpawnCardRpc(ID, card.UID, index);
+            Managers.Server.Game.TryPlayAndSpawnCardRpc(ID, card.UID, index);
         }
 
         public void TurnEnd()
         {
-            Managers.Server.TurnEndRpc();
+            Managers.Server.Game.TurnEndRpc();
         }
 
         public void TryAttack(Card attacker, Card defender)
         {
-            Managers.Server.TryAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
-        }
-
-        [Rpc(SendTo.ClientsAndHost)]
-        private void StartDeckBuildingRpc()
-        {
-            Managers.Logger.Log<GameClient>("StartBuilding", colorName: "green");
-
-            OnSuccessRelay?.Invoke();
-            Managers.UI.ShowPopupUI<UI_DeckBuilder>();
+            Managers.Server.Game.TryAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
@@ -167,15 +148,15 @@ namespace Marsion.Client
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void UpdateDataRpc(NetworkGameData networkData)
+        public void UpdateDataRpc(SerializedGameData networkData)
         {
             Sequencer.Sequence updateSequence = new Sequencer.Sequence("Update", Sequencer);
             Sequencer.Clip updateClip = new Sequencer.Clip("UpdateClip");
 
             updateClip.OnPlay += () =>
             {
-                _gameData = networkData.gameData;
-                Managers.Logger.Log<GameClient>("Game data updated", colorName:"green");
+                Data = networkData.gameData;
+                Managers.Logger.Log<GameClient>("Game data updated", colorName: "green");
 
                 OnDataUpdated?.Invoke();
             };
@@ -207,8 +188,6 @@ namespace Marsion.Client
                         ui.Text_Result.text = "LOSE";
                 }
 
-                Managers.Builder.SetNextSelectSequence(new Queue<int>(Enumerable.Repeat(2, 3)));
-                Managers.Builder.SetSelection();
                 OnGameEnded?.Invoke();
             };
 
@@ -339,7 +318,7 @@ namespace Marsion.Client
             deadLog.OnPlay += () =>
             {
                 Managers.Logger.Log<GameClient>("Card dead");
-            };            
+            };
 
             deadClip.OnPlay += () =>
             {
@@ -392,7 +371,7 @@ namespace Marsion.Client
 
             attackLogClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>("Start Attack", colorName:"green");
+                Managers.Logger.Log<GameClient>("Start Attack", colorName: "green");
             };
 
             invokeEventClip.OnPlay += () =>
@@ -410,7 +389,7 @@ namespace Marsion.Client
 
         public bool IsMine(Player player)
         {
-            return _gameData.GetPlayer(ID) == player;
+            return Data.GetPlayer(ID) == player;
         }
 
         public bool IsMine(Card card)
@@ -430,14 +409,14 @@ namespace Marsion.Client
 
         public GameData GetGameData()
         {
-            return _gameData;
+            return Data;
         }
 
         public ICharacterView GetCharacter(ulong clientID, string cardUID)
         {
-            if(IsMine(clientID))
+            if (IsMine(clientID))
             {
-                if(cardUID == PlayerHero.Card.UID)
+                if (cardUID == PlayerHero.Card.UID)
                 {
                     return PlayerHero;
                 }
@@ -448,7 +427,7 @@ namespace Marsion.Client
             }
             else
             {
-                if(cardUID == EnemyHero.Card.UID)
+                if (cardUID == EnemyHero.Card.UID)
                 {
                     return EnemyHero;
                 }

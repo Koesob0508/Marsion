@@ -8,7 +8,7 @@ namespace Marsion.UI
     {
         public int Cost;
         public int Count = 0;
-        [SerializeField] TMP_Text Text_Name;
+        public TMP_Text Text_Name;
         [SerializeField] TMP_Text Text_Cost;
         [SerializeField] TMP_Text Text_Count;
         [SerializeField] Image Image_Card;
@@ -18,12 +18,19 @@ namespace Marsion.UI
             
         }
 
-        public void Setup(Card card)
+        public void Setup(string soID)
         {
-            Text_Name.text = card.Name;
-            Cost = card.Mana;
-            Text_Cost.text = card.Mana.ToString();
-            Image_Card.sprite = Managers.Resource.Load<Sprite>(card.BoardArtPath);
+            if (Managers.Data.CardDictionary.TryGetValue(soID, out var cardSO))
+            {
+                Text_Name.text = cardSO.Name;
+                Cost = cardSO.Mana;
+                Text_Cost.text = cardSO.Mana.ToString();
+                Image_Card.sprite = Managers.Resource.Load<Sprite>(cardSO.BoardArtPath);
+            }
+            else
+            {
+                Managers.Logger.LogWarning<Content_Card>($"ID : {soID} CardSO not found", colorName: ColorCodes.ContentUI);
+            }
         }
 
         public void IncreaseCount()

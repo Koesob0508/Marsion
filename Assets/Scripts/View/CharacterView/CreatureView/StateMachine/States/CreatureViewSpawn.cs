@@ -33,6 +33,7 @@ namespace Marsion.CardView
         private void GoToIdle()
         {
             FSM.PopState(true);
+            Handler.Order.SetMostFrontOrder(false);
             FSM.PushState<CreatureViewIdle>();
         }
     }

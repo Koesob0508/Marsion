@@ -26,7 +26,7 @@ namespace Marsion.CardView
 
             Quaternion targetRotation;
 
-            if(Managers.Client.IsMine(Handler.Card))
+            if(Managers.Client.Game.IsMine(Handler.Card))
                 targetRotation = Quaternion.FromToRotation(Vector3.up, directionToTarget);
             else
                 targetRotation = Quaternion.FromToRotation(Vector3.down, directionToTarget);

@@ -24,11 +24,11 @@ namespace Marsion.CardView
 
         private void Start()
         {
-            Managers.Client.OnCardPlayed -= CardPlayed;
-            Managers.Client.OnCardPlayed += CardPlayed;
+            Managers.Client.Game.OnCardPlayed -= CardPlayed;
+            Managers.Client.Game.OnCardPlayed += CardPlayed;
 
-            Managers.Client.OnGameReset -= ResetGame;
-            Managers.Client.OnGameReset += ResetGame;
+            Managers.Client.Game.OnGameReset -= ResetGame;
+            Managers.Client.Game.OnGameReset += ResetGame;
         }
 
         private void Update()

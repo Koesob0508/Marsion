@@ -11,36 +11,38 @@ namespace Marsion.CardView
 
         public void Start()
         {
-            Managers.Client.OnCardDrawn -= DrawCard;
-            Managers.Client.OnCardDrawn += DrawCard;
+            //Managers.Client.Game.OnCardDrawn -= DrawCard;
+            //Managers.Client.Game.OnCardDrawn += DrawCard;
+
+            Managers.Client.GameEx.OnCardDrawn += DrawCard;
         }
 
         public void DrawCard(Player player, Card card)
         {
-            if (Managers.Client.IsMine(player))
-            {
-                var cardObject = Instantiate(cardPrefab);
+            //if (Managers.Client.Game.IsMine(player))
+            //{
+            //    var cardObject = Instantiate(cardPrefab);
     
-                cardObject.Card = card;
-                cardObject.FrontImage.SetActive(true);
-                cardObject.BackImage.SetActive(false);
-                cardObject.transform.position = transform.position;
-                cardObject.name = $"Card_{hand.Cards.Count}";
-                cardObject.Setup();
-                hand.AddCard(cardObject);
-            }
-            else
-            {
-                var cardObject = Instantiate(cardPrefab);
-                cardObject.Card = card;
-                cardObject.FrontImage.SetActive(false);
-                cardObject.BackImage.SetActive(true);
-                cardObject.transform.position = EnemyDeck.transform.position;
-                cardObject.transform.rotation = EnemyDeck.transform.rotation;
-                cardObject.name = $"Enmey Card";
-                cardObject.Setup();
-                EnemyHand.AddCard(cardObject);
-            }
+            //    cardObject.Card = card;
+            //    cardObject.FrontImage.SetActive(true);
+            //    cardObject.BackImage.SetActive(false);
+            //    cardObject.transform.position = transform.position;
+            //    cardObject.name = $"Card_{hand.Cards.Count}";
+            //    cardObject.Setup();
+            //    hand.AddCard(cardObject);
+            //}
+            //else
+            //{
+            //    var cardObject = Instantiate(cardPrefab);
+            //    cardObject.Card = card;
+            //    cardObject.FrontImage.SetActive(false);
+            //    cardObject.BackImage.SetActive(true);
+            //    cardObject.transform.position = EnemyDeck.transform.position;
+            //    cardObject.transform.rotation = EnemyDeck.transform.rotation;
+            //    cardObject.name = $"Enmey Card";
+            //    cardObject.Setup();
+            //    EnemyHand.AddCard(cardObject);
+            //}
         }
     }
 }

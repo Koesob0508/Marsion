@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Marsion
 {
+    [DefaultExecutionOrder(-10)]
     public class Managers : MonoBehaviour
     {
         static Managers s_instance;
@@ -17,24 +18,26 @@ namespace Marsion
             }
         }
 
-        [SerializeField] GameServer _server;
-        [SerializeField] GameClient _client;
-        [SerializeField] CardManager _card;
-        ResourceManager _resource = new ResourceManager();
-        UIManager _ui = new UIManager();
-        DeckBuilder _builder = new DeckBuilder();
+        UIUtility _ui = new UIUtility();
+        LogUtility _log = new LogUtility();
+        ResourceUtility _resource = new ResourceUtility();
+        CardManager _card = new CardManager();
 
-        Logger _logger = new Logger();
+        DataManager _data = new DataManager();
+        [SerializeField] MarsNetwork _network;
+        [SerializeField] ServerManager _server;
+        [SerializeField] ClientManager _client;
 
-        public static NetworkManager Network { get { return NetworkManager.Singleton; } }
-        public static IGameServer Server { get { return Instance._server; } }
-        public static IGameClient Client { get { return Instance._client; } }
+        public static UIUtility UI { get { return Instance._ui; } }
+        public static LogUtility Logger { get { return Instance._log; } }
+        public static ResourceUtility Resource { get { return Instance._resource; } }
         public static CardManager Card { get { return Instance._card; } }
-        public static ResourceManager Resource { get { return Instance._resource; } }
-        public static UIManager UI { get { return Instance._ui; } }
-        public static DeckBuilder Builder { get { return Instance._builder; } }
 
-        public static Logger Logger { get { return Instance._logger; } }
+        public static DataManager Data { get { return Instance._data; } }
+        public static MarsNetwork Network { get { return Instance._network; } }
+        public static ServerManager Server { get { return Instance._server; } }
+        public static ClientManager Client { get { return Instance._client; } }
+        
 
         private void Start()
         {
@@ -56,9 +59,13 @@ namespace Marsion
                 DontDestroyOnLoad(obj);
                 s_instance = obj.GetComponent<Managers>();
 
+
+                s_instance._log.Log<Managers>("Managers initialized", colorName: ColorCodes.Managers);
+                
+                s_instance._data.Init();
+                s_instance._network.Init();
                 s_instance._server.Init();
                 s_instance._client.Init();
-                s_instance._builder.Init();
             }
         }
 
