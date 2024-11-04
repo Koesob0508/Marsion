@@ -69,110 +69,80 @@ namespace Marsion
 
         private void OnReceiveUpdatData(SerializedData sdata)
         {
-            Managers.Logger.Log<GameClientEx>($"Received updated data", colorName: ColorCodes.Client);
             SerializedGameData sGameData = sdata.Get<SerializedGameData>();
-            Data = sGameData.gameData;
 
-            OnDataUpdated?.Invoke();
+            Sequencer.Sequence Sequence = new("UpdateData", Sequencer);
+            Sequencer.Clip logClip = new("Log");
+            Sequencer.Clip updateClip = new("Update");
 
-            //Sequencer.Sequence Sequence = new("UpdateData", Sequencer);
-            //Sequencer.Clip logClip = new("Log");
-            //Sequencer.Clip updateClip = new("Update");
+            logClip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameClientEx>($"Received updated data", colorName: ColorCodes.Client);
+            };
 
-            //logClip.OnPlay += () =>
-            //{
-            //    Managers.Logger.Log<GameClientEx>($"Received updated data", colorName: ColorCodes.Client);
-            //};
+            updateClip.OnPlay += () =>
+            {
+                Data = sGameData.gameData;
 
-            //updateClip.OnPlay += () =>
-            //{
-            //    SerializedGameData sGameData = sdata.Get<SerializedGameData>();
-            //    Data = sGameData.gameData;
+                OnDataUpdated?.Invoke();
+            };
 
-            //    OnDataUpdated?.Invoke();
-            //};
-
-            //Sequence.Append(logClip);
-            //Sequence.Append(updateClip);
-            //Sequencer.Append(Sequence);
+            Sequence.Append(logClip);
+            Sequence.Append(updateClip);
+            Sequencer.Append(Sequence);
         }
 
         private void OnReceiveStartGame(SerializedData sdata)
         {
-            Managers.Logger.Log<GameClientEx>($"Received start game", colorName: ColorCodes.Client);
+            Sequencer.Sequence Sequence = new("StartGame", Sequencer);
+            Sequencer.Clip logClip = new("Log");
+            Sequencer.Clip initHeroClip = new("InitHero");
+            Sequencer.Clip initHandClip = new("InitHand");
+            Sequencer.Clip invokeClip = new("InvokeAction");
 
-            foreach (var player in Data.Players)
+            logClip.OnPlay += () =>
             {
-                if (ClientID == player.ClientID)
-                {
-                    PlayerHero.Init(player.Card);
-                    PlayerHero.Spawn();
-                }
-                else
-                {
-                    EnemyHero.Init(player.Card);
-                    EnemyHero.Spawn();
-                }
-            }
+                Managers.Logger.Log<GameClientEx>($"Received start game", colorName: ColorCodes.Client);
+            };
 
-            foreach (var player in Data.Players)
+            initHeroClip.OnPlay += () =>
             {
-                foreach (var card in player.Hand)
+                foreach (var player in Data.Players)
                 {
-                    OnCardDrawn?.Invoke(player, card);
+                    if (ClientID == player.ClientID)
+                    {
+                        PlayerHero.Init(player.Card);
+                        PlayerHero.Spawn();
+                    }
+                    else
+                    {
+                        EnemyHero.Init(player.Card);
+                        EnemyHero.Spawn();
+                    }
                 }
-            }
-            OnGameStarted?.Invoke();
+            };
 
-            //Sequencer.Sequence Sequence = new("StartGame", Sequencer);
-            //Sequencer.Clip logClip = new("Log");
-            //Sequencer.Clip initHeroClip = new("InitHero");
-            //Sequencer.Clip initHandClip = new("InitHand");
-            //Sequencer.Clip invokeClip = new("InvokeAction");
+            initHandClip.OnPlay += () =>
+            {
+                foreach (var player in Data.Players)
+                {
+                    foreach (var card in player.Hand)
+                    {
+                        OnCardDrawn?.Invoke(player, card);
+                    }
+                }
+            };
 
-            //logClip.OnPlay += () =>
-            //{
-            //    Managers.Logger.Log<GameClientEx>($"Received start game", colorName: ColorCodes.Client);
-            //};
+            invokeClip.OnPlay += () =>
+            {
+                OnGameStarted?.Invoke();
+            };
 
-            //initHeroClip.OnPlay += () =>
-            //{
-            //    foreach(var player in Data.Players)
-            //    {
-            //        if(ClientID == player.ClientID)
-            //        {
-            //            PlayerHero.Init(player.Card);
-            //            PlayerHero.Spawn();
-            //        }
-            //        else
-            //        {
-            //            EnemyHero.Init(player.Card);
-            //            EnemyHero.Spawn();
-            //        }
-            //    }
-            //};
-
-            //initHandClip.OnPlay += () =>
-            //{
-            //    foreach (var player in Data.Players)
-            //    {
-            //        foreach(var card in player.Hand)
-            //        {
-            //            OnCardDrawn?.Invoke(player, card);
-            //        }
-            //    }
-            //};
-
-            //invokeClip.OnPlay += () =>
-            //{
-            //    OnGameStarted?.Invoke();
-            //};
-
-            //Sequence.Append(logClip);
-            //Sequence.Append(initHeroClip);
-            //Sequence.Append(initHandClip);
-            //Sequence.Append(invokeClip);
-            //Sequencer.Append(Sequence);
+            Sequence.Append(logClip);
+            Sequence.Append(initHeroClip);
+            Sequence.Append(initHandClip);
+            Sequence.Append(invokeClip);
+            Sequencer.Append(Sequence);
         }
 
         #endregion

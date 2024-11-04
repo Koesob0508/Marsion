@@ -1,5 +1,6 @@
 ﻿using Marsion.Logic;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine.Rendering.Universal;
 
@@ -30,22 +31,6 @@ namespace Marsion
         {
             reader.ReadNetworkSerializable(out T val);
             return val;
-
-            //if (data != null)
-            //{
-            //    return (T)data;
-            //}
-            //else if (bytes != null)
-            //{
-            //    data = NetworkTool.NetworkDeserialize<T>(bytes);
-            //    return (T)data;
-            //}
-            //else
-            //{
-            //    reader.ReadNetworkSerializable(out T val);
-            //    data = val;
-            //    return val;
-            //}
         }
 
         public void PreRead()

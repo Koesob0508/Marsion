@@ -50,61 +50,58 @@ namespace Marsion
 
         public void Ready(ulong clientID, List<string> deck)
         {
-            ConnectedClients.Add(clientID);
-            Logic.SetPlayerDeck(clientID, deck);
-            if (ConnectedClients.Count == 2)
+            //ConnectedClients.Add(clientID);
+            //Logic.SetPlayerDeck(clientID, deck);
+            //if (ConnectedClients.Count == 2)
+            //{
+            //    StartGame();
+            //}
+
+            Sequencer.Sequence Sequence = new Sequencer.Sequence("Ready", Sequencer);
+            Sequencer.Clip SetDeckClip = new Sequencer.Clip("SetDeck");
+            Sequencer.Clip CheckClip = new Sequencer.Clip("Check");
+
+            SetDeckClip.OnPlay += () =>
             {
-                StartGame();
-            }
+                ConnectedClients.Add(clientID);
+                Logic.SetPlayerDeck(clientID, deck);
+            };
 
-            //Sequencer.Sequence Sequence = new Sequencer.Sequence("Ready", Sequencer);
-            //Sequencer.Clip SetDeckClip = new Sequencer.Clip("SetDeck");
-            //Sequencer.Clip CheckClip = new Sequencer.Clip("Check");
+            CheckClip.OnPlay += () =>
+            {
+                if (ConnectedClients.Count == 2)
+                {
+                    StartGame();
+                }
+            };
 
-            //SetDeckClip.OnPlay += () =>
-            //{
-            //    ConnectedClients.Add(clientID);
-            //    Logic.SetPlayerDeck(clientID, deck);
-            //};
+            Sequence.Append(SetDeckClip);
+            Sequence.Append(CheckClip);
 
-            //CheckClip.OnPlay += () =>
-            //{
-            //    if (ConnectedClients.Count == 2)
-            //    {
-            //        StartGame();
-            //    }
-            //};
-
-            //Sequence.Append(SetDeckClip);
-            //Sequence.Append(CheckClip);
-
-            //Sequencer.Append(Sequence);
+            Sequencer.Append(Sequence);
         }
 
         public void StartGame()
         {
-            Managers.Logger.Log<GameServerEx>($"Start game", colorName: ColorCodes.Server);
-            Logic.StartGame();
+            Sequencer.Sequence Sequence = new("StartGame", Sequencer);
+            Sequencer.Clip LogClip = new("Log");
+            Sequencer.Clip StartGameClip = new("StartGame");
 
-            //Sequencer.Sequence Sequence = new("StartGame", Sequencer);
-            //Sequencer.Clip LogClip = new("Log");
-            //Sequencer.Clip StartGameClip = new("StartGame");
+            LogClip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameServerEx>($"Start game", colorName: ColorCodes.Server);
+            };
 
-            //LogClip.OnPlay += () =>
-            //{
-            //    Managers.Logger.Log<GameServerEx>($"Start game", colorName: ColorCodes.Server);
-            //};
+            StartGameClip.OnPlay += () =>
+            {
+                Logic.StartGame();
+            };
 
-            //StartGameClip.OnPlay += () =>
-            //{
-            //    Logic.StartGame();
-            //};
+            Sequence.Append(LogClip);
+            Sequence.Append(StartGameClip);
+            Sequencer.Append(Sequence);
 
-            //Sequence.Append(LogClip);
-            //Sequence.Append(StartGameClip);
-            //Sequencer.Append(Sequence);
-
-            // StartGame
+            //StartGame
 
             // Logic.Start Turn
         }
@@ -138,17 +135,35 @@ namespace Marsion
 
         private void SendUpdateData()
         {
-            Managers.Logger.Log<GameServerEx>($"Send updated data", colorName: ColorCodes.Server);
-            SerializedGameData sdata = new SerializedGameData();
-            sdata.gameData = new GameData(Data);
+            Sequencer.Sequence Sequence = new("UpdateData", Sequencer);
+            Sequencer.Clip Clip = new("UpdateData");
 
-            SendToAll(GameCommand.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
+            Clip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameServerEx>($"Send updated data", colorName: ColorCodes.Server);
+                SerializedGameData sdata = new SerializedGameData();
+                sdata.gameData = new GameData(Data);
+
+                SendToAll(GameCommand.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
+            };
+
+            Sequence.Append(Clip);
+            Sequencer.Append(Sequence);
         }
 
         private void SendStartGame()
         {
-            Managers.Logger.Log<GameServerEx>($"Send updated data", colorName: ColorCodes.Server);
-            SendToAll(GameCommand.ServerStartGame);
+            Sequencer.Sequence Sequence = new("StartGame", Sequencer);
+            Sequencer.Clip Clip = new("StartGame");
+
+            Clip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameServerEx>($"Send start game", colorName: ColorCodes.Server);
+                SendToAll(GameCommand.ServerStartGame);
+            };
+
+            Sequence.Append(Clip);
+            Sequencer.Append(Sequence);
         }
 
         private void Send(ulong target, ushort tag)
