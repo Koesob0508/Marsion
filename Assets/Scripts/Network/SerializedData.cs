@@ -63,7 +63,7 @@ namespace Marsion
 
     public class SerializedGameData : INetworkSerializable
     {
-        public GameData gameData;
+        public GameData GameData;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
@@ -79,14 +79,14 @@ namespace Marsion
                 {
                     byte[] bytes = new byte[size];
                     serializer.SerializeValue(ref bytes);
-                    gameData = NetworkTool.Deserialize<GameData>(bytes);
+                    GameData = NetworkTool.Deserialize<GameData>(bytes);
                 }
             }
 
             // 직렬화
             if (serializer.IsWriter)
             {
-                byte[] bytes = NetworkTool.Serialize(gameData);
+                byte[] bytes = NetworkTool.Serialize(GameData);
                 int size = bytes.Length;
 
                 // 크기를 먼저 직렬화합니다.
@@ -109,6 +109,60 @@ namespace Marsion
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref UID);
+        }
+    }
+
+    public class SerializedDrawnCardData : INetworkSerializable
+    {
+        public ulong PlayerID;
+        public string CardUID;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref PlayerID);
+            serializer.SerializeValue(ref CardUID);
+        }
+    }
+
+    public class SerializedTrySpawnCardData : INetworkSerializable
+    {
+        public string CardUID;
+        public int Index;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref CardUID);
+            serializer.SerializeValue(ref Index);
+        }
+    }
+
+    public class SerializedPlayCardResultData : INetworkSerializable
+    {
+        public bool Succeeded;
+        public ulong PlayerID;
+        public string CardUID;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Succeeded);
+            serializer.SerializeValue(ref PlayerID);
+            serializer.SerializeValue(ref CardUID);
+        }
+    }
+
+    public class SerializedSpawnCardResultData : INetworkSerializable
+    {
+        public bool Succeeded;
+        public ulong PlayerID;
+        public string CardUID;
+        public int Index;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Succeeded);
+            serializer.SerializeValue(ref PlayerID);
+            serializer.SerializeValue(ref CardUID);
+            serializer.SerializeValue(ref Index);
         }
     }
 

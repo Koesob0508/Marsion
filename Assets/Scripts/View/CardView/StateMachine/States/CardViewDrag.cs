@@ -51,7 +51,7 @@ namespace Marsion.CardView
             {
                 if (eventData.button == PointerEventData.InputButton.Left && IsAreaDetected() && !Managers.Client.Game.PlayerField.IsFullField)
                 {
-                    Managers.Client.Game.TryPlayAndSpawnCard(Handler.Card, Managers.Client.Game.PlayerField.EmptyCreatureIndex);
+                    Managers.Client.Game.SendTrySpawnCard(Handler.Card, Managers.Client.Game.PlayerField.EmptyCreatureIndex);
                 }
                 else
                 {

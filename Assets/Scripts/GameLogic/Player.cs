@@ -10,34 +10,36 @@ namespace Marsion
     [Serializable]
     public class Player
     {
-        public ulong ClientID { get; private set; }
+        public ulong PlayerID { get; private set; }
 
         public Card Card;
-        public int Portrait;
+        public string Portrait;
 
         public MyDictionary<string, Card> Cards = new MyDictionary<string, Card>();
         public List<Card> Deck = new List<Card>();
         public List<Card> Hand = new List<Card>();
         public List<Card> Field = new List<Card>();
 
+        [JsonProperty]
         public int Mana { get; private set; }
+        [JsonProperty]
         public int MaxMana { get; private set; }
 
         public Player(int clientID)
         {
-            ClientID = (ulong)clientID;
-            Card = new Card(ClientID);
+            PlayerID = (ulong)clientID;
+            Card = new Card(PlayerID);
         }
 
         [JsonConstructor]
-        public Player(ulong clientID)
+        public Player(ulong playerID)
         {
-            ClientID = clientID;
+            PlayerID = playerID;
         }
 
         public Player(Player original)
         {
-            ClientID = original.ClientID;
+            PlayerID = original.PlayerID;
             Portrait = original.Portrait;
             Mana = original.Mana;
             MaxMana = original.MaxMana;
@@ -124,12 +126,12 @@ namespace Marsion
         public override bool Equals(object obj)
         {
             return obj is Player player &&
-                   ClientID == player.ClientID;
+                   PlayerID == player.PlayerID;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(ClientID);
+            return HashCode.Combine(PlayerID);
         }
     }
 }

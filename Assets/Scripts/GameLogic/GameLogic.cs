@@ -7,10 +7,6 @@ namespace Marsion.Logic
 {
     public class GameLogic : IGameLogic
     {
-        #region Logic Operations
-
-        #endregion
-
         private List<Player> AlivePlayers = new List<Player>();
 
         #region Interface Operations
@@ -18,7 +14,7 @@ namespace Marsion.Logic
         // Game Operations
         public void SetPortrait(Player player, int index)
         {
-            player.Portrait = index;
+            //player.Portrait = index;
         }
 
         public void SetHP(Player player, int amount)
@@ -126,7 +122,7 @@ namespace Marsion.Logic
 
             foreach (var player in AlivePlayers)
             {
-                winner = (int)player.ClientID;
+                winner = (int)player.PlayerID;
             }
 
             return winner;

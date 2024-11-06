@@ -34,7 +34,7 @@
         
         // Cyan & Blue
         public static readonly string Server = Cyan;
-        public static readonly string ServerSequencer = Blue;
+        public static readonly string ServerSequencer = Aqua;
 
         // Green
         public static readonly string Client = Lime;

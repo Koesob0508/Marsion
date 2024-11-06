@@ -1,18 +1,17 @@
 ﻿using Marsion.Client;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Marsion
 {
     public class ClientManager : MonoBehaviour
     {
-        public GameClient Game;
-        public GameClientEx GameEx;
+        //public GameClient Game;
+        [SerializeField] GameClientEx game;
+
+        public IGameClient Game => game;
         public DraftClient Draft;
 
         public InputManager Input { get; private set; }
-
-        public ulong ID { get; private set; }
 
         public void Init()
         {
@@ -22,7 +21,7 @@ namespace Marsion
             Draft = new DraftClient();
             Draft.Init();
             //Game.Init();
-            GameEx.Init();
+            Game.Init();
 
             Managers.UI.ShowPopupUI<UI_Connect>();
         }
@@ -35,11 +34,6 @@ namespace Marsion
         private void Clear()
         {
 
-        }
-
-        public void Ready(List<string> deck)
-        {
-            Game.Ready(deck);
         }
     }
 }

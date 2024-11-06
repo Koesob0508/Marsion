@@ -41,7 +41,7 @@ namespace Marsion.UI
 
             Managers.Client.Draft.OnStateUpdate += UpdateState;
             //Managers.Client.Game.OnGameStarted += ClosePopupUI;
-            Managers.Client.GameEx.OnGameStarted += ClosePopupUI;
+            Managers.Client.Game.OnGameStarted += ClosePopupUI;
 
             contentsDictionary = new Dictionary<string, GameObject>();
 
@@ -54,7 +54,7 @@ namespace Marsion.UI
         private void Clear()
         {
             //Managers.Client.Game.OnGameStarted -= ClosePopupUI;
-            Managers.Client.GameEx.OnGameStarted -= ClosePopupUI;
+            Managers.Client.Game.OnGameStarted -= ClosePopupUI;
             Managers.Client.Draft.OnStateUpdate -= UpdateState;
         }
 

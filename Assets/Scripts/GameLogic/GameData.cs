@@ -64,7 +64,7 @@ namespace Marsion.Logic
 
         public Player GetOpponentPlayer(Player player)
         {
-            return GetPlayer(1 - player.ClientID);
+            return GetPlayer(1 - player.PlayerID);
         }
 
         public Card GetHandCard(ulong clientID, string cardUID)

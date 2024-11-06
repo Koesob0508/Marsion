@@ -9,6 +9,11 @@ namespace Marsion
         public GameData Data;
         public event Action OnDataUpdated;
         public event Action OnGameStarted;
+        public event Action OnManaChanged;
+        public event Action OnTurnStarted;
+        public event Action<ulong, string> OnCardDrawn;
+        public event Action<bool, ulong, string> OnCardPlayed;
+        public event Action<bool, ulong, string, int> OnCardSpawned;
 
         public GameLogicEx(GameData data)
         {
@@ -17,7 +22,7 @@ namespace Marsion
 
         public void SetPlayerDeck(ulong clientID, List<string> deck)
         {
-            Managers.Logger.Log<GameLogicEx>($"Set player deck", colorName: ColorCodes.Server);
+            Managers.Logger.Log<GameLogicEx>($"Set player deck", colorName: ColorCodes.Logic);
             Player player = Data.GetPlayer(clientID);
             List<Card> resultDeck = new List<Card>();
 
@@ -29,7 +34,7 @@ namespace Marsion
                 }
                 else
                 {
-                    Managers.Logger.Log<GameLogicEx>($"{soID} CardSO not found", colorName: ColorCodes.Server);
+                    Managers.Logger.Log<GameLogicEx>($"{soID} CardSO not found", colorName: ColorCodes.Logic);
                 }
             }
 
@@ -40,8 +45,9 @@ namespace Marsion
 
         public void StartGame()
         {
+            Managers.Logger.Log<GameLogicEx>($"Start Game", colorName: ColorCodes.Logic);
+
             // 초상화 설정
-            // 그냥 랜덤하게 하나씩 쥐어줘 ㅠㅠ 값만 넣어주면 Client쪽에서 알아서 처리해줄텐디 ㅠㅠ
             Random random = new Random();
             int number1 = random.Next(3, 13); // Next의 두 번째 인자는 상한을 포함하지 않으므로 13을 사용
             // 두 번째 숫자 뽑기 (첫 번째 숫자와 중복되지 않도록)
@@ -51,8 +57,8 @@ namespace Marsion
                 number2 = random.Next(3, 13);
             } while (number2 == number1);
 
-            Data.Players[0].Portrait = number1;
-            Data.Players[1].Portrait = number2;
+            Data.Players[0].Portrait = number1.ToString();
+            Data.Players[1].Portrait = number2.ToString();
 
             // 체력 30
             // 마나 0
@@ -77,6 +83,27 @@ namespace Marsion
             OnDataUpdated?.Invoke();
             // Send Start Game
             OnGameStarted?.Invoke();
+
+            StartTurn();
+        }
+
+        private void StartTurn()
+        {
+            Managers.Logger.Log<GameLogicEx>($"Start Turn", colorName: ColorCodes.Logic);
+
+            Data.TurnCount++;
+
+            if (Data.CurrentPlayer.MaxMana < 10)
+                Data.CurrentPlayer.IncreaseMaxMana(1);
+
+            Data.CurrentPlayer.RestoreAllMana();
+
+            DrawCard(Data.CurrentPlayer, out var card);
+
+            OnDataUpdated?.Invoke();
+            OnManaChanged?.Invoke();
+            OnTurnStarted?.Invoke();
+            OnCardDrawn?.Invoke(Data.CurrentPlayer.PlayerID, card.UID);
         }
 
         private void ShuffleDeck(Player player)
@@ -95,9 +122,29 @@ namespace Marsion
             }
         }
 
-        private void DrawCard(Player player, out List<Card> drawnCards, int count = 1)
+        public void DrawCard(Player player, out Card drawnCard)
         {
-            Managers.Logger.Log<GameLogic>("Card draw", colorName: ColorCodes.Server);
+            Managers.Logger.Log<GameLogic>("Draw a card", colorName: ColorCodes.Logic);
+
+            Card card = null;
+
+            if (player.Deck.Count > 0 && player.Hand.Count < 10)
+            {
+                card = player.Deck[0];
+                player.Deck.RemoveAt(0);
+                player.Hand.Add(card);
+            }
+            else
+            {
+                Managers.Logger.LogWarning<GameLogic>("Can't draw", colorName: ColorCodes.Logic);
+            }
+
+            drawnCard = card;
+        }
+
+        public void DrawCard(Player player, out List<Card> drawnCards, int count = 1)
+        {
+            Managers.Logger.Log<GameLogic>("Draw cards", colorName: ColorCodes.Logic);
 
             List<Card> outCards = new();
 
@@ -115,11 +162,34 @@ namespace Marsion
                 }
                 else
                 {
-                    Managers.Logger.LogWarning<GameLogic>("Can't draw", colorName: ColorCodes.Server);
+                    Managers.Logger.LogWarning<GameLogic>("Can't draw", colorName: ColorCodes.Logic);
                 }
             }
 
             drawnCards = outCards;
+        }
+
+        public void TrySpawnCard(Player player, Card card, int index)
+        {
+            Managers.Logger.Log<GameLogic>("Try spawn card", colorName: ColorCodes.Logic);
+
+            if (!(player.Mana >= card.Mana))
+            {
+                Managers.Logger.Log<GameLogicEx>("Spawn try failed", colorName: ColorCodes.Logic);
+                OnCardPlayed?.Invoke(false, player.PlayerID, card.UID);
+                OnCardSpawned?.Invoke(false, player.PlayerID, card.UID, index);
+
+                return;
+            }
+
+            player.PayMana(card.Mana);
+            player.Hand.Remove(card);
+            player.Field.Insert(index, card);
+
+            OnCardPlayed?.Invoke(true, player.PlayerID, card.UID);
+            OnCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
+            OnDataUpdated?.Invoke();
+            OnManaChanged?.Invoke();
         }
     }
 }

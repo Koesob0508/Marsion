@@ -89,11 +89,11 @@ namespace Marsion.CardView
         {
             if (Card.UID != attacker.UID) return;
 
-            Sequencer.Clip startAttackClip = new("StartAttack", false);
+            Sequencer.Clip startAttackClip = new("StartAttack", sequence, false);
 
             startAttackClip.OnPlay += () =>
             {
-                FSM.AttackState.Target = Managers.Client.Game.GetCharacter(defendPlayer.ClientID, defender.UID).MonoBehaviour.gameObject;
+                FSM.AttackState.Target = Managers.Client.Game.GetCharacter(defendPlayer.PlayerID, defender.UID).MonoBehaviour.gameObject;
                 FSM.AttackState.OnComplete += () =>
                 {
                     Managers.Logger.Log<CharacterView>("Dead check?", colorName:"cyan");
@@ -102,15 +102,13 @@ namespace Marsion.CardView
 
                 FSM.PushState<CreatureViewAttack>();
             };
-
-            sequence.Append(startAttackClip);
         }
 
         protected virtual void BeforeDead(Sequencer.Sequence sequence)
         {
             if (!Card.IsDead) return;
 
-            Sequencer.Clip deadAnimClip = new Sequencer.Clip("DeadAnim", false);
+            Sequencer.Clip deadAnimClip = new Sequencer.Clip("DeadAnim", sequence, false);
             deadAnimClip.OnPlay += () =>
             {
                 FSM.DeadState.OnComplete += () =>
@@ -120,8 +118,6 @@ namespace Marsion.CardView
 
                 FSM.PushState<CreatureViewDead>();
             };
-
-            sequence.Append(deadAnimClip);
         }
 
         public override bool Equals(object obj)

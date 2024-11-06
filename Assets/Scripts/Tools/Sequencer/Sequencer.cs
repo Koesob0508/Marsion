@@ -8,6 +8,7 @@ namespace Marsion.Tool
     public class Sequencer : MonoBehaviour
     {
         public bool IsPlaying;
+        public bool IsServer;
         public string Name;
         public string CurrentSequence;
         public List<string> CurrentClip;
@@ -72,7 +73,8 @@ namespace Marsion.Tool
             if (Sequences.TryDequeue(out var sequence))
             {
                 _currentSequence = sequence;
-                Debug.Log($"[{Name}] {sequence.Name} Sequence : Play");
+
+                Managers.Logger.LogSequence(Name, $"{sequence.Name} Sequence : Play", IsServer);
                 SetCurrentSequence(sequence.Name);
                 sequence.Play();
             }
@@ -136,13 +138,15 @@ namespace Marsion.Tool
 
                 Clips = new Queue<Clip>();
                 Checks = new Dictionary<string, bool>();
+
+                Handler.Append(this);
             }
 
             public void Append(Clip clip)
             {
                 clip.OnComplete += () =>
                 {
-                    Debug.Log($"[{Handler.Name}] {Name} sequence : {clip.Name} clip(Append) completed");
+                    Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : {clip.Name} clip completed", Handler.IsServer);
                     if(!CompleteClip(clip.ID))
                         PlayNext();
                 };
@@ -155,7 +159,7 @@ namespace Marsion.Tool
             {
                 if (isPlaying)
                 {
-                    Debug.Log($"[{Handler.Name}] {Name} sequence : Sequence is playing");
+                    Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : Sequence is playing", Handler.IsServer);
                     return;
                 }
 
@@ -164,7 +168,7 @@ namespace Marsion.Tool
                 Clips.TryDequeue(out var clip);
                 _currentClip = clip;
 
-                Debug.Log($"[{Handler.Name}] {Name} sequence : {clip.Name} clip(Append) play");
+                Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : {clip.Name} clip play", Handler.IsServer);
 
                 Handler.SetCurrentClip(_currentClip.Name);
                 clip.Play();
@@ -175,11 +179,11 @@ namespace Marsion.Tool
 
             private void PlayNext()
             {
-                Debug.Log($"[{Handler.Name}] {Name} sequence : Try to play next");
+                Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : Try to play next", Handler.IsServer);
 
                 if (Clips.Count == 0)
                 {
-                    Debug.Log($"[{Handler.Name}] {Name} sequence : Sequence has reach the end of the sequene");
+                    Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : Sequence has reach the end of the sequene", Handler.IsServer);
                     return;
                 }
 
@@ -189,7 +193,7 @@ namespace Marsion.Tool
             // Joined를 염두에 두고 따로 구현함. 현재는 NextPlay와 기능 거의 동일
             public void Complete()
             {
-                Debug.Log($"[{Handler.Name}] {Name} sequence : {Name} sequence complete");
+                Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : {Name} sequence complete", Handler.IsServer);
                 OnComplete?.Invoke();
                 Clear();
             }
@@ -238,11 +242,13 @@ namespace Marsion.Tool
             public event Action OnComplete;
             public bool IsAutoComplete { get; private set; }
 
-            public Clip(string name, bool isAutoComplete = true)
+            public Clip(string name, Sequence handler, bool isAutoComplete = true)
             {
                 ID = Guid.NewGuid().ToString();
                 Name = name;
                 IsAutoComplete = isAutoComplete;
+
+                handler.Append(this);
             }
 
             public void Play()

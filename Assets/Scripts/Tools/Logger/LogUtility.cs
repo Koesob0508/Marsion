@@ -9,7 +9,7 @@ namespace Marsion
 
         [SerializeField] bool AreLogsEnabled = true;
         const char Period = '.';
-        const string OpenColor = "]: <color={0}><b>";
+        const string OpenColor = ": <color={0}><b>";
         const string CloseColor = "</b></color>";
 
         #endregion
@@ -103,6 +103,20 @@ namespace Marsion
                 log = string.Format("[" + context + OpenColor + log + CloseColor + GetTypeName(param), colorName);
                 // Debug.Log(log);
             }
+        }
+
+        public void LogSequence(string name, string log, bool isServer)
+        {
+            string color = "";
+
+            if(isServer)
+                color = ColorCodes.ServerSequencer;
+            else
+                color = ColorCodes.ClientSequencer;
+
+            log = string.Format($"<color={color}><b>[{name}]</b></color> {log}");
+
+            Debug.Log(log);
         }
 
         #endregion

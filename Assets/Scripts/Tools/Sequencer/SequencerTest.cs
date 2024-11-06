@@ -18,7 +18,9 @@ namespace Marsion.Tool
         {
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                Sequencer.Clip clip = new Sequencer.Clip($"Test {clipCount} Clip ", false);
+                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence", Sequencer);
+                
+                Sequencer.Clip clip = new Sequencer.Clip($"Test {clipCount} Clip ", sequence, false);
                 clipCount++;
                 clip.OnPlay += () =>
                 {
@@ -34,16 +36,14 @@ namespace Marsion.Tool
                             });
                 };
 
-                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence", Sequencer);
                 sequenceCount++;
-                sequence.Append(clip);
-
-                Sequencer.Append(sequence);
             }
 
             if (Input.GetKeyDown(KeyCode.W))
             {
-                Sequencer.Clip clip1 = new Sequencer.Clip($"Test {clipCount} Clip ", false);
+                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence", Sequencer);
+
+                Sequencer.Clip clip1 = new Sequencer.Clip($"Test {clipCount} Clip ", sequence, false);
                 clipCount++;
                 clip1.OnPlay += () =>
                 {
@@ -59,7 +59,7 @@ namespace Marsion.Tool
                             });
                 };
 
-                Sequencer.Clip clip2 = new Sequencer.Clip($"Test {clipCount} Clip ", false);
+                Sequencer.Clip clip2 = new Sequencer.Clip($"Test {clipCount} Clip ", sequence, false);
                 clipCount++;
                 clip2.OnPlay += () =>
                 {
@@ -75,17 +75,14 @@ namespace Marsion.Tool
                             });
                 };
 
-                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence", Sequencer);
                 sequenceCount++;
-                sequence.Append(clip1);
-                sequence.Append(clip2);
-
-                Sequencer.Append(sequence);
             }
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                Sequencer.Clip clip1 = new Sequencer.Clip($"Test {clipCount} Clip ", false);
+                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence", Sequencer);
+
+                Sequencer.Clip clip1 = new Sequencer.Clip($"Test {clipCount} Clip ", sequence, false);
                 clipCount++;
                 clip1.OnPlay += () =>
                 {
@@ -101,7 +98,7 @@ namespace Marsion.Tool
                             });
                 };
 
-                Sequencer.Clip clip2 = new Sequencer.Clip($"Test {clipCount} Clip ", false);
+                Sequencer.Clip clip2 = new Sequencer.Clip($"Test {clipCount} Clip ", sequence, false);
                 clipCount++;
                 clip2.OnPlay += () =>
                 {
@@ -117,7 +114,7 @@ namespace Marsion.Tool
                             });
                 };
 
-                Sequencer.Clip clip3 = new Sequencer.Clip($"Test {clipCount} Clip ", false);
+                Sequencer.Clip clip3 = new Sequencer.Clip($"Test {clipCount} Clip ", sequence, false);
                 clipCount++;
                 clip3.OnPlay += () =>
                 {
@@ -133,13 +130,8 @@ namespace Marsion.Tool
                             });
                 };
 
-                Sequencer.Sequence sequence = new Sequencer.Sequence($"Test {sequenceCount} Sequence", Sequencer);
+                
                 sequenceCount++;
-                sequence.Append(clip1);
-                sequence.Append(clip2);
-                sequence.Append(clip3);
-
-                Sequencer.Append(sequence);
             }
         }
     }
