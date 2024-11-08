@@ -12,9 +12,12 @@ namespace Marsion.CardView
     public class CreatureView : CharacterView, ICreatureView
     {
         [SerializeField] bool IsEmpty;
+        IFieldView Field;
 
-        public override void Init(Card card)
+        public void Init(Card card, IFieldView field)
         {
+            Field = field;
+
             Transform = transform;
             Collider = GetComponent<Collider2D>();
 
@@ -28,8 +31,8 @@ namespace Marsion.CardView
             Managers.Client.Game.OnDataUpdated -= UpdateCard;
             Managers.Client.Game.OnDataUpdated += UpdateCard;
 
-            Managers.Client.Game.OnStartAttack -= Attack;
-            Managers.Client.Game.OnStartAttack += Attack;
+            Managers.Client.Game.OnAttackStarted -= Attack;
+            Managers.Client.Game.OnAttackStarted += Attack;
 
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
@@ -45,9 +48,20 @@ namespace Marsion.CardView
             FSM.PushState<CreatureViewSpawn>();
         }
 
+        public override void Die()
+        {
+            FSM.DeadState.OnComplete += () =>
+            {
+                Field.Remove(this);
+                Managers.Logger.Log<CreatureView>("Remove this", colorName: ColorCodes.Yellow);
+            };
+
+            FSM.PushState<CreatureViewDead>();
+        }
+
         protected override void UpdateCard()
         {
-            if (Card == null) Managers.Logger.Log<CreatureView>(gameObject.name, colorName: "yellow");
+            if (Card.IsDead) return;
             Card = Managers.Client.Game.GetCard(Type, Card.PlayerID, Card.UID);
         }
     }

@@ -2,6 +2,7 @@
 using Marsion.Logic;
 using Marsion.Tool;
 using System;
+using System.Collections.Generic;
 
 namespace Marsion
 {
@@ -21,7 +22,8 @@ namespace Marsion
         event Action<Player, Card> OnCardDrawn;
         event Action<bool, Player, Card> OnCardPlayed;
         event Action<bool, Player, Card, int> OnCardSpawned;
-        event Action<Sequencer.Sequence, Player, Card, Player, Card> OnStartAttack;
+        event Action<Sequencer.Sequence, Player, Card, Player, Card> OnAttackStarted;
+        event Action<List<string>> OnCardDied;
 
         void Init();
 

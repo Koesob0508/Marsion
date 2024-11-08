@@ -25,6 +25,8 @@ namespace Marsion.CardView
         {
             Managers.Client.Game.OnCardSpawned -= SpawnCard;
             Managers.Client.Game.OnCardSpawned += SpawnCard;
+            Managers.Client.Game.OnCardDied -= DieCard;
+            Managers.Client.Game.OnCardDied += DieCard;
 
             Managers.Client.Game.OnGameReset -= ResetGame;
             Managers.Client.Game.OnGameReset += ResetGame;
@@ -32,7 +34,7 @@ namespace Marsion.CardView
             Creatures = new List<ICreatureView>();
 
             EmptyCreature = Instantiate(EmptyCreaturePrefab, transform);
-            EmptyCreature.Init(null);
+            EmptyCreature.Init(null, this);
         }
 
         private void Update()
@@ -95,7 +97,7 @@ namespace Marsion.CardView
                     Creatures.Insert(index, creature);
                 }
 
-                creature.Init(card);
+                creature.Init(card, this);
                 creature.Spawn();
             }
             else
@@ -104,26 +106,24 @@ namespace Marsion.CardView
             }
         }
 
-        private void RemoveDeadCreature()
+        private void DieCard(List<string> deadCards)
         {
-            List<ICreatureView> removeObjects = new List<ICreatureView>();
-
-            foreach(var creature in Creatures)
+            foreach(var cardUID in deadCards)
             {
-                if(creature.Card.IsDead)
+                foreach(var creatureView in Creatures)
                 {
-                    creature.Clear();
-                    removeObjects.Add(creature);
+                    if(creatureView.Card.UID == cardUID)
+                    {
+                        creatureView.Die();
+                    }
                 }
-            }
+            }    
+        }
 
-            foreach(var obj in removeObjects)
-            {
-                Creatures.Remove(obj);
-                Managers.Resource.Destroy(obj.MonoBehaviour.gameObject);
-            }
-
-            removeObjects.Clear();
+        public void Remove(ICreatureView creature)
+        {
+            Creatures.Remove(creature);
+            Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
         }
 
         public ICharacterView GetCreature(Card card)

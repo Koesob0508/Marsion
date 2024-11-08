@@ -98,6 +98,21 @@ namespace Marsion
             return result;
         }
 
+        public bool GetFieldCard(string uid, out Card card)
+        {
+            foreach(Card fieldCard in Field)
+            {
+                if(fieldCard.UID == uid)
+                {
+                    card = fieldCard;
+                    return true;
+                }
+            }
+
+            card = null;
+            return false;
+        }
+
         public void SetMaxMana(int amount)
         {
             MaxMana = amount;

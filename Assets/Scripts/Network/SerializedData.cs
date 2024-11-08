@@ -1,4 +1,5 @@
 ﻿using Marsion.Logic;
+using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Collections;
 using Unity.Netcode;
@@ -163,6 +164,70 @@ namespace Marsion
             serializer.SerializeValue(ref PlayerID);
             serializer.SerializeValue(ref CardUID);
             serializer.SerializeValue(ref Index);
+        }
+    }
+
+    public class SerializedTryAttackData : INetworkSerializable
+    {
+        public ulong AttackPlayerID;
+        public string AttackerUID;
+        public ulong DefendPlayerID;
+        public string DefenderUID;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref AttackPlayerID);
+            serializer.SerializeValue(ref AttackerUID);
+            serializer.SerializeValue(ref DefendPlayerID);
+            serializer.SerializeValue(ref DefenderUID);
+        }
+    }
+
+    public class SerializedAttackCardResultData : INetworkSerializable
+    {
+        public bool Succeeded;
+        public ulong AttackPlayerID;
+        public string AttackerUID;
+        public ulong DefendPlayerID;
+        public string DefenderUID;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Succeeded);
+            serializer.SerializeValue(ref AttackPlayerID);
+            serializer.SerializeValue(ref AttackerUID);
+            serializer.SerializeValue(ref DefendPlayerID);
+            serializer.SerializeValue(ref DefenderUID);
+        }
+    }
+
+    public class SerializedDeadCardsData : INetworkSerializable
+    {
+        public List<string> DeadCards = new();
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            int count = DeadCards.Count;
+            serializer.SerializeValue(ref count);
+
+            if (serializer.IsReader)
+            {
+                DeadCards = new List<string>(count);
+                for (int i = 0; i < count; i++)
+                {
+                    string value = "";
+                    serializer.SerializeValue(ref value);
+                    DeadCards.Add(value);
+                }
+            }
+            else
+            {
+                foreach (var value in DeadCards)
+                {
+                    string item = value;
+                    serializer.SerializeValue(ref item);
+                }
+            }
         }
     }
 

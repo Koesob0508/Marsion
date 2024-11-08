@@ -58,8 +58,8 @@ namespace Marsion.CardView
             Managers.Client.Game.OnDataUpdated -= UpdateCard;
             Managers.Client.Game.OnDataUpdated += UpdateCard;
 
-            Managers.Client.Game.OnStartAttack -= Attack;
-            Managers.Client.Game.OnStartAttack += Attack;
+            Managers.Client.Game.OnAttackStarted -= Attack;
+            Managers.Client.Game.OnAttackStarted += Attack;
 
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
@@ -72,7 +72,7 @@ namespace Marsion.CardView
         public virtual void Clear()
         {
             Managers.Client.Game.OnDataUpdated -= UpdateCard;
-            Managers.Client.Game.OnStartAttack -= Attack;
+            Managers.Client.Game.OnAttackStarted -= Attack;
         }
 
         protected abstract void UpdateCard();
@@ -84,7 +84,7 @@ namespace Marsion.CardView
         }
 
         public abstract void Spawn();
-
+        public abstract void Die();
         protected virtual void Attack(Sequencer.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
             if (Card.UID != attacker.UID) return;
@@ -96,7 +96,6 @@ namespace Marsion.CardView
                 FSM.AttackState.Target = Managers.Client.Game.GetCharacter(defendPlayer.PlayerID, defender.UID).MonoBehaviour.gameObject;
                 FSM.AttackState.OnComplete += () =>
                 {
-                    Managers.Logger.Log<CharacterView>("Dead check?", colorName:"cyan");
                     startAttackClip.Complete();
                 };
 

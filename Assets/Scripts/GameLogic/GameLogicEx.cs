@@ -11,9 +11,13 @@ namespace Marsion
         public event Action OnGameStarted;
         public event Action OnManaChanged;
         public event Action OnTurnStarted;
+        public event Action OnTurnEnded;
         public event Action<ulong, string> OnCardDrawn;
         public event Action<bool, ulong, string> OnCardPlayed;
         public event Action<bool, ulong, string, int> OnCardSpawned;
+        public event Action<bool, ulong, string, ulong, string> OnCardAttacked;
+        public event Action<List<string>> OnCardDied;
+        public event Action<ulong> OnGameEnded;
 
         public GameLogicEx(GameData data)
         {
@@ -106,6 +110,18 @@ namespace Marsion
             OnCardDrawn?.Invoke(Data.CurrentPlayer.PlayerID, card.UID);
         }
 
+        public void EndTurn()
+        {
+            Managers.Logger.Log<GameLogicEx>($"End turn", colorName: ColorCodes.Logic);
+
+            Data.CurrentPlayer = Data.CurrentPlayer == Data.GetPlayer(0) ? Data.GetPlayer(1) : Data.GetPlayer(0);
+
+            OnDataUpdated?.Invoke();
+            OnTurnEnded?.Invoke();
+
+            StartTurn();
+        }
+
         private void ShuffleDeck(Player player)
         {
             List<Card> deck = player.Deck;
@@ -190,6 +206,91 @@ namespace Marsion
             OnCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
             OnDataUpdated?.Invoke();
             OnManaChanged?.Invoke();
+        }
+
+        public void TryAttack(Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        {
+            Managers.Logger.Log<GameLogic>("Try attack", colorName: ColorCodes.Logic);
+
+            attacker.Damage(defender.Attack);
+            defender.Damage(attacker.Attack);
+
+            OnDataUpdated?.Invoke();
+            OnCardAttacked?.Invoke(true, attackPlayer.PlayerID, attacker.UID, defendPlayer.PlayerID, defender.UID);
+
+            List<string> deadCardUIDs = CheckDeadCard();
+
+            OnDataUpdated?.Invoke();
+            OnCardDied?.Invoke(deadCardUIDs);
+
+            RemoveDeadCard();
+
+            OnDataUpdated?.Invoke();
+
+            List<ulong> alivePlayerIDs = new();
+
+            foreach(var player in Data.Players)
+            {
+                if(player.Card.Health > 0)
+                {
+                    alivePlayerIDs.Add(player.PlayerID);
+                }
+            }
+
+            if(alivePlayerIDs.Count == 1)
+            {
+                OnGameEnded?.Invoke(alivePlayerIDs[0]);
+            }
+            else if(alivePlayerIDs.Count == 0)
+            {
+                OnGameEnded?.Invoke(1000);
+            }
+        }
+
+        private List<string> CheckDeadCard()
+        {
+            List<string> result = new();
+
+            foreach (var player in Data.Players)
+            {
+                foreach (Card card in player.Field)
+                {
+                    if(card.Health <= 0)
+                    {
+                        card.Die();
+                        result.Add(card.UID);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private void RemoveDeadCard()
+        {
+            List<Card> deadCards = new();
+
+            foreach (var player in Data.Players)
+            {
+                foreach (Card card in player.Field)
+                {
+                    if (card.IsDead)
+                    {
+                        deadCards.Add(card);
+                    }
+                }
+            }
+
+            foreach(var card in deadCards)
+            {
+                foreach(var player in Data.Players)
+                {
+                    if(player.Field.Contains(card))
+                    {
+                        player.Field.Remove(card);
+                    }
+                }
+            }
         }
     }
 }

@@ -9,6 +9,11 @@ namespace Marsion.CardView
             FSM.PushState<CreatureViewSpawn>();
         }
 
+        public override void Die()
+        {
+            FSM.PushState<CreatureViewDead>();
+        }
+
         protected override void UpdateCard()
         {
             Card = Managers.Client.Game.GetCard(Type, Card.PlayerID, Card.UID);

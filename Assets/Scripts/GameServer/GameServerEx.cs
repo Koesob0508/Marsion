@@ -30,15 +30,21 @@ namespace Marsion
 
             Logic = new GameLogicEx(new GameData(2));
 
+            RegisterCommand(GameCommand.ClientTurnEnd, OnReceivedTurnEnd);
             RegisterCommand(GameCommand.ClientTrySpawnCard, OnReceivedTrySpawnCard);
+            RegisterCommand(GameCommand.ClientTryAttack, OnReceivedTryAttack);
 
             Logic.OnDataUpdated += SendUpdateData;
             Logic.OnGameStarted += SendStartGame;
             Logic.OnManaChanged += SendChangeMana;
             Logic.OnTurnStarted += SendStartTurn;
+            Logic.OnTurnEnded += SendEndTurn;
             Logic.OnCardDrawn += SendDrawCard;
             Logic.OnCardPlayed += SendPlayCardResult;
             Logic.OnCardSpawned += SendSpawnCardResult;
+            Logic.OnCardAttacked += SendAttackCardResult;
+            Logic.OnCardDied += SendDeadCards;
+            Logic.OnGameEnded += SendEndGame;
 
             Managers.Network.Messaging.SubscribeMessage("GameClient", OnReceivedCommand);
         }
@@ -87,6 +93,17 @@ namespace Marsion
 
         #region OnReceive (Use queue)
 
+        private void OnReceivedTurnEnd(ulong playerID, SerializedData sdata)
+        {
+            Sequencer.Sequence sequence = new("Turn end", Upstream);
+            Sequencer.Clip clip = new("Turn end", sequence);
+
+            clip.OnPlay += () =>
+            {
+                Logic.EndTurn();
+            };
+        }
+
         private void OnReceivedTrySpawnCard(ulong playerID, SerializedData sdata)
         {
             SerializedTrySpawnCardData spawnCard = sdata.Get<SerializedTrySpawnCardData>();
@@ -100,6 +117,24 @@ namespace Marsion
             };
         }
 
+        private void OnReceivedTryAttack(ulong playerID, SerializedData sdata)
+        {
+            SerializedTryAttackData attackData = sdata.Get<SerializedTryAttackData>();
+
+            Sequencer.Sequence sequence = new("Try attack", Upstream);
+            Sequencer.Clip clip = new("Try attack", sequence);
+
+            clip.OnPlay += () =>
+            {
+                Player attackPlayer = Data.GetPlayer(attackData.AttackPlayerID);
+                Card attacker = Data.GetFieldCard(attackPlayer.PlayerID, attackData.AttackerUID);
+                Player defendPlayer = Data.GetPlayer(attackData.DefendPlayerID);
+                Card defender = Data.GetFieldCard(defendPlayer.PlayerID, attackData.DefenderUID);
+
+                Logic.TryAttack(attackPlayer, attacker, defendPlayer, defender);
+            };
+        }
+
         #endregion
 
         #region Send Utility (Not use queue, logic process queue already)
@@ -110,11 +145,6 @@ namespace Marsion
             SerializedGameData sdata = new SerializedGameData();
             sdata.GameData = new GameData(Data);
 
-            foreach(var player in Data.Players)
-            {
-                Managers.Logger.Log<GameServerEx>($"{Data.GetPlayer(player.PlayerID).Mana} / {Data.GetPlayer(player.PlayerID).MaxMana}", colorName: ColorCodes.Client);
-            }
-
             SendToAll(GameCommand.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
         }
 
@@ -123,6 +153,15 @@ namespace Marsion
             Managers.Logger.Log<GameServerEx>($"Send start game", colorName: ColorCodes.Server);
 
             SendToAll(GameCommand.ServerStartGame);
+        }
+
+        private void SendEndGame(ulong winnerID)
+        {
+            Managers.Logger.Log<GameServerEx>($"Send end game", colorName: ColorCodes.Server);
+            SerializedUlong sdata = new SerializedUlong();
+            sdata.value = winnerID;
+
+            SendToAll(GameCommand.ServerEndGame, sdata, NetworkDelivery.Reliable);
         }
 
         private void SendChangeMana()
@@ -137,6 +176,13 @@ namespace Marsion
             Managers.Logger.Log<GameServerEx>($"Send start turn", colorName: ColorCodes.Server);
 
             SendToAll(GameCommand.ServerStartTurn);
+        }
+
+        private void SendEndTurn()
+        {
+            Managers.Logger.Log<GameServerEx>($"Send end turn", colorName: ColorCodes.Server);
+
+            SendToAll(GameCommand.ServerEndTurn);
         }
 
         private void SendDrawCard(ulong playerID, string cardUID)
@@ -173,6 +219,30 @@ namespace Marsion
             sdata.Index = index;
 
             SendToAll(GameCommand.ServerSpawnCardResult, sdata, NetworkDelivery.Reliable);
+        }
+
+        private void SendAttackCardResult(bool succeeded, ulong attackPlayerID, string attackerUID, ulong defendPlayerID, string defenderUID)
+        {
+            Managers.Logger.Log<GameServerEx>($"Send attack card result", colorName: ColorCodes.Server);
+
+            SerializedAttackCardResultData sdata = new();
+            sdata.Succeeded = succeeded;
+            sdata.AttackPlayerID = attackPlayerID;
+            sdata.AttackerUID = attackerUID;
+            sdata.DefendPlayerID = defendPlayerID;
+            sdata.DefenderUID = defenderUID;
+
+            SendToAll(GameCommand.ServerAttackCardResult, sdata, NetworkDelivery.Reliable);
+        }
+
+        private void SendDeadCards(List<string> cards)
+        {
+            Managers.Logger.Log<GameServerEx>($"Send dead cards", colorName: ColorCodes.Server);
+
+            SerializedDeadCardsData sdata = new();
+            sdata.DeadCards = cards;
+
+            SendToAll(GameCommand.ServerDeadCards, sdata, NetworkDelivery.Reliable);
         }
 
         #endregion

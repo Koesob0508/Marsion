@@ -2,6 +2,7 @@
 using Marsion.Client;
 using Marsion.Logic;
 using Marsion.Tool;
+using Marsion.UI;
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
@@ -45,7 +46,8 @@ namespace Marsion
         public event Action<Player, Card> OnCardDrawn;
         public event Action<bool, Player, Card> OnCardPlayed;
         public event Action<bool, Player, Card, int> OnCardSpawned;
-        public event Action<Sequencer.Sequence, Player, Card, Player, Card> OnStartAttack;
+        public event Action<Sequencer.Sequence, Player, Card, Player, Card> OnAttackStarted;
+        public event Action<List<string>> OnCardDied;
 
         public void Init()
         {
@@ -55,11 +57,15 @@ namespace Marsion
 
             RegisterCommand(GameCommand.ServerUpdateData, OnReceivedUpdatData);
             RegisterCommand(GameCommand.ServerStartGame, OnReceivedStartGame);
+            RegisterCommand(GameCommand.ServerEndGame, OnReceivedEndGame);
             RegisterCommand(GameCommand.ServerChangeMana, OnReceivedChangeMana);
             RegisterCommand(GameCommand.ServerStartTurn, OnReceivedStartTurn);
+            RegisterCommand(GameCommand.ServerEndTurn, OnReceivedEndTurn);
             RegisterCommand(GameCommand.ServerDrawCard, OnReceivedDrawCard);
             RegisterCommand(GameCommand.ServerPlayCardResult, OnReceivedPlayCardResult);
             RegisterCommand(GameCommand.ServerSpawnCardResult, OnReceivedSpawnCardResult);
+            RegisterCommand(GameCommand.ServerAttackCardResult, OnReceivedAttackCardResult);
+            RegisterCommand(GameCommand.ServerDeadCards, OnReceivedDeadCards);
 
             Messaging.SubscribeMessage("GameServer", OnReceivedCommand);
         }
@@ -92,12 +98,22 @@ namespace Marsion
 
         public void SendTurnEnd()
         {
+            Managers.Logger.Log<GameClientEx>("Send turn end", colorName: ColorCodes.Client);
 
+            Send(GameCommand.ClientTurnEnd);
         }
 
         public void SendTryAttack(Card attacker, Card defender)
         {
-            // Send Attack
+            Managers.Logger.Log<GameClientEx>("Send try attack", colorName: ColorCodes.Client);
+
+            SerializedTryAttackData sdata = new();
+            sdata.AttackPlayerID = attacker.PlayerID;
+            sdata.AttackerUID = attacker.UID;
+            sdata.DefendPlayerID = defender.PlayerID;
+            sdata.DefenderUID = defender.UID;
+
+            Send(GameCommand.ClientTryAttack, sdata, NetworkDelivery.Reliable);
         }
 
         public void SendTrySpawnCard(Card card, int index)
@@ -127,7 +143,6 @@ namespace Marsion
                 Managers.Logger.Log<GameClientEx>($"Received updated data", colorName: ColorCodes.Client);
 
                 Data = sGameData.GameData;
-                Managers.Logger.Log<GameClientEx>($"{Data.GetPlayer(PlayerID).Mana} / {Data.GetPlayer(PlayerID).MaxMana}", colorName: ColorCodes.Client);
 
                 OnDataUpdated?.Invoke();
             };
@@ -177,6 +192,36 @@ namespace Marsion
             };
         }
 
+        private void OnReceivedEndGame(SerializedData sdata)
+        {
+            SerializedUlong winnerData = sdata.Get<SerializedUlong>();
+
+            Sequencer.Sequence sequence = new("On received end game", Downstream);
+            Sequencer.Clip clip = new("On received end game", sequence);
+
+            clip.OnPlay += () =>
+            {
+                Managers.Logger.Log<GameClient>("Game end", colorName: ColorCodes.Client);
+                UI_EndGame ui = Managers.UI.ShowPopupUI<UI_EndGame>();
+
+                if(winnerData.value > 10)
+                {
+                    ui.Text_Result.text = "DRAW";
+                }
+                else
+                {
+                    if(winnerData.value == PlayerID)
+                    {
+                        ui.Text_Result.text = "WINNER!";
+                    }
+                    else
+                    {
+                        ui.Text_Result.text = "LOSE";
+                    }
+                }
+            };
+        }
+
         private void OnReceivedChangeMana(SerializedData sdata)
         {
             Sequencer.Sequence sequence = new("Change mana", Downstream);
@@ -196,6 +241,17 @@ namespace Marsion
             clip.OnPlay += () =>
             {
                 OnTurnStarted?.Invoke();
+            };
+        }
+
+        private void OnReceivedEndTurn(SerializedData sdata)
+        {
+            Sequencer.Sequence sequence = new("End turn", Downstream);
+            Sequencer.Clip clip = new("End turn", sequence);
+
+            clip.OnPlay += () =>
+            {
+                OnTurnEnded?.Invoke();
             };
         }
 
@@ -230,12 +286,43 @@ namespace Marsion
         {
             SerializedSpawnCardResultData sResultData = sdata.Get<SerializedSpawnCardResultData>();
 
-            Sequencer.Sequence sequence = new("Spawn card result", Downstream);
-            Sequencer.Clip clip = new("Spawn card result", sequence);
+            Sequencer.Sequence sequence = new("On received spawn card result", Downstream);
+            Sequencer.Clip clip = new("On received spawn card result", sequence);
 
             clip.OnPlay += () =>
             {
                 OnCardSpawned?.Invoke(sResultData.Succeeded, Data.GetPlayer(sResultData.PlayerID), Data.GetHandCard(sResultData.PlayerID, sResultData.CardUID), sResultData.Index);
+            };
+        }
+
+        private void OnReceivedAttackCardResult(SerializedData sdata)
+        {
+            SerializedAttackCardResultData sResultData = sdata.Get<SerializedAttackCardResultData>();
+
+            Sequencer.Sequence sequence = new("On received attack card result", Downstream);
+            Sequencer.Clip clip = new("On received attack card result", sequence);
+
+            clip.OnPlay += () =>
+            {
+                Player attackPlayer = Data.GetPlayer(sResultData.AttackPlayerID);
+                Card attacker = Data.GetFieldCard(attackPlayer.PlayerID, sResultData.AttackerUID);
+                Player defendPlayer = Data.GetPlayer(sResultData.DefendPlayerID);
+                Card defender = Data.GetFieldCard(defendPlayer.PlayerID, sResultData.DefenderUID);
+
+                OnAttackStarted?.Invoke(sequence, attackPlayer, attacker, defendPlayer, defender);
+            };
+        }
+
+        private void OnReceivedDeadCards(SerializedData sdata)
+        {
+            SerializedDeadCardsData sDeadCards = sdata.Get<SerializedDeadCardsData>();
+
+            Sequencer.Sequence sequence = new("On received dead cards", Downstream);
+            Sequencer.Clip clip = new("On received dead cards", sequence);
+
+            clip.OnPlay += () =>
+            {
+                OnCardDied?.Invoke(sDeadCards.DeadCards);
             };
         }
 
