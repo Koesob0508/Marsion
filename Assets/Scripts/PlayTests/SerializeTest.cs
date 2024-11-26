@@ -111,9 +111,9 @@ public class SerializeTest
     {
         // 1. 테스트용 Player 객체 생성
         Player originalPlayer = new Player(1);
-        originalPlayer.Deck.Add(new Card(originalPlayer.ClientID));
-        originalPlayer.Hand.Add(new Card(originalPlayer.ClientID));
-        originalPlayer.Field.Add(new Card(originalPlayer.ClientID));
+        originalPlayer.Deck.Add(new Card(originalPlayer.PlayerID));
+        originalPlayer.Hand.Add(new Card(originalPlayer.PlayerID));
+        originalPlayer.Field.Add(new Card(originalPlayer.PlayerID));
 
         // 2. Player 객체를 JSON 문자열로 직렬화
         string json = NetworkTool.JsonSerialize(originalPlayer);
@@ -134,7 +134,7 @@ public class SerializeTest
         Player deserializedPlayer = NetworkTool.JsonDeserialize<Player>(readJson);
 
         // 8. 원래 Player 객체와 역직렬화된 객체가 동일한지 검증
-        Assert.AreEqual(originalPlayer.ClientID, deserializedPlayer.ClientID);
+        Assert.AreEqual(originalPlayer.PlayerID, deserializedPlayer.PlayerID);
         Assert.AreEqual(originalPlayer.Card.UID, deserializedPlayer.Card.UID);
         Assert.AreEqual(originalPlayer.Deck.Count, deserializedPlayer.Deck.Count);
         Assert.AreEqual(originalPlayer.Hand.Count, deserializedPlayer.Hand.Count);
@@ -168,13 +168,13 @@ public class SerializeTest
         GameData originalGameData = new GameData(2); // 두 플레이어를 가진 게임 데이터 생성
 
         // 각 플레이어에게 카드를 추가
-        originalGameData.Players[0].Deck.Add(new Card(originalGameData.Players[0].ClientID));
-        originalGameData.Players[0].Hand.Add(new Card(originalGameData.Players[0].ClientID));
-        originalGameData.Players[0].Field.Add(new Card(originalGameData.Players[0].ClientID));
+        originalGameData.Players[0].Deck.Add(new Card(originalGameData.Players[0].PlayerID));
+        originalGameData.Players[0].Hand.Add(new Card(originalGameData.Players[0].PlayerID));
+        originalGameData.Players[0].Field.Add(new Card(originalGameData.Players[0].PlayerID));
 
-        originalGameData.Players[1].Deck.Add(new Card(originalGameData.Players[1].ClientID));
-        originalGameData.Players[1].Hand.Add(new Card(originalGameData.Players[1].ClientID));
-        originalGameData.Players[1].Field.Add(new Card(originalGameData.Players[1].ClientID));
+        originalGameData.Players[1].Deck.Add(new Card(originalGameData.Players[1].PlayerID));
+        originalGameData.Players[1].Hand.Add(new Card(originalGameData.Players[1].PlayerID));
+        originalGameData.Players[1].Field.Add(new Card(originalGameData.Players[1].PlayerID));
 
         // 2. GameData 객체를 JSON 문자열로 직렬화
         string json = NetworkTool.JsonSerialize(originalGameData);
@@ -201,7 +201,7 @@ public class SerializeTest
         // 각 플레이어의 카드 수를 비교하여 검증
         for (int i = 0; i < originalGameData.Players.Length; i++)
         {
-            Assert.AreEqual(originalGameData.Players[i].ClientID, deserializedGameData.Players[i].ClientID);
+            Assert.AreEqual(originalGameData.Players[i].PlayerID, deserializedGameData.Players[i].PlayerID);
             Assert.AreEqual(originalGameData.Players[i].Deck.Count, deserializedGameData.Players[i].Deck.Count);
             Assert.AreEqual(originalGameData.Players[i].Hand.Count, deserializedGameData.Players[i].Hand.Count);
             Assert.AreEqual(originalGameData.Players[i].Field.Count, deserializedGameData.Players[i].Field.Count);

@@ -17,7 +17,7 @@ namespace Marsion.Client
     {
         public List<Sprite> PortraitSprites;
 
-        private GameData Data;
+        public GameData Data;
         
         [Header("Sequencer")]
         [SerializeField] Sequencer Sequencer;
@@ -73,21 +73,8 @@ namespace Marsion.Client
 
         }
 
-
-
         public void Ready(List<string> deck)
         {
-            //List<SerializedCardData> deck = new List<SerializedCardData>();
-
-            //foreach (var card in deckSO)
-            //{
-            //    SerializedCardData netCard = new SerializedCardData();
-            //    netCard.UID = card.UID;
-            //    deck.Add(netCard);
-            //}
-
-            //SerializedCardData[] netDeck = deck.ToArray();
-
             List<StringContainer> sdata = new();
             foreach (var id in deck)
             {
@@ -117,8 +104,8 @@ namespace Marsion.Client
         [Rpc(SendTo.ClientsAndHost)]
         public void StartGameRpc()
         {
-            Sequencer.Sequence gameStartSequence = new Sequencer.Sequence("GameStart", Sequencer);
-            Sequencer.Clip gameStartClip = new Sequencer.Clip("GameStart");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("GameStart", Sequencer);
+            Sequencer.Clip gameStartClip = new Sequencer.Clip("GameStart", sequence);
 
             gameStartClip.OnPlay += () =>
             {
@@ -127,14 +114,14 @@ namespace Marsion.Client
 
                 foreach (var player in GetGameData().Players)
                 {
-                    if (ID == player.ClientID)
+                    if (ID == player.PlayerID)
                     {
                         PlayerHero.Init(player.Card);
                         PlayerHero.Spawn();
                     }
                     else
                     {
-                        EnemyID = player.ClientID;
+                        EnemyID = player.PlayerID;
                         EnemyHero.Init(player.Card);
                         EnemyHero.Spawn();
                     }
@@ -142,34 +129,28 @@ namespace Marsion.Client
 
                 OnGameStarted?.Invoke();
             };
-
-            gameStartSequence.Append(gameStartClip);
-            Sequencer.Append(gameStartSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void UpdateDataRpc(SerializedGameData networkData)
         {
-            Sequencer.Sequence updateSequence = new Sequencer.Sequence("Update", Sequencer);
-            Sequencer.Clip updateClip = new Sequencer.Clip("UpdateClip");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("Update", Sequencer);
+            Sequencer.Clip updateClip = new Sequencer.Clip("UpdateClip", sequence);
 
             updateClip.OnPlay += () =>
             {
-                Data = networkData.gameData;
+                Data = networkData.GameData;
                 Managers.Logger.Log<GameClient>("Game data updated", colorName: "green");
 
                 OnDataUpdated?.Invoke();
             };
-
-            updateSequence.Append(updateClip);
-            Sequencer.Append(updateSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void EndGameRpc(int clientID)
         {
-            Sequencer.Sequence gameEndSequence = new Sequencer.Sequence("GameEnd", Sequencer);
-            Sequencer.Clip gameEndClip = new Sequencer.Clip("GameEnd");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("GameEnd", Sequencer);
+            Sequencer.Clip gameEndClip = new Sequencer.Clip("GameEnd", sequence);
 
             gameEndClip.OnPlay += () =>
             {
@@ -190,130 +171,105 @@ namespace Marsion.Client
 
                 OnGameEnded?.Invoke();
             };
-
-
-            gameEndSequence.Append(gameEndClip);
-            Sequencer.Append(gameEndSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void ResetGameRpc()
         {
-            Sequencer.Sequence resetSequence = new Sequencer.Sequence("GameReset", Sequencer);
-            Sequencer.Clip resetClipSequence = new Sequencer.Clip("GameReset");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("GameReset", Sequencer);
+            Sequencer.Clip resetClipSequence = new Sequencer.Clip("GameReset",sequence);
 
             resetClipSequence.OnPlay += () =>
             {
                 Sequencer.Init();
                 OnGameReset?.Invoke();
             };
-
-            resetSequence.Append(resetClipSequence);
-            Sequencer.Append(resetSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void StartTurnRpc()
         {
-            Sequencer.Sequence turnStartSequence = new Sequencer.Sequence("TurnStart", Sequencer);
-            Sequencer.Clip turnStartClip = new Sequencer.Clip("TurnStart");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("TurnStart", Sequencer);
+            Sequencer.Clip turnStartClip = new Sequencer.Clip("TurnStart", sequence);
 
             turnStartClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameClient>("Turn start", colorName: "green");
                 OnTurnStarted?.Invoke();
             };
-
-            turnStartSequence.Append(turnStartClip);
-            Sequencer.Append(turnStartSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void EndTurnRpc()
         {
-            Sequencer.Sequence turnEndSequence = new Sequencer.Sequence("TurnEnd", Sequencer);
-            Sequencer.Clip turnEndClip = new Sequencer.Clip("TurnEnd");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("TurnEnd", Sequencer);
+            Sequencer.Clip turnEndClip = new Sequencer.Clip("TurnEnd", sequence);
 
             turnEndClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameClient>("Turn end", colorName: "green");
                 OnTurnEnded?.Invoke();
             };
-
-            turnEndSequence.Append(turnEndClip);
-            Sequencer.Append(turnEndSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void DrawCardRpc(ulong clientID, string cardUID)
         {
-            Sequencer.Sequence cardDrawSequence = new Sequencer.Sequence("CardDraw", Sequencer);
-            Sequencer.Clip cardDrawClip = new Sequencer.Clip("CardDraw");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("CardDraw", Sequencer);
+            Sequencer.Clip cardDrawClip = new Sequencer.Clip("CardDraw", sequence);
 
             cardDrawClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameClient>("Card draw", colorName: "green");
                 OnCardDrawn?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetHandCard(clientID, cardUID));
             };
-
-            cardDrawSequence.Append(cardDrawClip);
-            Sequencer.Append(cardDrawSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void ChangeManaRpc()
         {
-            Sequencer.Sequence changeManaSequence = new Sequencer.Sequence("ChangeMana", Sequencer);
-            Sequencer.Clip changeManaClip = new Sequencer.Clip("ChangeMana");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("ChangeMana", Sequencer);
+            Sequencer.Clip changeManaClip = new Sequencer.Clip("ChangeMana", sequence);
 
             changeManaClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameClient>("Mana Changed", colorName: "green");
                 OnManaChanged?.Invoke();
             };
-
-            changeManaSequence.Append(changeManaClip);
-            Sequencer.Append(changeManaSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void PlayCardRpc(bool succeeded, ulong clientID, string cardUID)
         {
-            Sequencer.Sequence cardPlaySequence = new Sequencer.Sequence("CardPlay", Sequencer);
-            Sequencer.Clip cardPlayClip = new Sequencer.Clip("CardPlay");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("CardPlay", Sequencer);
+            Sequencer.Clip cardPlayClip = new Sequencer.Clip("CardPlay", sequence);
 
             cardPlayClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameClient>($"Card play succeeded? : {succeeded}", colorName: "green");
                 OnCardPlayed?.Invoke(succeeded, GetGameData().GetPlayer(clientID), cardUID);
             };
-
-            cardPlaySequence.Append(cardPlayClip);
-            Sequencer.Append(cardPlaySequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void SpawnCardRpc(bool succeeded, ulong clientID, string cardUID, int index)
         {
-            Sequencer.Sequence cardSpawnSequence = new Sequencer.Sequence("CardSpawn", Sequencer);
-            Sequencer.Clip cardSpawnClip = new Sequencer.Clip("CardSpawn");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("CardSpawn", Sequencer);
+            Sequencer.Clip cardSpawnClip = new Sequencer.Clip("CardSpawn", sequence);
 
             cardSpawnClip.OnPlay += () =>
             {
                 Managers.Logger.Log<GameClient>($"Card spawn succeeded? : {succeeded}", colorName: "green");
                 OnCardSpawned?.Invoke(succeeded, GetGameData().GetPlayer(clientID), GetGameData().GetFieldCard(clientID, cardUID), index);
             };
-
-            cardSpawnSequence.Append(cardSpawnClip);
-            Sequencer.Append(cardSpawnSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         public void DeadCardRpc()
         {
-            Sequencer.Sequence beforeDeadSequence = new Sequencer.Sequence("BeforeDead", Sequencer);
-            Sequencer.Clip deadLog = new Sequencer.Clip("DeadLog");
-            Sequencer.Clip deadClip = new Sequencer.Clip("Dead");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("BeforeDead", Sequencer);
+            Sequencer.Clip deadLog = new Sequencer.Clip("DeadLog", sequence);
+            Sequencer.Clip deadClip = new Sequencer.Clip("Dead", sequence);
 
             deadLog.OnPlay += () =>
             {
@@ -350,11 +306,6 @@ namespace Marsion.Client
                     }
                 }
             };
-
-            beforeDeadSequence.Append(deadLog);
-            beforeDeadSequence.Append(deadClip);
-
-            Sequencer.Append(beforeDeadSequence);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
@@ -365,9 +316,9 @@ namespace Marsion.Client
             Card attacker = attackPlayer.GetCard(attackerUID);
             Card defender = defendPlayer.GetCard(defenderUID);
 
-            Sequencer.Sequence attackSequence = new Sequencer.Sequence("StartAttack", Sequencer);
-            Sequencer.Clip attackLogClip = new Sequencer.Clip("AttackLog");
-            Sequencer.Clip invokeEventClip = new Sequencer.Clip("StartAttack");
+            Sequencer.Sequence sequence = new Sequencer.Sequence("StartAttack", Sequencer);
+            Sequencer.Clip attackLogClip = new Sequencer.Clip("AttackLog", sequence);
+            Sequencer.Clip invokeEventClip = new Sequencer.Clip("StartAttack", sequence);
 
             attackLogClip.OnPlay += () =>
             {
@@ -376,13 +327,8 @@ namespace Marsion.Client
 
             invokeEventClip.OnPlay += () =>
             {
-                OnStartAttack?.Invoke(attackSequence, attackPlayer, attacker, defendPlayer, defender);
+                OnStartAttack?.Invoke(sequence, attackPlayer, attacker, defendPlayer, defender);
             };
-
-            attackSequence.Append(attackLogClip);
-            attackSequence.Append(invokeEventClip);
-
-            Sequencer.Append(attackSequence);
         }
 
         #region Utils

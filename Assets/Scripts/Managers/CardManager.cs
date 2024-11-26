@@ -8,12 +8,12 @@ namespace Marsion
     {
         public List<string> FindByGrade(int grade, int count = 1, bool allowDuplicate = false, List<string> cards = null)
         {
-            List<string> result = new List<string>();
+            List<string> result = new();
             List<string> copiedCards;
 
             if (cards == null)
             {
-                copiedCards = new List<string>();
+                copiedCards = new();
 
                 foreach(var cardData in Managers.Data.CardList)
                 {
@@ -22,7 +22,7 @@ namespace Marsion
             }
             else
             {
-                copiedCards = new List<string>(cards);
+                copiedCards = new();
             }
 
             ShuffleList(copiedCards);

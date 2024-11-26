@@ -11,109 +11,73 @@ namespace Marsion
 {
     public class GameServerEx : MonoBehaviour
     {
-        [SerializeField] Sequencer Sequencer;
-        private Dictionary<ushort, Action<ulong, SerializedData>> Commands;
-        private GameData Data => Logic.Data;
+        [SerializeField] Sequencer Upstream;
+        [SerializeField] Sequencer Downstream;
+
         private GameLogicEx Logic;
+        private GameData Data => Logic.Data;
+        private NetworkMessaging Messaging => Managers.Network.Messaging;
 
-        private List<ulong> ConnectedClients;
-
-        private NetworkMessaging Messaging { get { return Managers.Network.Messaging; } }
+        private List<ulong> ConnectedClients = new();
+        private Dictionary<ushort, Action<ulong, SerializedData>> Commands = new();
 
         public void Init()
         {
             Managers.Logger.Log<GameServerEx>($"Game Server initialized", colorName: ColorCodes.Server);
 
-            Commands = new();
-            Logic = new GameLogicEx(new GameData(2));
-            Sequencer.Init();
+            Upstream.Init();
+            Downstream.Init();
 
-            ConnectedClients = new List<ulong>();
+            Logic = new GameLogicEx(new GameData(2));
+
+            RegisterCommand(GameCommand.ClientTurnEnd, OnReceivedTurnEnd);
+            RegisterCommand(GameCommand.ClientTrySpawnCard, OnReceivedTrySpawnCard);
+            RegisterCommand(GameCommand.ClientTryAttack, OnReceivedTryAttack);
 
             Logic.OnDataUpdated += SendUpdateData;
             Logic.OnGameStarted += SendStartGame;
+            Logic.OnManaChanged += SendChangeMana;
+            Logic.OnTurnStarted += SendStartTurn;
+            Logic.OnTurnEnded += SendEndTurn;
+            Logic.OnCardDrawn += SendDrawCard;
+            Logic.OnCardPlayed += SendPlayCardResult;
+            Logic.OnCardSpawned += SendSpawnCardResult;
+            Logic.OnCardAttacked += SendAttackCardResult;
+            Logic.OnCardDied += SendDeadCards;
+            Logic.OnGameEnded += SendEndGame;
 
-            Managers.Network.Messaging.SubscribeMessage("GameClient", OnReceiveCommand);
-        }
-
-        private void Reset()
-        {
-
+            Managers.Network.Messaging.SubscribeMessage("GameClient", OnReceivedCommand);
         }
 
         public void Clear()
         {
             Logic.OnDataUpdated -= SendUpdateData;
+            Logic.OnGameStarted -= SendStartGame;
         }
-
-        #region Operations
 
         public void Ready(ulong clientID, List<string> deck)
         {
-            //ConnectedClients.Add(clientID);
-            //Logic.SetPlayerDeck(clientID, deck);
-            //if (ConnectedClients.Count == 2)
-            //{
-            //    StartGame();
-            //}
+            Sequencer.Sequence sequence = new("Ready", Upstream);
+            Sequencer.Clip clip = new("SetDeck", sequence);
 
-            Sequencer.Sequence Sequence = new Sequencer.Sequence("Ready", Sequencer);
-            Sequencer.Clip SetDeckClip = new Sequencer.Clip("SetDeck");
-            Sequencer.Clip CheckClip = new Sequencer.Clip("Check");
-
-            SetDeckClip.OnPlay += () =>
+            clip.OnPlay += () =>
             {
                 ConnectedClients.Add(clientID);
                 Logic.SetPlayerDeck(clientID, deck);
-            };
 
-            CheckClip.OnPlay += () =>
-            {
                 if (ConnectedClients.Count == 2)
                 {
-                    StartGame();
+                    Logic.StartGame();
                 }
             };
-
-            Sequence.Append(SetDeckClip);
-            Sequence.Append(CheckClip);
-
-            Sequencer.Append(Sequence);
         }
-
-        public void StartGame()
-        {
-            Sequencer.Sequence Sequence = new("StartGame", Sequencer);
-            Sequencer.Clip LogClip = new("Log");
-            Sequencer.Clip StartGameClip = new("StartGame");
-
-            LogClip.OnPlay += () =>
-            {
-                Managers.Logger.Log<GameServerEx>($"Start game", colorName: ColorCodes.Server);
-            };
-
-            StartGameClip.OnPlay += () =>
-            {
-                Logic.StartGame();
-            };
-
-            Sequence.Append(LogClip);
-            Sequence.Append(StartGameClip);
-            Sequencer.Append(Sequence);
-
-            //StartGame
-
-            // Logic.Start Turn
-        }
-
-        #endregion
 
         private void RegisterCommand(ushort type, Action<ulong, SerializedData> callback)
         {
             Commands.Add(type, callback);
         }
 
-        private void OnReceiveCommand(ulong clientID, FastBufferReader reader)
+        private void OnReceivedCommand(ulong clientID, FastBufferReader reader)
         {
             reader.ReadValueSafe(out ushort type);
             SerializedData sdata = new SerializedData(reader);
@@ -127,44 +91,163 @@ namespace Marsion
                 command.Invoke(clientID, sdata);
         }
 
-        #region OnReceive
+        #region OnReceive (Use queue)
+
+        private void OnReceivedTurnEnd(ulong playerID, SerializedData sdata)
+        {
+            Sequencer.Sequence sequence = new("Turn end", Upstream);
+            Sequencer.Clip clip = new("Turn end", sequence);
+
+            clip.OnPlay += () =>
+            {
+                Logic.EndTurn();
+            };
+        }
+
+        private void OnReceivedTrySpawnCard(ulong playerID, SerializedData sdata)
+        {
+            SerializedTrySpawnCardData spawnCard = sdata.Get<SerializedTrySpawnCardData>();
+
+            Sequencer.Sequence sequence = new("Try spawn card", Upstream);
+            Sequencer.Clip clip = new("Try spawn card", sequence);
+
+            clip.OnPlay += () =>
+            {
+                Logic.TrySpawnCard(Data.GetPlayer(playerID), Data.GetHandCard(playerID, spawnCard.CardUID), spawnCard.Index);
+            };
+        }
+
+        private void OnReceivedTryAttack(ulong playerID, SerializedData sdata)
+        {
+            SerializedTryAttackData attackData = sdata.Get<SerializedTryAttackData>();
+
+            Sequencer.Sequence sequence = new("Try attack", Upstream);
+            Sequencer.Clip clip = new("Try attack", sequence);
+
+            clip.OnPlay += () =>
+            {
+                Player attackPlayer = Data.GetPlayer(attackData.AttackPlayerID);
+                Card attacker = Data.GetFieldCard(attackPlayer.PlayerID, attackData.AttackerUID);
+                Player defendPlayer = Data.GetPlayer(attackData.DefendPlayerID);
+                Card defender = Data.GetFieldCard(defendPlayer.PlayerID, attackData.DefenderUID);
+
+                Logic.TryAttack(attackPlayer, attacker, defendPlayer, defender);
+            };
+        }
 
         #endregion
 
-        #region Send
+        #region Send Utility (Not use queue, logic process queue already)
 
         private void SendUpdateData()
         {
-            Sequencer.Sequence Sequence = new("UpdateData", Sequencer);
-            Sequencer.Clip Clip = new("UpdateData");
+            Managers.Logger.Log<GameServerEx>($"Send updated data", colorName: ColorCodes.Server);
+            SerializedGameData sdata = new SerializedGameData();
+            sdata.GameData = new GameData(Data);
 
-            Clip.OnPlay += () =>
-            {
-                Managers.Logger.Log<GameServerEx>($"Send updated data", colorName: ColorCodes.Server);
-                SerializedGameData sdata = new SerializedGameData();
-                sdata.gameData = new GameData(Data);
-
-                SendToAll(GameCommand.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
-            };
-
-            Sequence.Append(Clip);
-            Sequencer.Append(Sequence);
+            SendToAll(GameCommand.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
         }
 
         private void SendStartGame()
         {
-            Sequencer.Sequence Sequence = new("StartGame", Sequencer);
-            Sequencer.Clip Clip = new("StartGame");
+            Managers.Logger.Log<GameServerEx>($"Send start game", colorName: ColorCodes.Server);
 
-            Clip.OnPlay += () =>
-            {
-                Managers.Logger.Log<GameServerEx>($"Send start game", colorName: ColorCodes.Server);
-                SendToAll(GameCommand.ServerStartGame);
-            };
-
-            Sequence.Append(Clip);
-            Sequencer.Append(Sequence);
+            SendToAll(GameCommand.ServerStartGame);
         }
+
+        private void SendEndGame(ulong winnerID)
+        {
+            Managers.Logger.Log<GameServerEx>($"Send end game", colorName: ColorCodes.Server);
+            SerializedUlong sdata = new SerializedUlong();
+            sdata.value = winnerID;
+
+            SendToAll(GameCommand.ServerEndGame, sdata, NetworkDelivery.Reliable);
+        }
+
+        private void SendChangeMana()
+        {
+            Managers.Logger.Log<GameServerEx>($"Send change mana", colorName: ColorCodes.Server);
+
+            SendToAll(GameCommand.ServerChangeMana);
+        }
+
+        private void SendStartTurn()
+        {
+            Managers.Logger.Log<GameServerEx>($"Send start turn", colorName: ColorCodes.Server);
+
+            SendToAll(GameCommand.ServerStartTurn);
+        }
+
+        private void SendEndTurn()
+        {
+            Managers.Logger.Log<GameServerEx>($"Send end turn", colorName: ColorCodes.Server);
+
+            SendToAll(GameCommand.ServerEndTurn);
+        }
+
+        private void SendDrawCard(ulong playerID, string cardUID)
+        {
+            Managers.Logger.Log<GameServerEx>($"Send draw card", colorName: ColorCodes.Server);
+
+            SerializedDrawnCardData sdata = new SerializedDrawnCardData();
+            sdata.PlayerID = playerID;
+            sdata.CardUID = cardUID;
+
+            SendToAll(GameCommand.ServerDrawCard, sdata, NetworkDelivery.Reliable);
+        }
+
+        private void SendPlayCardResult(bool succeeded, ulong playerID, string cardUID)
+        {
+            Managers.Logger.Log<GameServerEx>($"Send play card result", colorName: ColorCodes.Server);
+
+            SerializedPlayCardResultData sdata = new SerializedPlayCardResultData();
+            sdata.Succeeded = succeeded;
+            sdata.PlayerID = playerID;
+            sdata.CardUID = cardUID;
+
+            SendToAll(GameCommand.ServerPlayCardResult, sdata, NetworkDelivery.Reliable);
+        }
+
+        private void SendSpawnCardResult(bool succeeded, ulong playerID, string cardUID, int index)
+        {
+            Managers.Logger.Log<GameServerEx>($"Send spawn card result", colorName: ColorCodes.Server);
+
+            SerializedSpawnCardResultData sdata = new();
+            sdata.Succeeded = succeeded;
+            sdata.PlayerID = playerID;
+            sdata.CardUID = cardUID;
+            sdata.Index = index;
+
+            SendToAll(GameCommand.ServerSpawnCardResult, sdata, NetworkDelivery.Reliable);
+        }
+
+        private void SendAttackCardResult(bool succeeded, ulong attackPlayerID, string attackerUID, ulong defendPlayerID, string defenderUID)
+        {
+            Managers.Logger.Log<GameServerEx>($"Send attack card result", colorName: ColorCodes.Server);
+
+            SerializedAttackCardResultData sdata = new();
+            sdata.Succeeded = succeeded;
+            sdata.AttackPlayerID = attackPlayerID;
+            sdata.AttackerUID = attackerUID;
+            sdata.DefendPlayerID = defendPlayerID;
+            sdata.DefenderUID = defenderUID;
+
+            SendToAll(GameCommand.ServerAttackCardResult, sdata, NetworkDelivery.Reliable);
+        }
+
+        private void SendDeadCards(List<string> cards)
+        {
+            Managers.Logger.Log<GameServerEx>($"Send dead cards", colorName: ColorCodes.Server);
+
+            SerializedDeadCardsData sdata = new();
+            sdata.DeadCards = cards;
+
+            SendToAll(GameCommand.ServerDeadCards, sdata, NetworkDelivery.Reliable);
+        }
+
+        #endregion
+
+        #region Send Utilities
 
         private void Send(ulong target, ushort tag)
         {
@@ -182,7 +265,6 @@ namespace Marsion
             Managers.Network.Messaging.Send("GameServer", target, writer, delivery);
             writer.Dispose();
         }
-
 
         private void SendToAll(ushort tag)
         {

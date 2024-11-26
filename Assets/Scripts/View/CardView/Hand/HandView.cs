@@ -50,13 +50,13 @@ namespace Marsion.CardView
             Cards.Clear();
         }
 
-        private void CardPlayed(bool succeeded, Player player, string cardUID)
+        private void CardPlayed(bool succeeded, Player player, Card card)
         {
             if(succeeded)
             {
                 foreach (ICardView cardView in Cards)
                 {
-                    if (cardView.Card.UID == cardUID)
+                    if (cardView.Card.UID == card.UID)
                     {
                         Cards.Remove(cardView);
                         Managers.Resource.Destroy(cardView.MonoBehaviour.gameObject);
@@ -70,7 +70,7 @@ namespace Marsion.CardView
             {
                 foreach (ICardView cardView in Cards)
                 {
-                    if (cardView.Card.UID == cardUID)
+                    if (cardView.Card.UID == card.UID)
                     {
                         cardView.MonoBehaviour.gameObject.SetActive(true);
                     }

@@ -38,7 +38,7 @@ namespace Marsion.UI
 
         public void TurnEnd()
         {
-            Managers.Client.Game.TurnEnd();
+            Managers.Client.Game.SendTurnEnd();
         }
     }
 }

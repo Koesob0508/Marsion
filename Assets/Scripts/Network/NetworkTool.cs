@@ -44,7 +44,6 @@ namespace Marsion
         public static string JsonSerialize<T>(T obj) where T : class
         {
             string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            Managers.Logger.Log<NetworkTool>(json, colorName: ColorCodes.Logic);
 
             return json;
         }
@@ -53,7 +52,6 @@ namespace Marsion
         {
             try
             {
-                Managers.Logger.Log<NetworkTool>(json, colorName: ColorCodes.Logic);
                 // JSON 문자열을 T 타입 객체로 역직렬화
                 T obj = JsonConvert.DeserializeObject<T>(json);
 

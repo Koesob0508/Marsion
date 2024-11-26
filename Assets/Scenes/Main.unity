@@ -327,6 +327,56 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &330134028
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 330134029}
+  - component: {fileID: 330134030}
+  m_Layer: 0
+  m_Name: '@Upstream'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &330134029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330134028}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2004241319}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &330134030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330134028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ce8ea1408e11a74ebb6695cf23d1d18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsPlaying: 0
+  IsServer: 0
+  Name: Upstream(Client)
+  CurrentSequence: 
+  CurrentClip: []
+  Track: []
 --- !u!1 &476964214
 GameObject:
   m_ObjectHideFlags: 0
@@ -436,7 +486,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: e9dd814e46a27604abf504fa6bdf9664, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -508,7 +558,7 @@ GameObject:
   - component: {fileID: 675091100}
   - component: {fileID: 675091101}
   m_Layer: 0
-  m_Name: '@Sequencer'
+  m_Name: '@Downstream'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -542,7 +592,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsPlaying: 0
-  Name: ClientEx
+  IsServer: 0
+  Name: Downstream(Client)
   CurrentSequence: 
   CurrentClip: []
   Track: []
@@ -915,6 +966,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsPlaying: 0
+  IsServer: 0
   Name: Client
   CurrentSequence: 
   CurrentClip: []
@@ -982,6 +1034,56 @@ MonoBehaviour:
   CurveStart: {x: -3, y: -0.5, z: 0}
   CurveEnd: {x: 3, y: -0.5, z: 0}
   Height: 0.5
+--- !u!1 &757649170
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 757649171}
+  - component: {fileID: 757649172}
+  m_Layer: 0
+  m_Name: '@Upstream'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &757649171
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 757649170}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2058955357}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &757649172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 757649170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ce8ea1408e11a74ebb6695cf23d1d18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsPlaying: 0
+  IsServer: 1
+  Name: Upstream(Server)
+  CurrentSequence: 
+  CurrentClip: []
+  Track: []
 --- !u!1 &847371094
 GameObject:
   m_ObjectHideFlags: 0
@@ -1202,6 +1304,11 @@ MonoBehaviour:
   PortraitSprites:
   - {fileID: 21300000, guid: 6b016939c935e7c4eb6acb09e2c44515, type: 3}
   - {fileID: 21300000, guid: 919f5fefd56b9b645934e1d57e904dc8, type: 3}
+  Data:
+    Players: []
+    CurrentPlayer:
+      Portrait: 
+    TurnCount: 0
   Sequencer: {fileID: 741019385}
   hand: {fileID: 757059111}
   playerField: {fileID: 1583044159}
@@ -2234,8 +2341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 811efd8dc8e240449a35a2aa043334ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Game: {fileID: 925391793}
-  GameEx: {fileID: 2004241320}
+  game: {fileID: 2004241320}
 --- !u!4 &1397283166
 Transform:
   m_ObjectHideFlags: 0
@@ -2406,6 +2512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsPlaying: 0
+  IsServer: 0
   Name: Server
   CurrentSequence: 
   CurrentClip: []
@@ -2790,7 +2897,7 @@ GameObject:
   - component: {fileID: 1707179927}
   - component: {fileID: 1707179928}
   m_Layer: 0
-  m_Name: '@Sequencer'
+  m_Name: '@Downstream'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2824,7 +2931,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsPlaying: 0
-  Name: ServerEx
+  IsServer: 1
+  Name: Downstream(Server)
   CurrentSequence: 
   CurrentClip: []
   Track: []
@@ -3059,6 +3167,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 330134029}
   - {fileID: 675091100}
   m_Father: {fileID: 1397283166}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3074,9 +3183,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9ecafa74a516c6478bded96a1bf6326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sequencer: {fileID: 675091101}
+  Upstream: {fileID: 330134030}
+  Downstream: {fileID: 675091101}
   PlayerHero: {fileID: 6167736467616987399}
   EnemyHero: {fileID: 1675701222}
+  hand: {fileID: 757059111}
+  playerField: {fileID: 1583044159}
+  enemyField: {fileID: 1417632283}
 --- !u!224 &2033280166 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 787081707119677391, guid: 59b91bcaa617ba74ca1554471d981152, type: 3}
@@ -3203,6 +3316,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 757649171}
   - {fileID: 1707179927}
   m_Father: {fileID: 1842888364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3218,7 +3332,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5b666c4a8871324bb9e3beeab96bccc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sequencer: {fileID: 1707179928}
+  Upstream: {fileID: 757649172}
+  Downstream: {fileID: 1707179928}
 --- !u!1 &2089929320
 GameObject:
   m_ObjectHideFlags: 0
@@ -3361,7 +3476,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: e9dd814e46a27604abf504fa6bdf9664, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

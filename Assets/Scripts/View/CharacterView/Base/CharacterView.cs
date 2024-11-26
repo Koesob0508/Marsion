@@ -58,8 +58,8 @@ namespace Marsion.CardView
             Managers.Client.Game.OnDataUpdated -= UpdateCard;
             Managers.Client.Game.OnDataUpdated += UpdateCard;
 
-            Managers.Client.Game.OnStartAttack -= Attack;
-            Managers.Client.Game.OnStartAttack += Attack;
+            Managers.Client.Game.OnAttackStarted -= Attack;
+            Managers.Client.Game.OnAttackStarted += Attack;
 
             if (card == null)
                 Managers.Logger.Log<CreatureView>("Card is null");
@@ -72,7 +72,7 @@ namespace Marsion.CardView
         public virtual void Clear()
         {
             Managers.Client.Game.OnDataUpdated -= UpdateCard;
-            Managers.Client.Game.OnStartAttack -= Attack;
+            Managers.Client.Game.OnAttackStarted -= Attack;
         }
 
         protected abstract void UpdateCard();
@@ -84,33 +84,30 @@ namespace Marsion.CardView
         }
 
         public abstract void Spawn();
-
+        public abstract void Die();
         protected virtual void Attack(Sequencer.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
             if (Card.UID != attacker.UID) return;
 
-            Sequencer.Clip startAttackClip = new("StartAttack", false);
+            Sequencer.Clip startAttackClip = new("StartAttack", sequence, false);
 
             startAttackClip.OnPlay += () =>
             {
-                FSM.AttackState.Target = Managers.Client.Game.GetCharacter(defendPlayer.ClientID, defender.UID).MonoBehaviour.gameObject;
+                FSM.AttackState.Target = Managers.Client.Game.GetCharacter(defendPlayer.PlayerID, defender.UID).MonoBehaviour.gameObject;
                 FSM.AttackState.OnComplete += () =>
                 {
-                    Managers.Logger.Log<CharacterView>("Dead check?", colorName:"cyan");
                     startAttackClip.Complete();
                 };
 
                 FSM.PushState<CreatureViewAttack>();
             };
-
-            sequence.Append(startAttackClip);
         }
 
         protected virtual void BeforeDead(Sequencer.Sequence sequence)
         {
             if (!Card.IsDead) return;
 
-            Sequencer.Clip deadAnimClip = new Sequencer.Clip("DeadAnim", false);
+            Sequencer.Clip deadAnimClip = new Sequencer.Clip("DeadAnim", sequence, false);
             deadAnimClip.OnPlay += () =>
             {
                 FSM.DeadState.OnComplete += () =>
@@ -120,8 +117,6 @@ namespace Marsion.CardView
 
                 FSM.PushState<CreatureViewDead>();
             };
-
-            sequence.Append(deadAnimClip);
         }
 
         public override bool Equals(object obj)

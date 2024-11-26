@@ -16,6 +16,7 @@ namespace Marsion.CardView
         void Init(Card card);
         void Clear();
         void Spawn();
+        void Die();
         void UpdateStatus();
     }
 }
