@@ -3086,8 +3086,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32cd075144d8ddf4096293195f089bed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _GameServerEx: {fileID: 2058955358}
   Game: {fileID: 1267154521}
-  GameEx: {fileID: 2058955358}
 --- !u!4 &1842888364
 Transform:
   m_ObjectHideFlags: 0
@@ -3333,7 +3333,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Upstream: {fileID: 757649172}
-  Downstream: {fileID: 1707179928}
 --- !u!1 &2089929320
 GameObject:
   m_ObjectHideFlags: 0

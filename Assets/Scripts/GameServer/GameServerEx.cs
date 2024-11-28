@@ -9,16 +9,15 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class GameServerEx : MonoBehaviour
+    public class GameServerEx : MonoBehaviour, IGameServer
     {
         [SerializeField] Sequencer Upstream;
-        [SerializeField] Sequencer Downstream;
 
         private GameLogicEx Logic;
         private GameData Data => Logic.Data;
         private NetworkMessaging Messaging => Managers.Network.Messaging;
 
-        private List<ulong> ConnectedClients = new();
+        private List<ClientData> players = new();
         private Dictionary<ushort, Action<ulong, SerializedData>> Commands = new();
 
         public void Init()
@@ -26,7 +25,6 @@ namespace Marsion
             Managers.Logger.Log<GameServerEx>($"Game Server initialized", colorName: ColorCodes.Server);
 
             Upstream.Init();
-            Downstream.Init();
 
             Logic = new GameLogicEx(new GameData(2));
 
@@ -55,21 +53,26 @@ namespace Marsion
             Logic.OnGameStarted -= SendStartGame;
         }
 
-        public void Ready(ulong clientID, List<string> deck)
+        public void AddPlayer(ClientData client)
         {
             Sequencer.Sequence sequence = new("Ready", Upstream);
             Sequencer.Clip clip = new("SetDeck", sequence);
 
             clip.OnPlay += () =>
             {
-                ConnectedClients.Add(clientID);
-                Logic.SetPlayerDeck(clientID, deck);
+                if (!players.Contains(client))
+                {
+                    players.Add(client);
 
-                if (ConnectedClients.Count == 2)
+                    Logic.SetPlayerDeck(client.ClientID, client.Deck);
+                }
+
+                if (players.Count == 2)
                 {
                     Logic.StartGame();
                 }
             };
+            
         }
 
         private void RegisterCommand(ushort type, Action<ulong, SerializedData> callback)
@@ -143,7 +146,7 @@ namespace Marsion
         {
             Managers.Logger.Log<GameServerEx>($"Send updated data", colorName: ColorCodes.Server);
             SerializedGameData sdata = new SerializedGameData();
-            sdata.GameData = new GameData(Data);
+            sdata.GameData = Data;
 
             SendToAll(GameCommand.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
         }
@@ -158,6 +161,10 @@ namespace Marsion
         private void SendEndGame(ulong winnerID)
         {
             Managers.Logger.Log<GameServerEx>($"Send end game", colorName: ColorCodes.Server);
+
+            players.Clear();
+            Managers.Server.EndGame();
+
             SerializedUlong sdata = new SerializedUlong();
             sdata.value = winnerID;
 
@@ -270,9 +277,9 @@ namespace Marsion
         {
             FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
             writer.WriteValueSafe(tag);
-            foreach(ulong clientID in ConnectedClients)
+            foreach(var player in players)
             {
-                Messaging.Send("GameServer", clientID, writer, NetworkDelivery.ReliableSequenced);
+                Messaging.Send("GameServer", player.ClientID, writer, NetworkDelivery.ReliableSequenced);
             }
             writer.Dispose();
         }
@@ -282,9 +289,9 @@ namespace Marsion
             FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
             writer.WriteValueSafe(tag);
             writer.WriteValueSafe(data);
-            foreach(var clientID in ConnectedClients)
+            foreach(var player in players)
             {
-                Messaging.Send("GameServer", clientID, writer, delivery);
+                Messaging.Send("GameServer", player.ClientID, writer, delivery);
             }
             writer.Dispose();
         }
@@ -294,9 +301,9 @@ namespace Marsion
             FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
             writer.WriteValueSafe(tag);
             writer.WriteNetworkSerializable(data);
-            foreach(var clientID in ConnectedClients)
+            foreach(var player in players)
             {
-                Messaging.Send("GameServer", clientID, writer, delivery);
+                Messaging.Send("GameServer", player.ClientID, writer, delivery);
             }
             writer.Dispose();
         }

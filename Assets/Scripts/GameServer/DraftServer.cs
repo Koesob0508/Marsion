@@ -97,7 +97,7 @@ namespace Marsion
 
             DraftDictionary.TryGetValue(clientID, out var state);
 
-            Managers.Server.GameEx.Ready(clientID, state.CurrentDeck);
+            Managers.Server.ReadyClient(clientID, state.CurrentDeck);
         }
 
         #endregion
@@ -121,6 +121,7 @@ namespace Marsion
 
         private void SendStartDraft(ulong clientID)
         {
+            Managers.Server.GetClient(clientID).State = ClientState.Draft;
             Send(clientID, DraftCommand.ServerStartDraft);
         }
 
@@ -189,11 +190,6 @@ namespace Marsion
                 var state = new DraftState(InitialTypeSequence);
                 state.SetSelection();
                 DraftDictionary.Add(clientID, state);
-
-                SerializedUlong sdata = new();
-                sdata.value = clientID;
-
-                //OnStartDraft(clientID);
             }
             else
             {

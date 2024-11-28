@@ -3,7 +3,7 @@
 namespace Marsion
 {
     [CreateAssetMenu(fileName = "NewStartTurnAbility", menuName = "Marsion/CardAbilities/Example")]
-    public class StartTurnAbilityExample : CardAbility
+    public class StartTurnAbilityExample : BaseCardAbility
     {
         public override void Register()
         {

@@ -288,7 +288,7 @@ namespace Marsion.Server
                 player.Hand.Remove(card);
                 player.Field.Insert(index, card);
 
-                card.OnPlay?.Invoke();
+                card.Play();
 
                 SerializedGameData networkData = new SerializedGameData();
                 networkData.GameData = GameData;

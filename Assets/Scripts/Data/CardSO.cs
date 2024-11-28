@@ -17,6 +17,6 @@ namespace Marsion
         public string AbilityExplain;
         public int Attack;
         public int Health;
-        public List<CardAbility> Abilities;
+        public List<BaseCardAbility> Abilities;
     }
 }
