@@ -26,7 +26,7 @@ namespace Marsion
 
         public void SetPlayerDeck(ulong clientID, List<string> deck)
         {
-            Managers.Logger.Log<GameLogicEx>($"Set player deck", colorName: ColorCodes.Logic);
+            Logger.Log<GameLogicEx>($"Set player deck", colorName: ColorCodes.Logic);
             Player player = Data.GetPlayer(clientID);
             List<Card> resultDeck = new List<Card>();
 
@@ -38,18 +38,26 @@ namespace Marsion
                 }
                 else
                 {
-                    Managers.Logger.Log<GameLogicEx>($"{soID} CardSO not found", colorName: ColorCodes.Logic);
+                    Logger.Log<GameLogicEx>($"{soID} CardSO not found", colorName: ColorCodes.Logic);
                 }
             }
 
             player.Deck = resultDeck;
+
+            foreach (var playerData in Data.Players)
+            {
+                foreach (var card in playerData.Deck)
+                {
+                    Logger.Log<GameLogicEx>(card.UID, colorName:ColorCodes.Logic);
+                }
+            }
 
             OnDataUpdated?.Invoke();
         }
 
         public void StartGame()
         {
-            Managers.Logger.Log<GameLogicEx>($"Start Game", colorName: ColorCodes.Logic);
+            Logger.Log<GameLogicEx>($"Start Game", colorName: ColorCodes.Logic);
 
             // 초상화 설정
             Random random = new Random();
@@ -93,7 +101,7 @@ namespace Marsion
 
         private void StartTurn()
         {
-            Managers.Logger.Log<GameLogicEx>($"Start Turn", colorName: ColorCodes.Logic);
+            Logger.Log<GameLogicEx>($"Start Turn", colorName: ColorCodes.Logic);
 
             Data.TurnCount++;
 
@@ -112,7 +120,7 @@ namespace Marsion
 
         public void EndTurn()
         {
-            Managers.Logger.Log<GameLogicEx>($"End turn", colorName: ColorCodes.Logic);
+            Logger.Log<GameLogicEx>($"End turn", colorName: ColorCodes.Logic);
 
             Data.CurrentPlayer = Data.CurrentPlayer == Data.GetPlayer(0) ? Data.GetPlayer(1) : Data.GetPlayer(0);
 
@@ -140,7 +148,7 @@ namespace Marsion
 
         public void DrawCard(Player player, out Card drawnCard)
         {
-            Managers.Logger.Log<GameLogic>("Draw a card", colorName: ColorCodes.Logic);
+            Logger.Log<GameLogic>("Draw a card", colorName: ColorCodes.Logic);
 
             Card card = null;
 
@@ -152,7 +160,7 @@ namespace Marsion
             }
             else
             {
-                Managers.Logger.LogWarning<GameLogic>("Can't draw", colorName: ColorCodes.Logic);
+                Logger.LogWarning<GameLogic>("Can't draw", colorName: ColorCodes.Logic);
             }
 
             drawnCard = card;
@@ -160,7 +168,7 @@ namespace Marsion
 
         public void DrawCard(Player player, out List<Card> drawnCards, int count = 1)
         {
-            Managers.Logger.Log<GameLogic>("Draw cards", colorName: ColorCodes.Logic);
+            Logger.Log<GameLogic>("Draw cards", colorName: ColorCodes.Logic);
 
             List<Card> outCards = new();
 
@@ -178,7 +186,7 @@ namespace Marsion
                 }
                 else
                 {
-                    Managers.Logger.LogWarning<GameLogic>("Can't draw", colorName: ColorCodes.Logic);
+                    Logger.LogWarning<GameLogic>("Can't draw", colorName: ColorCodes.Logic);
                 }
             }
 
@@ -187,11 +195,11 @@ namespace Marsion
 
         public void TrySpawnCard(Player player, Card card, int index)
         {
-            Managers.Logger.Log<GameLogic>("Try spawn card", colorName: ColorCodes.Logic);
+            Logger.Log<GameLogic>("Try spawn card", colorName: ColorCodes.Logic);
 
             if (!(player.Mana >= card.Mana))
             {
-                Managers.Logger.Log<GameLogicEx>("Spawn try failed", colorName: ColorCodes.Logic);
+                Logger.Log<GameLogicEx>("Spawn try failed", colorName: ColorCodes.Logic);
                 OnCardPlayed?.Invoke(false, player.PlayerID, card.UID);
                 OnCardSpawned?.Invoke(false, player.PlayerID, card.UID, index);
 
@@ -210,7 +218,7 @@ namespace Marsion
 
         public void TryAttack(Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
-            Managers.Logger.Log<GameLogic>("Try attack", colorName: ColorCodes.Logic);
+            Logger.Log<GameLogic>("Try attack", colorName: ColorCodes.Logic);
 
             attacker.Damage(defender.Attack);
             defender.Damage(attacker.Attack);

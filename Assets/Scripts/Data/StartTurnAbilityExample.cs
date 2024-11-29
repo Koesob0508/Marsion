@@ -12,7 +12,7 @@ namespace Marsion
 
         public override void Activate()
         {
-            Managers.Logger.Log<StartTurnAbilityExample>("Start Turn Marsion", colorName: "yellow");
+            Logger.Log<StartTurnAbilityExample>("Start Turn Marsion", colorName: "yellow");
         }
 
         public override void Clear()

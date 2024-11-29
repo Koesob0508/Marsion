@@ -58,7 +58,7 @@ namespace Marsion
 
         public void Init()
         {
-            Managers.Logger.Log<MarsNetwork>("Network initialized", colorName: ColorCodes.Server);
+            Logger.Log<MarsNetwork>("Network initialized", colorName: ColorCodes.Server);
 
             network = GetComponent<NetworkManager>();
             transport = GetComponent<MarsTransport>();
@@ -71,21 +71,21 @@ namespace Marsion
 
         public void StartHost()
         {
-            Managers.Logger.Log<MarsNetwork>($"Start host", colorName: "#00FFFF");
+            Logger.Log<MarsNetwork>($"Start host", colorName: "#00FFFF");
             network.StartHost();
             AfterConnect();
         }
 
         public void StartServer()
         {
-            Managers.Logger.Log<MarsNetwork>($"Start server", colorName: "#00FFFF");
+            Logger.Log<MarsNetwork>($"Start server", colorName: "#00FFFF");
             network.StartServer();
             AfterConnect();
         }
 
         public void StartClient()
         {
-            Managers.Logger.Log<MarsNetwork>($"Start client", colorName: "#00FFFF");
+            Logger.Log<MarsNetwork>($"Start client", colorName: "#00FFFF");
             network.StartClient();
         }
 
@@ -93,7 +93,7 @@ namespace Marsion
         {
             if (!IsClient && !IsServer) return;
 
-            Managers.Logger.Log<MarsNetwork>($"Disconnect", colorName: "#00FFFF");
+            Logger.Log<MarsNetwork>($"Disconnect", colorName: "#00FFFF");
             network.Shutdown();
             AfterDisconnect();
         }
@@ -108,7 +108,7 @@ namespace Marsion
         {
             if (IsServer && clientID != ServerID)
             {
-                Managers.Logger.Log<MarsNetwork>($"Client : {clientID} connected", colorName: "#00FFFF");
+                Logger.Log<MarsNetwork>($"Client : {clientID} connected", colorName: "#00FFFF");
                 OnClientJoin?.Invoke(clientID);
             }
 
@@ -120,7 +120,7 @@ namespace Marsion
         {
             if (IsServer && clientID != ServerID)
             {
-                Managers.Logger.Log<MarsNetwork>($"Client : {clientID} disconnected", colorName: "#00FFFF");
+                Logger.Log<MarsNetwork>($"Client : {clientID} disconnected", colorName: "#00FFFF");
                 OnClientQuit?.Invoke(clientID);
             }
 

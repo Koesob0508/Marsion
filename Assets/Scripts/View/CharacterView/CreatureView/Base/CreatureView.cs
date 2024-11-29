@@ -35,7 +35,7 @@ namespace Marsion.CardView
             Managers.Client.Game.OnAttackStarted += Attack;
 
             if (card == null)
-                Managers.Logger.Log<CreatureView>("Card is null");
+                Logger.Log<CreatureView>("Card is null");
 
             Card = card;
             Text_Attack.text = card.Attack.ToString();
@@ -53,7 +53,7 @@ namespace Marsion.CardView
             FSM.DeadState.OnComplete += () =>
             {
                 Field.Remove(this);
-                Managers.Logger.Log<CreatureView>("Remove this", colorName: ColorCodes.Yellow);
+                Logger.Log<CreatureView>("Remove this", colorName: ColorCodes.Yellow);
             };
 
             FSM.PushState<CreatureViewDead>();

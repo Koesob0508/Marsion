@@ -14,13 +14,18 @@ namespace Marsion
             return Resources.LoadAll<T>(path);
         }
 
+        public ResourceRequest LoadAllAsync<T>(string path) where T : Object
+        {
+            return Resources.LoadAsync<T>(path);
+        }
+
         public GameObject Instantiate(string path, Transform parent = null)
         {
             GameObject original = Load<GameObject>($"{path}");
 
             if(original == null)
             {
-                Managers.Logger.Log<ResourceUtility>($"Failed to load prefab : {path}");
+                Logger.Log<ResourceUtility>($"Failed to load prefab : {path}");
                 return null;
             }
 
@@ -40,7 +45,7 @@ namespace Marsion
 
             if (original == null)
             {
-                Managers.Logger.Log<ResourceUtility>($"Failed to load prefab : {path}");
+                Logger.Log<ResourceUtility>($"Failed to load prefab : {path}");
                 return default;
             }
 

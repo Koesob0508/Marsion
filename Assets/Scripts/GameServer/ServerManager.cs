@@ -17,7 +17,7 @@ namespace Marsion
 
         public void Init()
         {
-            Managers.Logger.Log<ServerManager>("Server Manager initialized", colorName: ColorCodes.Server);
+            Logger.Log<ServerManager>("Server Manager initialized", colorName: ColorCodes.Server);
 
             Managers.Network.OnConnect += OnConnect;
             Managers.Network.OnClientJoin += OnClientConnected;
@@ -28,7 +28,7 @@ namespace Marsion
         {
             if (!Managers.Network.IsHost)
             {
-                Managers.Logger.Log<ServerManager>("This is not host client", colorName: ColorCodes.Server);
+                Logger.Log<ServerManager>("This is not host client", colorName: ColorCodes.Server);
 
                 Clear();
                 gameObject.SetActive(false);
@@ -45,7 +45,7 @@ namespace Marsion
 
         private void Clear()
         {
-            Managers.Logger.Log<ServerManager>("Server Manager cleared", colorName: ColorCodes.Server);
+            Logger.Log<ServerManager>("Server Manager cleared", colorName: ColorCodes.Server);
 
             Game.Clear();
             Managers.Network.OnClientJoin -= OnClientConnected;
@@ -63,7 +63,7 @@ namespace Marsion
 
         private void RegisterClient(ulong clientID)
         {
-            Managers.Logger.Log<ServerManager>($"Client(ID : {clientID}) regist", colorName: ColorCodes.Server);
+            Logger.Log<ServerManager>($"Client(ID : {clientID}) regist", colorName: ColorCodes.Server);
             ClientData iclient = new ClientData(clientID);
             clientList[clientID] = iclient;
 

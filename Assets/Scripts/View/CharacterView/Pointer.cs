@@ -77,7 +77,7 @@ namespace Marsion.CardView
             }
             else
             {
-                Managers.Logger.Log<CardViewSelect>("Point not found.");
+                Logger.Log<CardViewSelect>("Point not found.");
                 return default;
             }
         }

@@ -16,7 +16,6 @@ namespace Marsion
         }
 
         UIUtility _ui = new UIUtility();
-        LogUtility _log = new LogUtility();
         ResourceUtility _resource = new ResourceUtility();
         CardManager _card = new CardManager();
 
@@ -26,7 +25,6 @@ namespace Marsion
         [SerializeField] ClientManager _client;
 
         public static UIUtility UI { get { return Instance._ui; } }
-        public static LogUtility Logger { get { return Instance._log; } }
         public static ResourceUtility Resource { get { return Instance._resource; } }
         public static CardManager Card { get { return Instance._card; } }
 
@@ -41,7 +39,7 @@ namespace Marsion
             Init();
         }
 
-        private static void Init()
+        public static void Init()
         {
             if (s_instance == null)
             {
@@ -57,7 +55,7 @@ namespace Marsion
                 s_instance = obj.GetComponent<Managers>();
 
 
-                s_instance._log.Log<Managers>("Managers initialized", colorName: ColorCodes.Managers);
+                Logger.Log<Managers>("Managers initialized", colorName: ColorCodes.Managers);
                 
                 s_instance._data.Init();
                 s_instance._network.Init();

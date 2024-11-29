@@ -23,7 +23,7 @@ namespace Marsion
             }
             catch (Exception e)
             {
-                Managers.Logger.LogError<JsonSerializer>("Serialization error: " + e.Message);
+                Logger.LogError<JsonSerializer>("Serialization error: " + e.Message);
                 return new byte[0];
             }
         }
@@ -38,7 +38,7 @@ namespace Marsion
             }
             catch (Exception e)
             {
-                Managers.Logger.LogError<JsonSerializer>("Deserialization error: " + e.Message);
+                Logger.LogError<JsonSerializer>("Deserialization error: " + e.Message);
                 return null;
             }
         }
@@ -51,7 +51,7 @@ namespace Marsion
                 Formatting = Formatting.Indented
             };
 
-            string json = JsonConvert.SerializeObject(obj, settings);
+            string json = JsonConvert.SerializeObject(obj);
 
             return json;
         }
@@ -67,7 +67,7 @@ namespace Marsion
                 };
 
                 // JSON 문자열을 T 타입 객체로 역직렬화
-                T obj = JsonConvert.DeserializeObject<T>(json, settings);
+                T obj = JsonConvert.DeserializeObject<T>(json);
 
                 return obj;
             }

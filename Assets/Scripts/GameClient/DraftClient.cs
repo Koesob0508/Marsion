@@ -20,7 +20,7 @@ namespace Marsion
 
         public void Init()
         {
-            Managers.Logger.Log<DraftClient>($"Draft Client initialized", colorName: ColorCodes.Client);
+            Logger.Log<DraftClient>($"Draft Client initialized", colorName: ColorCodes.Client);
 
             Commands = new();
 
@@ -53,7 +53,7 @@ namespace Marsion
         #region OnReceive
         private void OnReceiveInitState(SerializedData sdata)
         {
-            Managers.Logger.Log<DraftClient>($"Received init state", colorName: ColorCodes.Client);
+            Logger.Log<DraftClient>($"Received init state", colorName: ColorCodes.Client);
 
             SerializedDraftState sState = sdata.Get<SerializedDraftState>();
 
@@ -62,14 +62,14 @@ namespace Marsion
 
         private void OnReceiveStartDraft(SerializedData sdata)
         {
-            Managers.Logger.Log<DraftClient>($"Received start draft", colorName: ColorCodes.Client);
+            Logger.Log<DraftClient>($"Received start draft", colorName: ColorCodes.Client);
 
             Managers.UI.ShowPopupUI<UI_DraftPanel>();
         }
 
         private void OnReceiveUpdateState(SerializedData sdata)
         {
-            Managers.Logger.Log<DraftClient>($"Received updated state", colorName: ColorCodes.Client);
+            Logger.Log<DraftClient>($"Received updated state", colorName: ColorCodes.Client);
 
             SerializedDraftState sState = sdata.Get<SerializedDraftState>();
 

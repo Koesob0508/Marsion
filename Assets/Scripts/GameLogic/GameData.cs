@@ -26,7 +26,7 @@ namespace Marsion.Logic
         {
             if (Players[clientID] == null)
             {
-                Managers.Logger.LogWarning<GameData>("Get player result is null.");
+                Logger.LogWarning<GameData>("Get player result is null.");
                 
                 return null;
             }

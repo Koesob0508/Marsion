@@ -65,7 +65,7 @@ namespace Marsion.CardView
                 else
                 {
                     // 나중에 대사로 출력하세요.
-                    Managers.Logger.Log<CardViewHover>("그렇게는 할 수 없어요.", colorName: "red");
+                    Logger.Log<CardViewHover>("그렇게는 할 수 없어요.", colorName: "red");
                     FSM.PopState();
                 }
                 
@@ -84,7 +84,7 @@ namespace Marsion.CardView
                 }
                 else
                 {
-                    Managers.Logger.Log<CardViewHover>("그렇게는 할 수 없어요.", colorName: "red");
+                    Logger.Log<CardViewHover>("그렇게는 할 수 없어요.", colorName: "red");
                     FSM.PopState();
                 }
             }
