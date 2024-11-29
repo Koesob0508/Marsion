@@ -19,65 +19,21 @@ namespace Marsion
             logger = customLogger;
         }
 
-        #region Log
+        #region Log Methods
 
         public static void Log<T>(string log, string colorName = "black", Type param = null)
         {
-            var context = GetTypeName(typeof(T));
-
-            // OpenColor에 colorName을 적용하여 색상 값 삽입
-            string openColorFormatted = string.Format(OpenColor, colorName);
-
-            // 로그 메시지를 포맷에 맞춰 작성
-            log = string.Format("[{0}] {1}{2}{3}", context, openColorFormatted, log, CloseColor);
-
-            // param이 null이 아닌 경우 타입 이름 추가
-            if (param != null)
-            {
-                log += GetTypeName(param);
-            }
-
-            // 로그 출력
-            logger.Log(log);
+            LogInternal<T>(log, colorName, param, logger.Log);
         }
 
-        public static void LogWarning<T>(object log, string colorName = "black", Type param = null)
+        public static void LogWarning<T>(string log, string colorName = "black", Type param = null)
         {
-            var context = GetTypeName(typeof(T));
-
-            // OpenColor에 colorName을 적용하여 색상 값 삽입
-            string openColorFormatted = string.Format(OpenColor, colorName);
-
-            // 로그 메시지를 포맷에 맞춰 작성
-            log = string.Format("[{0}] {1}{2}{3}", context, openColorFormatted, log, CloseColor);
-
-            // param이 null이 아닌 경우 타입 이름 추가
-            if (param != null)
-            {
-                log += GetTypeName(param);
-            }
-
-            Debug.LogWarning(log);
-
+            LogInternal<T>(log, colorName, param, logger.LogWarning);
         }
 
-        public static void LogError<T>(object log, string colorName = "black", Type param = null)
+        public static void LogError<T>(string log, string colorName = "black", Type param = null)
         {
-            var context = GetTypeName(typeof(T));
-
-            // OpenColor에 colorName을 적용하여 색상 값 삽입
-            string openColorFormatted = string.Format(OpenColor, colorName);
-
-            // 로그 메시지를 포맷에 맞춰 작성
-            log = string.Format("[{0}] {1}{2}{3}", context, openColorFormatted, log, CloseColor);
-
-            // param이 null이 아닌 경우 타입 이름 추가
-            if (param != null)
-            {
-                log += GetTypeName(param);
-            }
-
-            Debug.LogError(log);
+            LogInternal<T>(log, colorName, param, logger.LogError);
         }
 
         public static void LogPointer<T>(object log, string colorName = "yellow", Type param = null)
@@ -96,16 +52,29 @@ namespace Marsion
 
         public static void LogSequence(string name, string log, bool isServer)
         {
-            string color = "";
+            string color = isServer ? ColorCodes.ServerSequencer : ColorCodes.ClientSequencer;
+            logger.Log($"<color={color}><b>[{name}]</b></color> {log}");
+        }
 
-            if(isServer)
-                color = ColorCodes.ServerSequencer;
-            else
-                color = ColorCodes.ClientSequencer;
+        private static void LogInternal<T>(string log, string colorName, Type param, Action<string> logAction)
+        {
+            var context = GetTypeName(typeof(T));
+            string formattedLog = FormatLogMessage(context, log, colorName, param);
+            logAction(formattedLog);
+        }
 
-            log = string.Format($"<color={color}><b>[{name}]</b></color> {log}");
+        private static string FormatLogMessage(string context, string log, string colorName, Type param)
+        {
+            string openColorFormatted = string.Format(OpenColor, colorName);
+            string formattedLog = $"[{context}] {openColorFormatted}{log}{CloseColor}";
 
-            Debug.Log(log);
+            if(param != null)
+            {
+                formattedLog += GetTypeName(param);
+            }
+
+            return formattedLog;
+
         }
 
         #endregion
@@ -118,8 +87,7 @@ namespace Marsion
                 return string.Empty;
 
             var split = type.ToString().Split(Period);
-            var last = split.Length - 1;
-            return last > 0 ? split[last] : string.Empty;
+            return split.Length > 0 ? split[^1] : string.Empty;
         }
 
         #endregion
