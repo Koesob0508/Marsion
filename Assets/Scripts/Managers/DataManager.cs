@@ -43,7 +43,7 @@ namespace Marsion
             var dictionary = (Dictionary<string, T>)dataDictionaries[typeof(T)];
 
             // 리소스 로드 및 리스트에 추가
-            T[] loadedItems = Managers.Resource.LoadAll<T>(path);
+            T[] loadedItems = Managers.Instance.Resource.LoadAll<T>(path);
             list.AddRange(loadedItems);
 
             // ID를 키로 딕셔너리에 추가

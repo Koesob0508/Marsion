@@ -26,10 +26,10 @@ namespace Marsion
         private Dictionary<ushort, Action<SerializedData>> Commands;
 
         public GameData Data { get; private set; }
-        public ulong ServerID => Managers.Network.ServerID;
-        public ulong PlayerID => Managers.Network.ClientID;
+        public ulong ServerID => Managers.Instance.Network.ServerID;
+        public ulong PlayerID => Managers.Instance.Network.ClientID;
         public ulong EnemyID { get; private set; }
-        private NetworkMessaging Messaging => Managers.Network.Messaging;
+        private NetworkMessaging Messaging => Managers.Instance.Network.Messaging;
 
         public IHandView Hand => hand;
 
@@ -210,7 +210,7 @@ namespace Marsion
             clip.OnPlay += () =>
             {
                 Logger.Log<GameClient>("Game end", colorName: ColorCodes.Client);
-                UI_EndGame ui = Managers.UI.ShowPopupUI<UI_EndGame>();
+                UI_EndGame ui = Managers.Instance.UI.ShowUI<UI_EndGame>();
 
                 if(winnerData.value > 10)
                 {

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Marsion.UI
+namespace Marsion
 {
     public enum UI_Event
     {
@@ -16,10 +16,12 @@ namespace Marsion.UI
     {
         protected Dictionary<Type, UnityEngine.Object[]> _objects = new Dictionary<Type, UnityEngine.Object[]>();
         public abstract void Init();
+
         private void Start()
         {
             Init();
         }
+
         protected void Bind<T>(Type type) where T : UnityEngine.Object
         {
             string[] names = Enum.GetNames(type);
@@ -65,6 +67,14 @@ namespace Marsion.UI
                     break;
                 default:
                     break;
+            }
+        }
+
+        public void Close()
+        {
+            if(this is UI_Popup popup)
+            {
+                Managers.Instance.UI.ClosePopupUI(popup);
             }
         }
     }

@@ -101,14 +101,14 @@ namespace Marsion
             switch (Type)
             {
                 case SelectType.Legendary:
-                    CurrentSelections = Managers.Card.FindByGrade(4, 3);
+                    CurrentSelections = Managers.Instance.Card.FindByGrade(4, 3);
                     break;
                 case SelectType.Table:
-                    CurrentSelections = Managers.Card.FindExcludeGrade(4, 3);
+                    CurrentSelections = Managers.Instance.Card.FindExcludeGrade(4, 3);
                     break;
                 case SelectType.Exchange:
-                    CurrentSubSelections = Managers.Card.FindExcludeGrade(4, 3, pile: CurrentDeck);
-                    CurrentSelections = Managers.Card.FindExcludeGrade(4, 3);
+                    CurrentSubSelections = Managers.Instance.Card.FindExcludeGrade(4, 3, pile: CurrentDeck);
+                    CurrentSelections = Managers.Instance.Card.FindExcludeGrade(4, 3);
                     break;
             }
         }

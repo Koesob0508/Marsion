@@ -55,11 +55,11 @@ namespace Marsion.CardView
 
             FSM = new CharacterViewFSM(this);
 
-            Managers.Client.Game.OnDataUpdated -= UpdateCard;
-            Managers.Client.Game.OnDataUpdated += UpdateCard;
+            Managers.Instance.Client.Game.OnDataUpdated -= UpdateCard;
+            Managers.Instance.Client.Game.OnDataUpdated += UpdateCard;
 
-            Managers.Client.Game.OnAttackStarted -= Attack;
-            Managers.Client.Game.OnAttackStarted += Attack;
+            Managers.Instance.Client.Game.OnAttackStarted -= Attack;
+            Managers.Instance.Client.Game.OnAttackStarted += Attack;
 
             if (card == null)
                 Logger.Log<CreatureView>("Card is null");
@@ -71,8 +71,8 @@ namespace Marsion.CardView
 
         public virtual void Clear()
         {
-            Managers.Client.Game.OnDataUpdated -= UpdateCard;
-            Managers.Client.Game.OnAttackStarted -= Attack;
+            Managers.Instance.Client.Game.OnDataUpdated -= UpdateCard;
+            Managers.Instance.Client.Game.OnAttackStarted -= Attack;
         }
 
         protected abstract void UpdateCard();
@@ -93,7 +93,7 @@ namespace Marsion.CardView
 
             startAttackClip.OnPlay += () =>
             {
-                FSM.AttackState.Target = Managers.Client.Game.GetCharacter(defendPlayer.PlayerID, defender.UID).MonoBehaviour.gameObject;
+                FSM.AttackState.Target = Managers.Instance.Client.Game.GetCharacter(defendPlayer.PlayerID, defender.UID).MonoBehaviour.gameObject;
                 FSM.AttackState.OnComplete += () =>
                 {
                     startAttackClip.Complete();

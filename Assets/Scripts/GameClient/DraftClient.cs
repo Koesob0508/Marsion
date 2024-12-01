@@ -12,9 +12,9 @@ namespace Marsion
         public DraftState State { get; private set; }
 
         // shortcuts
-        private bool IsHost { get { return Managers.Network.IsHost; } }
-        private ulong ServerID { get { return Managers.Network.ServerID; } }
-        private NetworkMessaging Messaging { get { return Managers.Network.Messaging; } }
+        private bool IsHost { get { return Managers.Instance.Network.IsHost; } }
+        private ulong ServerID { get { return Managers.Instance.Network.ServerID; } }
+        private NetworkMessaging Messaging { get { return Managers.Instance.Network.Messaging; } }
 
         public Action OnStateUpdate;
 
@@ -28,7 +28,7 @@ namespace Marsion
             RegisterCommand(DraftCommand.ServerStartDraft, OnReceiveStartDraft);
             RegisterCommand(DraftCommand.ServerUpdateState, OnReceiveUpdateState);
 
-            Managers.Network.Messaging.SubscribeMessage("DraftServer", OnReceiveCommand);
+            Managers.Instance.Network.Messaging.SubscribeMessage("DraftServer", OnReceiveCommand);
         }
 
         private void RegisterCommand(ushort tag, Action<SerializedData> callback)
@@ -64,7 +64,7 @@ namespace Marsion
         {
             Logger.Log<DraftClient>($"Received start draft", colorName: ColorCodes.Client);
 
-            Managers.UI.ShowPopupUI<UI_DraftPanel>();
+            Managers.Instance.UI.ShowUI<UI_DraftPanel>();
         }
 
         private void OnReceiveUpdateState(SerializedData sdata)

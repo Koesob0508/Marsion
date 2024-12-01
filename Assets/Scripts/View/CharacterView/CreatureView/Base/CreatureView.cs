@@ -28,11 +28,11 @@ namespace Marsion.CardView
 
             if (IsEmpty) return;
 
-            Managers.Client.Game.OnDataUpdated -= UpdateCard;
-            Managers.Client.Game.OnDataUpdated += UpdateCard;
+            Managers.Instance.Client.Game.OnDataUpdated -= UpdateCard;
+            Managers.Instance.Client.Game.OnDataUpdated += UpdateCard;
 
-            Managers.Client.Game.OnAttackStarted -= Attack;
-            Managers.Client.Game.OnAttackStarted += Attack;
+            Managers.Instance.Client.Game.OnAttackStarted -= Attack;
+            Managers.Instance.Client.Game.OnAttackStarted += Attack;
 
             if (card == null)
                 Logger.Log<CreatureView>("Card is null");
@@ -40,7 +40,7 @@ namespace Marsion.CardView
             Card = card;
             Text_Attack.text = card.Attack.ToString();
             Text_Health.text = card.Health.ToString();
-            CardSprite.sprite = Managers.Resource.Load<Sprite>(card.BoardArtPath);
+            CardSprite.sprite = Managers.Instance.Resource.Load<Sprite>(card.BoardArtPath);
         }
 
         public override void Spawn()
@@ -62,7 +62,7 @@ namespace Marsion.CardView
         protected override void UpdateCard()
         {
             if (Card.IsDead) return;
-            Card = Managers.Client.Game.GetCard(Type, Card.PlayerID, Card.UID);
+            Card = Managers.Instance.Client.Game.GetCard(Type, Card.PlayerID, Card.UID);
         }
     }
 }

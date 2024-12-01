@@ -17,14 +17,14 @@ namespace Marsion.UI
 
         public void Setup(string soID)
         {
-            if (Managers.Data.CardDictionary.TryGetValue(soID, out var cardSO))
+            if (Managers.Instance.Data.CardDictionary.TryGetValue(soID, out var cardSO))
             {
                 Text_Name.text = cardSO.Name;
                 Text_Mana.text = cardSO.Mana.ToString();
                 Text_AbilityExplain.text = cardSO.AbilityExplain;
                 Text_Attack.text = cardSO.Attack.ToString();
                 Text_Health.text = cardSO.Health.ToString();
-                Image_Sprite.sprite = Managers.Resource.Load<Sprite>(cardSO.FullArtPath);
+                Image_Sprite.sprite = Managers.Instance.Resource.Load<Sprite>(cardSO.FullArtPath);
             }
             else
             {

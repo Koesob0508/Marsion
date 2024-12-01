@@ -32,7 +32,7 @@ namespace Marsion
 
             foreach(var soID in deck)
             {
-                if(Managers.Data.CardDictionary.TryGetValue(soID, out var cardSO))
+                if(Managers.Instance.Data.CardDictionary.TryGetValue(soID, out var cardSO))
                 {
                     resultDeck.Add(new Card(clientID, cardSO));
                 }

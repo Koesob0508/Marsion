@@ -54,18 +54,18 @@ namespace Marsion.Client
 
             Sequencer.Init();
 
-            Managers.Server.Game.OnDataUpdated += UpdateDataRpc;
-            Managers.Server.Game.OnGameStarted += StartGameRpc;
-            Managers.Server.Game.OnGameEnded += EndGameRpc;
-            Managers.Server.Game.OnResetGame += ResetGameRpc;
-            Managers.Server.Game.OnTurnStarted += StartTurnRpc;
-            Managers.Server.Game.OnTurnEnded += EndTurnRpc;
-            Managers.Server.Game.OnCardDrawn += DrawCardRpc;
-            Managers.Server.Game.OnManaChanged += ChangeManaRpc;
-            Managers.Server.Game.OnCardPlayed += PlayCardRpc;
-            Managers.Server.Game.OnCardSpawned += SpawnCardRpc;
-            Managers.Server.Game.OnStartAttack += StartAttackRpc;
-            Managers.Server.Game.OnDeadCard += DeadCardRpc;
+            Managers.Instance.Server.Game.OnDataUpdated += UpdateDataRpc;
+            Managers.Instance.Server.Game.OnGameStarted += StartGameRpc;
+            Managers.Instance.Server.Game.OnGameEnded += EndGameRpc;
+            Managers.Instance.Server.Game.OnResetGame += ResetGameRpc;
+            Managers.Instance.Server.Game.OnTurnStarted += StartTurnRpc;
+            Managers.Instance.Server.Game.OnTurnEnded += EndTurnRpc;
+            Managers.Instance.Server.Game.OnCardDrawn += DrawCardRpc;
+            Managers.Instance.Server.Game.OnManaChanged += ChangeManaRpc;
+            Managers.Instance.Server.Game.OnCardPlayed += PlayCardRpc;
+            Managers.Instance.Server.Game.OnCardSpawned += SpawnCardRpc;
+            Managers.Instance.Server.Game.OnStartAttack += StartAttackRpc;
+            Managers.Instance.Server.Game.OnDeadCard += DeadCardRpc;
         }
 
         public void Clear()
@@ -83,22 +83,22 @@ namespace Marsion.Client
                 sdata.Add(container);
             }
 
-            Managers.Server.Game.ReadyRpc(ID, sdata.ToArray());
+            Managers.Instance.Server.Game.ReadyRpc(ID, sdata.ToArray());
         }
 
         public void TryPlayAndSpawnCard(Card card, int index)
         {
-            Managers.Server.Game.TryPlayAndSpawnCardRpc(ID, card.UID, index);
+            Managers.Instance.Server.Game.TryPlayAndSpawnCardRpc(ID, card.UID, index);
         }
 
         public void TurnEnd()
         {
-            Managers.Server.Game.TurnEndRpc();
+            Managers.Instance.Server.Game.TurnEndRpc();
         }
 
         public void TryAttack(Card attacker, Card defender)
         {
-            Managers.Server.Game.TryAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
+            Managers.Instance.Server.Game.TryAttackRpc(attacker.PlayerID, attacker.UID, defender.PlayerID, defender.UID);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
@@ -155,7 +155,7 @@ namespace Marsion.Client
             gameEndClip.OnPlay += () =>
             {
                 Logger.Log<GameClient>("Game end.");
-                UI_EndGame ui = Managers.UI.ShowPopupUI<UI_EndGame>();
+                UI_EndGame ui = Managers.Instance.UI.ShowUI<UI_EndGame>();
 
                 if (clientID == -1)
                 {
@@ -285,7 +285,7 @@ namespace Marsion.Client
                         creature.FSM.DeadState.OnComplete += () =>
                         {
                             playerField.Creatures.Remove(creature);
-                            Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+                            Managers.Instance.Resource.Destroy(creature.MonoBehaviour.gameObject);
                         };
 
                         creature.FSM.PushState<CreatureViewDead>();
@@ -299,7 +299,7 @@ namespace Marsion.Client
                         creature.FSM.DeadState.OnComplete += () =>
                         {
                             enemyField.Creatures.Remove(creature);
-                            Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+                            Managers.Instance.Resource.Destroy(creature.MonoBehaviour.gameObject);
                         };
 
                         creature.FSM.PushState<CreatureViewDead>();

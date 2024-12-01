@@ -11,13 +11,13 @@ namespace Marsion.CardView
 
         public void Start()
         {
-            Managers.Client.Game.OnCardDrawn -= DrawCard;
-            Managers.Client.Game.OnCardDrawn += DrawCard;
+            Managers.Instance.Client.Game.OnCardDrawn -= DrawCard;
+            Managers.Instance.Client.Game.OnCardDrawn += DrawCard;
         }
 
         public void DrawCard(Player player, Card card)
         {
-            if (Managers.Client.Game.IsMine(player))
+            if (Managers.Instance.Client.Game.IsMine(player))
             {
                 var cardObject = Instantiate(cardPrefab);
 

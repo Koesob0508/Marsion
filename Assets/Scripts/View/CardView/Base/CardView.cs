@@ -80,7 +80,7 @@ namespace Marsion.CardView
             Text_AbilityExplain.text = Card.AbilityExplain;
             Text_Attack.text = Card.Attack.ToString();
             Text_Health.text = Card.Health.ToString();
-            CardSprite.sprite = Managers.Resource.Load<Sprite>(Card.FullArtPath);
+            CardSprite.sprite = Managers.Instance.Resource.Load<Sprite>(Card.FullArtPath);
         }
 
         public void Enable() => FSM.PushState<CardViewIdle>();

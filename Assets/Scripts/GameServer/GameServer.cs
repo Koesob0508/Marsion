@@ -222,7 +222,7 @@ namespace Marsion.Server
 
             foreach(var soID in deck)
             {
-                if(Managers.Data.CardDictionary.TryGetValue(soID.SomeText, out var cardSO))
+                if(Managers.Instance.Data.CardDictionary.TryGetValue(soID.SomeText, out var cardSO))
                 {
                     resultDeck.Add(new Card(id, cardSO));
                 }
@@ -346,7 +346,7 @@ namespace Marsion.Server
 
         private bool AreAllPlayersConnected()
         {
-            return Managers.Network.ConnectedClientsCount == 2;
+            return Managers.Instance.Network.ConnectedClientsCount == 2;
         }
 
         private Player GetPlayer(ulong clientID)
@@ -357,7 +357,7 @@ namespace Marsion.Server
         //[Rpc(SendTo.Server)]
         //public void CheckConnectionRpc()
         //{
-        //    Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsCount}", colorName: "#FFA500");
+        //    Logger.Log<GameServer>($"Server : {Managers.Instance.Network.ConnectedClientsCount}", colorName: "#FFA500");
 
         //    if (AreAllPlayersConnected())
         //    {

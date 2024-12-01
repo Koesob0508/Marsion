@@ -11,6 +11,6 @@ public class ServerTest
     {
         yield return new WaitForSeconds(5f);
 
-        Assert.IsNotNull(Managers.Server);
+        Assert.IsNotNull(Managers.Instance.Server);
     }
 }

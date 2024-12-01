@@ -53,7 +53,7 @@ namespace Marsion
             }
             else
             {
-                Managers.Network.StartHost();
+                Managers.Instance.Network.StartHost();
             }
 
             StartCoroutine(DisplayContentsWithDelay(1f, true));
@@ -81,7 +81,7 @@ namespace Marsion
             }
             else
             {
-                Managers.Network.StartClient();
+                Managers.Instance.Network.StartClient();
             }
 
             StartCoroutine(DisplayContentsWithDelay(1f, false));
@@ -91,10 +91,10 @@ namespace Marsion
         {
             Button_StartDraft.interactable = false;
 
-            Managers.UI.ClosePopupUI(this);
+            Managers.Instance.UI.ClosePopupUI(this);
 
             Logger.Log<UI_Connect>($"Start Draft", colorName: ColorCodes.CommonUI);
-            Managers.Client.Draft.RequestStartDraft();
+            Managers.Instance.Client.Draft.RequestStartDraft();
         }
 
         private IEnumerator DisplayContentsWithDelay(float delay, bool isHost)

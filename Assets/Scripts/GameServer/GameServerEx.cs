@@ -15,7 +15,7 @@ namespace Marsion
 
         private GameLogicEx Logic;
         private GameData Data => Logic.Data;
-        private NetworkMessaging Messaging => Managers.Network.Messaging;
+        private NetworkMessaging Messaging => Managers.Instance.Network.Messaging;
 
         private List<ClientData> players = new();
         private Dictionary<ushort, Action<ulong, SerializedData>> Commands = new();
@@ -44,7 +44,7 @@ namespace Marsion
             Logic.OnCardDied += SendDeadCards;
             Logic.OnGameEnded += SendEndGame;
 
-            Managers.Network.Messaging.SubscribeMessage("GameClient", OnReceivedCommand);
+            Managers.Instance.Network.Messaging.SubscribeMessage("GameClient", OnReceivedCommand);
         }
 
         public void Clear()
@@ -169,7 +169,7 @@ namespace Marsion
             Logger.Log<GameServerEx>($"Send end game", colorName: ColorCodes.Server);
 
             players.Clear();
-            Managers.Server.EndGame();
+            Managers.Instance.Server.EndGame();
 
             SerializedUlong sdata = new SerializedUlong();
             sdata.value = winnerID;
@@ -266,7 +266,7 @@ namespace Marsion
         {
             FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
             writer.WriteValueSafe(tag);
-            Managers.Network.Messaging.Send("GameServer", target, writer, NetworkDelivery.ReliableSequenced);
+            Managers.Instance.Network.Messaging.Send("GameServer", target, writer, NetworkDelivery.ReliableSequenced);
             writer.Dispose();
         }
 
@@ -275,7 +275,7 @@ namespace Marsion
             FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
             writer.WriteValueSafe(tag);
             writer.WriteNetworkSerializable(data);
-            Managers.Network.Messaging.Send("GameServer", target, writer, delivery);
+            Managers.Instance.Network.Messaging.Send("GameServer", target, writer, delivery);
             writer.Dispose();
         }
 

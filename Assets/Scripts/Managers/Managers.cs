@@ -1,72 +1,67 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Marsion
 {
-    [DefaultExecutionOrder(-10)]
     public class Managers : MonoBehaviour
     {
-        static Managers s_instance;
-        public static Managers Instance
+        public static Managers Instance { get; private set; }
+        public UIManager UI { get; private set; }
+        public IResourceManager Resource { get; private set; }
+        public CardManager Card { get; private set; }
+
+        public DataManager Data { get; private set; }
+        public MarsNetwork Network { get; private set; }
+        public ServerManager Server { get; private set; }
+        public ClientManager Client { get; private set; }
+
+        public static void Init(IManagerFactory factory)
         {
-            get
+            if (Instance == null)
             {
-                Init();
-                return s_instance;
-            }
-        }
-
-        UIUtility _ui = new UIUtility();
-        ResourceUtility _resource = new ResourceUtility();
-        CardManager _card = new CardManager();
-
-        IDataManager _data = new DataManager();
-        [SerializeField] MarsNetwork _network;
-        [SerializeField] ServerManager _server;
-        [SerializeField] ClientManager _client;
-
-        public static UIUtility UI { get { return Instance._ui; } }
-        public static ResourceUtility Resource { get { return Instance._resource; } }
-        public static CardManager Card { get { return Instance._card; } }
-
-        public static IDataManager Data { get { return Instance._data; } }
-        public static MarsNetwork Network { get { return Instance._network; } }
-        public static ServerManager Server { get { return Instance._server; } }
-        public static ClientManager Client { get { return Instance._client; } }
-        
-
-        private void Start()
-        {
-            Init();
-        }
-
-        public static void Init()
-        {
-            if (s_instance == null)
-            {
-                GameObject obj = GameObject.Find("@Managers");
-
-                if (obj == null)
-                {
-                    obj = new GameObject { name = "@Managers" };
-                    obj.AddComponent<Managers>();
-                }
-
+                var obj = new GameObject { name = "@Managers" };
                 DontDestroyOnLoad(obj);
-                s_instance = obj.GetComponent<Managers>();
+                Instance = obj.AddComponent<Managers>();
 
+                IResourceLoader loader = factory.CreateResourceLoader();
+                Instance.Resource = factory.CreateResource(loader);
+                Instance.UI = factory.CreateUI(Instance.Resource);
+                Instance.Card = factory.CreateCard();
 
-                Logger.Log<Managers>("Managers initialized", colorName: ColorCodes.Managers);
-                
-                s_instance._data.Init();
-                s_instance._network.Init();
-                s_instance._server.Init();
-                s_instance._client.Init();
+                Instance.Data = factory.CreateData();
+                Instance.Network = factory.CreateNetwork();
+                Instance.Server = factory.CreateServer();
+                Instance.Client = factory.CreateClient();
+
+                Instance.InitSubManagers();
             }
+        }
+
+        private void InitSubManagers()
+        {
+            Logger.Log<Managers>("Managers initialized", colorName: ColorCodes.Managers);
+            Data?.Init();
+            Network?.Init();
+            Server?.Init();
+            Client?.Init();
         }
 
         public static void Clear()
         {
-            s_instance._ui.Clear();
+            Instance?.UI?.Clear();
         }
     }
+
+    /*
+     * 2024.12.02.
+     * 기존 Managers는 다른 Manager에 대해 강한 결합을 갖고 있었음
+     * 따라서, 의존성 주입을 사용하여 외부에서 Manager를 초기화하도록 변경
+     * 이를 통해 Mock을 하는 것이 쉽게 됨
+     * 이 때, Factory 패턴을 사용하여 의존성을 생성하는 것 또한 분리
+     * 그에 따라 다음과 같은 형태로 책임이 분리 됨
+     * 
+     * ManagerFactory : 의존성(여러 Manager) 생성 책임
+     * Initializer : 초기화 흐름 제어 책임
+     * Managers : 생성된 의존성 관리 책임
+     */
 }

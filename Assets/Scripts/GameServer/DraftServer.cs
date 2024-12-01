@@ -20,7 +20,7 @@ namespace Marsion
         private Dictionary<ulong, DraftState> DraftDictionary;
         private Queue<int> InitialTypeSequence;
         
-        private NetworkMessaging Messaging { get { return Managers.Network.Messaging; } }
+        private NetworkMessaging Messaging { get { return Managers.Instance.Network.Messaging; } }
 
         public Action OnUpdateDraftState;
 
@@ -97,7 +97,7 @@ namespace Marsion
 
             DraftDictionary.TryGetValue(clientID, out var state);
 
-            Managers.Server.ReadyClient(clientID, state.CurrentDeck);
+            Managers.Instance.Server.ReadyClient(clientID, state.CurrentDeck);
         }
 
         #endregion
@@ -121,7 +121,7 @@ namespace Marsion
 
         private void SendStartDraft(ulong clientID)
         {
-            Managers.Server.GetClient(clientID).State = ClientState.Draft;
+            Managers.Instance.Server.GetClient(clientID).State = ClientState.Draft;
             Send(clientID, DraftCommand.ServerStartDraft);
         }
 
