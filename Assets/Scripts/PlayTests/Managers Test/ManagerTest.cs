@@ -1,17 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
-using Marsion;
 using NUnit.Framework;
-using UnityEngine;
+using System.Collections;
 using UnityEngine.TestTools;
 
-public class ManagerTest
+namespace Marsion.Tests
 {
-    [UnityTest]
-    public IEnumerator DataManagerTest()
+    [TestFixture]
+    public class ManagersTests
     {
-        yield return null;
+        [UnityTest]
+        public IEnumerator DataInitTest()
+        {
+            while(Managers.Data.CardDictionary == null || Managers.Data.CardDictionary.Count == 0)
+            {
+                yield return null;
+            }
 
-        Assert.AreEqual(true, true);
+            Assert.IsNotNull(Managers.Data.CardDictionary, "CardDictionary is null.");
+            Assert.Greater(Managers.Data.CardDictionary.Count, 0);
+        }
     }
 }

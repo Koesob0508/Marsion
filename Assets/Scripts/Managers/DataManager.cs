@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Marsion
 {
-    public class DataManager
+    public class DataManager : IDataManager
     {
         // 각 타입별로 리스트와 딕셔너리를 관리하기 위해 Dictionary 사용
         private Dictionary<Type, IList> dataLists;
@@ -25,7 +25,6 @@ namespace Marsion
             dataLists = new();
             dataDictionaries = new();
 
-            //Load<CardSO>("CardSO");
             LoadAddressableAssets<CardSO>("CardSO");
             Load<PortraitSO>("PortraitSO");
         }

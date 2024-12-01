@@ -36,18 +36,14 @@ namespace Marsion
             LogInternal<T>(log, colorName, param, logger.LogError);
         }
 
-        public static void LogPointer<T>(object log, string colorName = "yellow", Type param = null)
+        public static void LogPointer<T>(string log, string colorName = "yellow", Type param = null)
         {
-            var context = GetTypeName(typeof(T));
-            log = string.Format("[" + context + OpenColor + log + CloseColor + GetTypeName(param), colorName);
-            // Debug.Log(log);
+            LogInternal<T>(log, colorName, param, logger.Log);
         }
 
-        public static void LogState<T>(object log, string colorName = "yellow", Type param = null) where T : BaseStateMachine
+        public static void LogState<T>(string log, string colorName = "yellow", Type param = null) where T : BaseStateMachine
         {
-            var context = GetTypeName(typeof(T));
-            log = string.Format("[" + context + OpenColor + log + CloseColor + GetTypeName(param), colorName);
-            // Debug.Log(log);
+            LogInternal<T>(log, colorName, param, logger.Log);
         }
 
         public static void LogSequence(string name, string log, bool isServer)

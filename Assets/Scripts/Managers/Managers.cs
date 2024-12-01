@@ -19,7 +19,7 @@ namespace Marsion
         ResourceUtility _resource = new ResourceUtility();
         CardManager _card = new CardManager();
 
-        DataManager _data = new DataManager();
+        IDataManager _data = new DataManager();
         [SerializeField] MarsNetwork _network;
         [SerializeField] ServerManager _server;
         [SerializeField] ClientManager _client;
@@ -28,7 +28,7 @@ namespace Marsion
         public static ResourceUtility Resource { get { return Instance._resource; } }
         public static CardManager Card { get { return Instance._card; } }
 
-        public static DataManager Data { get { return Instance._data; } }
+        public static IDataManager Data { get { return Instance._data; } }
         public static MarsNetwork Network { get { return Instance._network; } }
         public static ServerManager Server { get { return Instance._server; } }
         public static ClientManager Client { get { return Instance._client; } }
