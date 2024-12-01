@@ -39,7 +39,7 @@ namespace Marsion.CardView
         {
             if (foundObject == null)
             {
-                Managers.Logger.Log<CreatureViewSelect>($"{isDetected} & null");
+                Logger.Log<CreatureViewSelect>($"{isDetected} & null");
                 FSM.PopState();
             }
             else

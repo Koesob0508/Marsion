@@ -3,7 +3,7 @@
 namespace Marsion
 {
     [CreateAssetMenu(fileName = "NewExampleAbility", menuName = "Marsion/CardAbilities/Example")]
-    public class ExampleAbility : CardAbility
+    public class ExampleAbility : BaseCardAbility
     {
         [SerializeField] string Log;
         public override void Register()

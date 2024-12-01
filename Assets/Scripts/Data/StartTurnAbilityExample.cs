@@ -3,7 +3,7 @@
 namespace Marsion
 {
     [CreateAssetMenu(fileName = "NewStartTurnAbility", menuName = "Marsion/CardAbilities/Example")]
-    public class StartTurnAbilityExample : CardAbility
+    public class StartTurnAbilityExample : BaseCardAbility
     {
         public override void Register()
         {
@@ -12,7 +12,7 @@ namespace Marsion
 
         public override void Activate()
         {
-            Managers.Logger.Log<StartTurnAbilityExample>("Start Turn Marsion", colorName: "yellow");
+            Logger.Log<StartTurnAbilityExample>("Start Turn Marsion", colorName: "yellow");
         }
 
         public override void Clear()

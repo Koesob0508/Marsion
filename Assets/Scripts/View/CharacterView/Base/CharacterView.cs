@@ -62,7 +62,7 @@ namespace Marsion.CardView
             Managers.Client.Game.OnAttackStarted += Attack;
 
             if (card == null)
-                Managers.Logger.Log<CreatureView>("Card is null");
+                Logger.Log<CreatureView>("Card is null");
 
             Card = card;
             Text_Attack.text = card.Attack.ToString();

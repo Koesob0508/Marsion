@@ -50,7 +50,7 @@ namespace Marsion.Client
 
         public void Init()
         {
-            Managers.Logger.Log<GameClient>($"Game Client initialized", colorName: ColorCodes.Client);
+            Logger.Log<GameClient>($"Game Client initialized", colorName: ColorCodes.Client);
 
             Sequencer.Init();
 
@@ -110,7 +110,7 @@ namespace Marsion.Client
             gameStartClip.OnPlay += () =>
             {
                 OnSuccessRelay?.Invoke();
-                Managers.Logger.Log<GameClient>("Start game", colorName: "green");
+                Logger.Log<GameClient>("Start game", colorName: "green");
 
                 foreach (var player in GetGameData().Players)
                 {
@@ -140,7 +140,7 @@ namespace Marsion.Client
             updateClip.OnPlay += () =>
             {
                 Data = networkData.GameData;
-                Managers.Logger.Log<GameClient>("Game data updated", colorName: "green");
+                Logger.Log<GameClient>("Game data updated", colorName: "green");
 
                 OnDataUpdated?.Invoke();
             };
@@ -154,7 +154,7 @@ namespace Marsion.Client
 
             gameEndClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>("Game end.");
+                Logger.Log<GameClient>("Game end.");
                 UI_EndGame ui = Managers.UI.ShowPopupUI<UI_EndGame>();
 
                 if (clientID == -1)
@@ -194,7 +194,7 @@ namespace Marsion.Client
 
             turnStartClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>("Turn start", colorName: "green");
+                Logger.Log<GameClient>("Turn start", colorName: "green");
                 OnTurnStarted?.Invoke();
             };
         }
@@ -207,7 +207,7 @@ namespace Marsion.Client
 
             turnEndClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>("Turn end", colorName: "green");
+                Logger.Log<GameClient>("Turn end", colorName: "green");
                 OnTurnEnded?.Invoke();
             };
         }
@@ -220,7 +220,7 @@ namespace Marsion.Client
 
             cardDrawClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>("Card draw", colorName: "green");
+                Logger.Log<GameClient>("Card draw", colorName: "green");
                 OnCardDrawn?.Invoke(GetGameData().GetPlayer(clientID), GetGameData().GetHandCard(clientID, cardUID));
             };
         }
@@ -233,7 +233,7 @@ namespace Marsion.Client
 
             changeManaClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>("Mana Changed", colorName: "green");
+                Logger.Log<GameClient>("Mana Changed", colorName: "green");
                 OnManaChanged?.Invoke();
             };
         }
@@ -246,7 +246,7 @@ namespace Marsion.Client
 
             cardPlayClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>($"Card play succeeded? : {succeeded}", colorName: "green");
+                Logger.Log<GameClient>($"Card play succeeded? : {succeeded}", colorName: "green");
                 OnCardPlayed?.Invoke(succeeded, GetGameData().GetPlayer(clientID), cardUID);
             };
         }
@@ -259,7 +259,7 @@ namespace Marsion.Client
 
             cardSpawnClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>($"Card spawn succeeded? : {succeeded}", colorName: "green");
+                Logger.Log<GameClient>($"Card spawn succeeded? : {succeeded}", colorName: "green");
                 OnCardSpawned?.Invoke(succeeded, GetGameData().GetPlayer(clientID), GetGameData().GetFieldCard(clientID, cardUID), index);
             };
         }
@@ -273,7 +273,7 @@ namespace Marsion.Client
 
             deadLog.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>("Card dead");
+                Logger.Log<GameClient>("Card dead");
             };
 
             deadClip.OnPlay += () =>
@@ -322,7 +322,7 @@ namespace Marsion.Client
 
             attackLogClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameClient>("Start Attack", colorName: "green");
+                Logger.Log<GameClient>("Start Attack", colorName: "green");
             };
 
             invokeEventClip.OnPlay += () =>

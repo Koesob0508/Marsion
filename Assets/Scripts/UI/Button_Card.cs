@@ -28,7 +28,7 @@ namespace Marsion.UI
             }
             else
             {
-                Managers.Logger.LogWarning<Button_Card>($"ID : {soID} CardSO not found", colorName: ColorCodes.ContentUI);
+                Logger.LogWarning<Button_Card>($"ID : {soID} CardSO not found", colorName: ColorCodes.ContentUI);
             }
         }
     }

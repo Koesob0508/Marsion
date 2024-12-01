@@ -19,7 +19,7 @@ namespace Marsion.Tool
 
         public void Init()
         {
-            Managers.Logger.Log<Sequence>($"Sequence initialized", colorName: ColorCodes.Yellow);
+            Logger.Log<Sequence>($"Sequence initialized", colorName: ColorCodes.Yellow);
 
             gameObject.SetActive(true);
 
@@ -74,7 +74,7 @@ namespace Marsion.Tool
             {
                 _currentSequence = sequence;
 
-                Managers.Logger.LogSequence(Name, $"{sequence.Name} Sequence : Play", IsServer);
+                Logger.LogSequence(Name, $"{sequence.Name} Sequence : Play", IsServer);
                 SetCurrentSequence(sequence.Name);
                 sequence.Play();
             }
@@ -146,7 +146,7 @@ namespace Marsion.Tool
             {
                 clip.OnComplete += () =>
                 {
-                    Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : {clip.Name} clip completed", Handler.IsServer);
+                    Logger.LogSequence(Handler.Name, $"{Name} sequence : {clip.Name} clip completed", Handler.IsServer);
                     if(!CompleteClip(clip.ID))
                         PlayNext();
                 };
@@ -159,7 +159,7 @@ namespace Marsion.Tool
             {
                 if (isPlaying)
                 {
-                    Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : Sequence is playing", Handler.IsServer);
+                    Logger.LogSequence(Handler.Name, $"{Name} sequence : Sequence is playing", Handler.IsServer);
                     return;
                 }
 
@@ -168,7 +168,7 @@ namespace Marsion.Tool
                 Clips.TryDequeue(out var clip);
                 _currentClip = clip;
 
-                Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : {clip.Name} clip play", Handler.IsServer);
+                Logger.LogSequence(Handler.Name, $"{Name} sequence : {clip.Name} clip play", Handler.IsServer);
 
                 Handler.SetCurrentClip(_currentClip.Name);
                 clip.Play();
@@ -179,11 +179,11 @@ namespace Marsion.Tool
 
             private void PlayNext()
             {
-                Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : Try to play next", Handler.IsServer);
+                Logger.LogSequence(Handler.Name, $"{Name} sequence : Try to play next", Handler.IsServer);
 
                 if (Clips.Count == 0)
                 {
-                    Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : Sequence has reach the end of the sequene", Handler.IsServer);
+                    Logger.LogSequence(Handler.Name, $"{Name} sequence : Sequence has reach the end of the sequene", Handler.IsServer);
                     return;
                 }
 
@@ -193,7 +193,7 @@ namespace Marsion.Tool
             // Joined를 염두에 두고 따로 구현함. 현재는 NextPlay와 기능 거의 동일
             public void Complete()
             {
-                Managers.Logger.LogSequence(Handler.Name, $"{Name} sequence : {Name} sequence complete", Handler.IsServer);
+                Logger.LogSequence(Handler.Name, $"{Name} sequence : {Name} sequence complete", Handler.IsServer);
                 OnComplete?.Invoke();
                 Clear();
             }

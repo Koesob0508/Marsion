@@ -55,7 +55,7 @@ namespace Marsion.CardView
                 }
                 else
                 {
-                    Managers.Logger.Log<CardViewSelect>("조건 불충족", colorName: "green");
+                    Logger.Log<CardViewSelect>("조건 불충족", colorName: "green");
                     Managers.Client.Game.PlayerField.RemoveEmptyCard();
                 }
 
@@ -91,7 +91,7 @@ namespace Marsion.CardView
             }
             else
             {
-                Managers.Logger.Log<CardViewSelect>("Point not found.");
+                Logger.Log<CardViewSelect>("Point not found.");
                 return default;
             }
         }

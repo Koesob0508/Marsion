@@ -43,7 +43,7 @@ namespace Marsion.Server
 
         public void Init()
         {
-            Managers.Logger.Log<GameServer>($"Game Server initialized", colorName: ColorCodes.Server);
+            Logger.Log<GameServer>($"Game Server initialized", colorName: ColorCodes.Server);
 
             Sequencer.Init();
         }
@@ -74,7 +74,7 @@ namespace Marsion.Server
 
             startGameClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameServer>("Start game", colorName: ColorCodes.Server);
+                Logger.Log<GameServer>("Start game", colorName: ColorCodes.Server);
 
                 GameData = new GameData(2);
                 Logic = new GameLogic();
@@ -102,7 +102,7 @@ namespace Marsion.Server
 
             drawCardClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameServer>("Draw initial card", colorName: "#FFA500");
+                Logger.Log<GameServer>("Draw initial card", colorName: "#FFA500");
 
                 SerializedGameData networkData = new SerializedGameData();
 
@@ -139,7 +139,7 @@ namespace Marsion.Server
 
             endGameClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameServer>("Game end", colorName: "#FFA500");
+                Logger.Log<GameServer>("Game end", colorName: "#FFA500");
 
                 int winner = Logic.GetAlivePlayer();
 
@@ -164,7 +164,7 @@ namespace Marsion.Server
 
             startTurnClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameServer>("Start turn", colorName: "#FFA500");
+                Logger.Log<GameServer>("Start turn", colorName: "#FFA500");
 
                 GameData.TurnCount++;
 
@@ -197,7 +197,7 @@ namespace Marsion.Server
 
             endTurnClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameLogic>("Turn end", colorName: "#FFA500");
+                Logger.Log<GameLogic>("Turn end", colorName: "#FFA500");
 
                 GameData.CurrentPlayer = CurrentPlayer == GetPlayer(0) ? GetPlayer(1) : GetPlayer(0);
 
@@ -217,7 +217,7 @@ namespace Marsion.Server
         [Rpc(SendTo.Server)]
         public void ReadyRpc(ulong id, StringContainer[] deck)
         {
-            Managers.Logger.Log<GameServer>($"Client({id}) ready", colorName: ColorCodes.Server);
+            Logger.Log<GameServer>($"Client({id}) ready", colorName: ColorCodes.Server);
             List<Card> resultDeck = new List<Card>();
 
             foreach(var soID in deck)
@@ -228,7 +228,7 @@ namespace Marsion.Server
                 }
                 else
                 {
-                    Managers.Logger.LogWarning<GameServer>($"ID : {soID} CardSO not found", colorName: ColorCodes.Server);
+                    Logger.LogWarning<GameServer>($"ID : {soID} CardSO not found", colorName: ColorCodes.Server);
                 }
             }
 
@@ -278,7 +278,7 @@ namespace Marsion.Server
 
                 if (!(player.Mana >= card.Mana))
                 {
-                    Managers.Logger.Log<GameServer>("그럴 수 없어요.", colorName: "#FFA500");
+                    Logger.Log<GameServer>("그럴 수 없어요.", colorName: "#FFA500");
                     OnCardPlayed?.Invoke(false, player.PlayerID, card.UID);
                     OnCardSpawned?.Invoke(false, player.PlayerID, card.UID, index);
                     return;
@@ -288,7 +288,7 @@ namespace Marsion.Server
                 player.Hand.Remove(card);
                 player.Field.Insert(index, card);
 
-                card.OnPlay?.Invoke();
+                card.Play();
 
                 SerializedGameData networkData = new SerializedGameData();
                 networkData.GameData = GameData;
@@ -310,7 +310,7 @@ namespace Marsion.Server
 
             tryAttackClip.OnPlay += () =>
             {
-                Managers.Logger.Log<GameServer>("Try attack", colorName: "#FFA500");
+                Logger.Log<GameServer>("Try attack", colorName: "#FFA500");
 
                 var attP = GetPlayer(attackPlayer);
                 var att = attP.GetCard(attackerUID);
@@ -357,11 +357,11 @@ namespace Marsion.Server
         //[Rpc(SendTo.Server)]
         //public void CheckConnectionRpc()
         //{
-        //    Managers.Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsCount}", colorName: "#FFA500");
+        //    Logger.Log<GameServer>($"Server : {Managers.Network.ConnectedClientsCount}", colorName: "#FFA500");
 
         //    if (AreAllPlayersConnected())
         //    {
-        //        Managers.Logger.Log<GameServer>($"Ready to start", colorName: "#FFA500");
+        //        Logger.Log<GameServer>($"Ready to start", colorName: "#FFA500");
 
         //        ReadyPlayerCount = 0;
         //    }

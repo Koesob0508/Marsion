@@ -1,11 +1,13 @@
-﻿using System;
+﻿using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Marsion
 {
-    public class DataManager
+    public class DataManager : IDataManager
     {
         // 각 타입별로 리스트와 딕셔너리를 관리하기 위해 Dictionary 사용
         private Dictionary<Type, IList> dataLists;
@@ -19,11 +21,11 @@ namespace Marsion
         // 데이터 초기화 메서드
         public void Init()
         {
-            Managers.Logger.Log<DataManager>("Data initialized", colorName: ColorCodes.CommonManager);
+            Logger.Log<DataManager>("Data initialized", colorName: ColorCodes.CommonManager);
             dataLists = new();
             dataDictionaries = new();
 
-            Load<CardSO>("CardSO");
+            LoadAddressableAssets<CardSO>("CardSO");
             Load<PortraitSO>("PortraitSO");
         }
 
@@ -48,6 +50,34 @@ namespace Marsion
             foreach (var item in list)
             {
                 dictionary.Add(item.ID, item); // T 타입이 IIdentifiable 인터페이스를 구현한다고 가정
+            }
+        }
+
+        public IEnumerator LoadAddressableAssets<T>(string label) where T : UnityEngine.Object, IIdentifiable
+        {
+            if(!dataLists.ContainsKey(typeof(T)))
+            {
+                dataLists[typeof(T)] = new List<T>();
+                dataDictionaries[typeof(T)] = new Dictionary<string, T>();
+            }
+
+            var list = (List<T>)dataLists[typeof(T)];
+            var dictionary = (Dictionary<string, T>)dataDictionaries[typeof(T)];
+
+            AsyncOperationHandle<IList<T>> handle = Addressables.LoadAssetsAsync<T>(label, null);
+            yield return handle;
+
+            if(handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                foreach(var item in handle.Result)
+                {
+                    list.Add(item);
+                    dictionary[item.ID] = item;
+                }
+            }
+            else
+            {
+                Logger.Log<DataManager>($"Failed to load {typeof(T).Name} with label : {label}");
             }
         }
 

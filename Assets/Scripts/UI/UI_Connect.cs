@@ -42,7 +42,7 @@ namespace Marsion
 
         public async void OnClickHost()
         {
-            Managers.Logger.Log<UI_Connect>("Start Host", colorName: ColorCodes.CommonUI);
+            Logger.Log<UI_Connect>("Start Host", colorName: ColorCodes.CommonUI);
 
             Button_Host.interactable = false;
             Button_Guest.interactable = false;
@@ -61,7 +61,7 @@ namespace Marsion
 
         public async void OnClickGuest()
         {
-            Managers.Logger.Log<UI_Connect>("Start Guest", colorName: ColorCodes.CommonUI);
+            Logger.Log<UI_Connect>("Start Guest", colorName: ColorCodes.CommonUI);
 
             Button_Host.interactable = false;
             Button_Guest.interactable = false;
@@ -70,14 +70,14 @@ namespace Marsion
             {
                 bool result = await StartClientWithRelay(inputField.text);
 
-                Managers.Logger.Log<UI_Connect>($"Try connect with join code : {inputField.text}.");
+                Logger.Log<UI_Connect>($"Try connect with join code : {inputField.text}.");
 
                 if (result)
                 {
-                    Managers.Logger.Log<UI_Connect>("Connection succeed.");
+                    Logger.Log<UI_Connect>("Connection succeed.");
                 }
                 else
-                    Managers.Logger.Log<UI_Connect>("Connection failed.");
+                    Logger.Log<UI_Connect>("Connection failed.");
             }
             else
             {
@@ -93,7 +93,7 @@ namespace Marsion
 
             Managers.UI.ClosePopupUI(this);
 
-            Managers.Logger.Log<UI_Connect>($"Start Draft", colorName: ColorCodes.CommonUI);
+            Logger.Log<UI_Connect>($"Start Draft", colorName: ColorCodes.CommonUI);
             Managers.Client.Draft.RequestStartDraft();
         }
 

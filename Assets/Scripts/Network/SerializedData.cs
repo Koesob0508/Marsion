@@ -80,14 +80,14 @@ namespace Marsion
                 {
                     byte[] bytes = new byte[size];
                     serializer.SerializeValue(ref bytes);
-                    GameData = NetworkTool.Deserialize<GameData>(bytes);
+                    GameData = JsonSerializer.DeserializeBytes<GameData>(bytes);
                 }
             }
 
             // 직렬화
             if (serializer.IsWriter)
             {
-                byte[] bytes = NetworkTool.Serialize(GameData);
+                byte[] bytes = JsonSerializer.SerializeBytes(GameData);
                 int size = bytes.Length;
 
                 // 크기를 먼저 직렬화합니다.
