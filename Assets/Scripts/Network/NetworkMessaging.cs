@@ -8,7 +8,7 @@ namespace Marsion
     public class NetworkMessaging
     {
         private MarsNetwork network;
-        private Dictionary<string, System.Action<ulong, FastBufferReader>> messageDictionary = new Dictionary<string, System.Action<ulong, FastBufferReader>>();
+        private Dictionary<string, Action<ulong, FastBufferReader>> messageDictionary = new Dictionary<string, System.Action<ulong, FastBufferReader>>();
         public bool IsOnline { get { return network.IsOnline; } }
         public bool IsServer { get { return network.IsServer; } }
         public ulong ServerID { get { return network.ServerID; } }
@@ -28,13 +28,13 @@ namespace Marsion
 
         private void OnConnect()
         {
-            foreach (KeyValuePair<string, System.Action<ulong, FastBufferReader>> pair in messageDictionary)
+            foreach (KeyValuePair<string, Action<ulong, FastBufferReader>> pair in messageDictionary)
             {
                 RegistMessage(pair.Key, pair.Value);
             }
         }
 
-        private void RegistMessage(string type, System.Action<ulong, FastBufferReader> callback)
+        private void RegistMessage(string type, Action<ulong, FastBufferReader> callback)
         {
             if (!IsOnline) return;
 

@@ -9,7 +9,7 @@ namespace Marsion
         void LogError(string message);
     }
 
-    public class UnityLogger : ILogger
+    public class DefaultLogger : ILogger
     {
         public void Log(string message)
         {

@@ -6,7 +6,7 @@ namespace Marsion
     public static class Logger
     {
         #region Fields and Properties
-        private static ILogger logger = new UnityLogger();
+        private static ILogger _logger = new DefaultLogger();
 
         const char Period = '.';
         const string OpenColor = ": <color={0}><b>";
@@ -16,40 +16,40 @@ namespace Marsion
 
         public static void SetLogger(ILogger customLogger)
         {
-            logger = customLogger;
+            _logger = customLogger;
         }
 
         #region Log Methods
 
         public static void Log<T>(string log, string colorName = "black", Type param = null)
         {
-            LogInternal<T>(log, colorName, param, logger.Log);
+            LogInternal<T>(log, colorName, param, _logger.Log);
         }
 
         public static void LogWarning<T>(string log, string colorName = "black", Type param = null)
         {
-            LogInternal<T>(log, colorName, param, logger.LogWarning);
+            LogInternal<T>(log, colorName, param, _logger.LogWarning);
         }
 
         public static void LogError<T>(string log, string colorName = "black", Type param = null)
         {
-            LogInternal<T>(log, colorName, param, logger.LogError);
+            LogInternal<T>(log, colorName, param, _logger.LogError);
         }
 
         public static void LogPointer<T>(string log, string colorName = "yellow", Type param = null)
         {
-            LogInternal<T>(log, colorName, param, logger.Log);
+            LogInternal<T>(log, colorName, param, _logger.Log);
         }
 
         public static void LogState<T>(string log, string colorName = "yellow", Type param = null) where T : BaseStateMachine
         {
-            LogInternal<T>(log, colorName, param, logger.Log);
+            LogInternal<T>(log, colorName, param, _logger.Log);
         }
 
         public static void LogSequence(string name, string log, bool isServer)
         {
             string color = isServer ? ColorCodes.ServerSequencer : ColorCodes.ClientSequencer;
-            logger.Log($"<color={color}><b>[{name}]</b></color> {log}");
+            _logger.Log($"<color={color}><b>[{name}]</b></color> {log}");
         }
 
         private static void LogInternal<T>(string log, string colorName, Type param, Action<string> logAction)
@@ -70,12 +70,7 @@ namespace Marsion
             }
 
             return formattedLog;
-
         }
-
-        #endregion
-
-        #region Util
 
         static string GetTypeName(Type type)
         {

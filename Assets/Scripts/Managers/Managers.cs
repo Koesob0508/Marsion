@@ -6,7 +6,7 @@ namespace Marsion
     public class Managers : MonoBehaviour
     {
         public static Managers Instance { get; private set; }
-        public UIManager UI { get; private set; }
+        public IUIManager UI { get; private set; }
         public IResourceManager Resource { get; private set; }
         public CardManager Card { get; private set; }
 

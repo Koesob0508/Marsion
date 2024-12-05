@@ -4,7 +4,7 @@
     {
         IResourceLoader CreateResourceLoader();
         IResourceManager CreateResource(IResourceLoader loader);
-        UIManager CreateUI(IResourceManager resource);
+        IUIManager CreateUI(IResourceManager resource);
         CardManager CreateCard();
         DataManager CreateData();
         MarsNetwork CreateNetwork();
@@ -12,11 +12,11 @@
         ClientManager CreateClient();
     }
 
-    public class ManagerFactory : IManagerFactory
+    public class DefaultManagerFactory : IManagerFactory
     {
-        public IResourceLoader CreateResourceLoader() => new BaseResourceLoader();
+        public IResourceLoader CreateResourceLoader() => new DefaultResourceLoader();
         public IResourceManager CreateResource(IResourceLoader loader) => new ResourceManager(loader);
-        public UIManager CreateUI(IResourceManager resource) => new UIManager(resource);
+        public IUIManager CreateUI(IResourceManager resource) => new UIManager(resource);
         public CardManager CreateCard() => new CardManager();
 
         public DataManager CreateData() => new DataManager();

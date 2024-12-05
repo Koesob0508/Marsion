@@ -8,8 +8,8 @@ namespace Marsion
         private readonly IResourceManager _resourceManager;
         private readonly CanvasOrderHandler _orderManager;
 
-        private Stack<UI_Popup> _popupStack = new Stack<UI_Popup>();
         private UI_Scene _sceneUI = null;
+        private Stack<UI_Popup> _popupStack = new Stack<UI_Popup>();
 
         public UIManager(IResourceManager resourceManager)
         {

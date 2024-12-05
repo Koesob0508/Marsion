@@ -13,7 +13,7 @@ namespace Marsion.Tests
         {
             // Arrange
             var mockFactory = new Mock<IManagerFactory>();
-            var mockUI = new Mock<UIManager>();
+            var mockUI = new Mock<IUIManager>();
             var mockLoader = new Mock<IResourceLoader>();
             var mockResource = new Mock<IResourceManager>();
             var mockCard = new Mock<CardManager>();
@@ -49,12 +49,11 @@ namespace Marsion.Tests
         public void Managers_Clear()
         {
             // Arrange
-            var mockUI = new Mock<UIManager>();
-            var mockFactory = new Mock<IManagerFactory>();
             var mockResourceLoader = new Mock<IResourceLoader>();
             var mockResourceManager = new Mock<IResourceManager>();
-            var mockUIManager = new Mock<UIManager>(mockResourceManager.Object);
+            var mockUI = new Mock<IUIManager>();
 
+            var mockFactory = new Mock<IManagerFactory>();
             mockFactory.Setup(f => f.CreateResourceLoader()).Returns(mockResourceLoader.Object);
             mockFactory.Setup(f => f.CreateResource(mockResourceLoader.Object)).Returns(mockResourceManager.Object);
             mockFactory.Setup(f => f.CreateUI(mockResourceManager.Object)).Returns(mockUI.Object);

@@ -10,7 +10,6 @@ namespace Marsion
     public class MarsNetwork : MonoBehaviour
     {
         private NetworkManager network;
-        private MarsTransport transport;
         private NetworkMessaging messaging;
 
         private bool IsConnected = false;
@@ -61,7 +60,7 @@ namespace Marsion
             Logger.Log<MarsNetwork>("Network initialized", colorName: ColorCodes.Server);
 
             network = GetComponent<NetworkManager>();
-            transport = GetComponent<MarsTransport>();
+            //transport = GetComponent<MarsTransport>();
             messaging = new NetworkMessaging(this);
 
             //network.ConnectionApprovalCallback += CheckApproval;
