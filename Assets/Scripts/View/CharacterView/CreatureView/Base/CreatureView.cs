@@ -40,7 +40,7 @@ namespace Marsion.CardView
             Card = card;
             Text_Attack.text = card.Attack.ToString();
             Text_Health.text = card.Health.ToString();
-            CardSprite.sprite = Managers.Resource.Load<Sprite>(card.BoardArtPath);
+            CardSprite.sprite = Managers.Instance.Resource.Load<Sprite>(card.BoardArtPath);
         }
 
         public override void Spawn()

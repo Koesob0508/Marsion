@@ -44,7 +44,7 @@ namespace Marsion.CardView
         {
             foreach(var card in Cards)
             {
-                Managers.Resource.Destroy(card.MonoBehaviour.gameObject);
+                Managers.Instance.Resource.Destroy(card.MonoBehaviour.gameObject);
             }
 
             Cards.Clear();
@@ -59,7 +59,7 @@ namespace Marsion.CardView
                     if (cardView.Card.UID == card.UID)
                     {
                         Cards.Remove(cardView);
-                        Managers.Resource.Destroy(cardView.MonoBehaviour.gameObject);
+                        Managers.Instance.Resource.Destroy(cardView.MonoBehaviour.gameObject);
                         break;
                     }
                 }

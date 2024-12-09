@@ -216,7 +216,7 @@ namespace Marsion.UI
                 bool IsZero = value.GetComponent<Content_Card>().DecreaseCount();
                 if (IsZero)
                 {
-                    Managers.Resource.Destroy(value);
+                    Managers.Instance.Resource.Destroy(value);
                     contentsDictionary.Remove(soID);
                 }
             }

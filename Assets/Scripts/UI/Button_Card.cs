@@ -24,7 +24,7 @@ namespace Marsion.UI
                 Text_AbilityExplain.text = cardSO.AbilityExplain;
                 Text_Attack.text = cardSO.Attack.ToString();
                 Text_Health.text = cardSO.Health.ToString();
-                Image_Sprite.sprite = Managers.Resource.Load<Sprite>(cardSO.FullArtPath);
+                Image_Sprite.sprite = Managers.Instance.Resource.Load<Sprite>(cardSO.FullArtPath);
             }
             else
             {

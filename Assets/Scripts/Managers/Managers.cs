@@ -5,70 +5,56 @@ using UnityEngine;
 
 namespace Marsion
 {
-    [DefaultExecutionOrder(-10)]
     public class Managers : MonoBehaviour
     {
-        static Managers s_instance;
-        public static Managers Instance
-        {
-            get
-            {
-                Init();
-                return s_instance;
-            }
-        }
+        public static Managers Instance { get; private set; }
 
-        UIUtility _ui = new UIUtility();
-        ResourceUtility _resource = new ResourceUtility();
-        CardManager _card = new CardManager();
-
-        DataManager _data = new DataManager();
         [SerializeField] MarsNetwork _network;
         [SerializeField] ServerManager _server;
         [SerializeField] ClientManager _client;
 
-        public static UIUtility UI { get { return Instance._ui; } }
-        public static ResourceUtility Resource { get { return Instance._resource; } }
-        public static CardManager Card { get { return Instance._card; } }
+        public IResourceManager Resource { get; private set; }
+        public static UIUtility UI { get; private set; }
+        public static CardManager Card { get; private set; }
 
-        public static DataManager Data { get { return Instance._data; } }
+        public static DataManager Data { get; private set; }
         public static MarsNetwork Network { get { return Instance._network; } }
         public static ServerManager Server { get { return Instance._server; } }
         public static ClientManager Client { get { return Instance._client; } }
-        
 
-        private void Start()
+        public static void Init(IManagerFactory factory)
         {
-            Init();
-        }
-
-        private static void Init()
-        {
-            if (s_instance == null)
+            if (Instance == null)
             {
-                GameObject obj = GameObject.Find("@Managers");
-
+                var obj = GameObject.Find("@Managers");
                 if (obj == null)
                 {
                     obj = new GameObject { name = "@Managers" };
                     obj.AddComponent<Managers>();
                 }
-
                 DontDestroyOnLoad(obj);
-                s_instance = obj.GetComponent<Managers>();
+                Instance = obj.GetComponent<Managers>();
 
                 Logger.Log<Managers>("Managers initialized", colorName: ColorCodes.Managers);
-                
-                s_instance._data.Init();
-                s_instance._network.Init();
-                s_instance._server.Init();
-                s_instance._client.Init();
+
+                IResourceLoader resourceLoader = factory.CreateResourceLoader();
+                IAddressableLoader addressableLoader = factory.CreateAddressableLoader();
+                Instance.Resource = factory.CreateResource(resourceLoader, addressableLoader);
+
+                UI = new UIUtility();
+                Card = new CardManager();
+                Data = new DataManager();
+
+                Data.Init();
+                Network.Init();
+                Server.Init();
+                Client.Init();
             }
         }
 
         public static void Clear()
         {
-            s_instance._ui.Clear();
+            UI.Clear();
         }
     }
 }

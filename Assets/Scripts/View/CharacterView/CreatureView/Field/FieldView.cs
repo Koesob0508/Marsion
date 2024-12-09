@@ -49,7 +49,7 @@ namespace Marsion.CardView
             foreach(var creature in Creatures)
             {
                 creature.Clear();
-                Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+                Managers.Instance.Resource.Destroy(creature.MonoBehaviour.gameObject);
             }
 
             Creatures.Clear();
@@ -123,7 +123,7 @@ namespace Marsion.CardView
         public void Remove(ICreatureView creature)
         {
             Creatures.Remove(creature);
-            Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+            Managers.Instance.Resource.Destroy(creature.MonoBehaviour.gameObject);
         }
 
         public ICharacterView GetCreature(Card card)

@@ -285,7 +285,7 @@ namespace Marsion.Client
                         creature.FSM.DeadState.OnComplete += () =>
                         {
                             playerField.Creatures.Remove(creature);
-                            Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+                            Managers.Instance.Resource.Destroy(creature.MonoBehaviour.gameObject);
                         };
 
                         creature.FSM.PushState<CreatureViewDead>();
@@ -299,7 +299,7 @@ namespace Marsion.Client
                         creature.FSM.DeadState.OnComplete += () =>
                         {
                             enemyField.Creatures.Remove(creature);
-                            Managers.Resource.Destroy(creature.MonoBehaviour.gameObject);
+                            Managers.Instance.Resource.Destroy(creature.MonoBehaviour.gameObject);
                         };
 
                         creature.FSM.PushState<CreatureViewDead>();

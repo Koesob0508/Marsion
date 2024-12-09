@@ -25,7 +25,7 @@ namespace Marsion.UI
                 Text_Name.text = cardSO.Name;
                 Cost = cardSO.Mana;
                 Text_Cost.text = cardSO.Mana.ToString();
-                Image_Card.sprite = Managers.Resource.Load<Sprite>(cardSO.BoardArtPath);
+                Image_Card.sprite = Managers.Instance.Resource.Load<Sprite>(cardSO.BoardArtPath);
             }
             else
             {
