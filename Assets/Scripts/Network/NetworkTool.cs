@@ -21,7 +21,7 @@ namespace Marsion
             }
             catch (Exception e)
             {
-                Managers.Logger.LogError<NetworkTool>("Serialization error: " + e.Message);
+                Logger.LogError<NetworkTool>("Serialization error: " + e.Message);
                 return new byte[0];
             }
         }
@@ -36,7 +36,7 @@ namespace Marsion
             }
             catch (Exception e)
             {
-                Managers.Logger.LogError<NetworkTool>("Deserialization error: " + e.Message);
+                Logger.LogError<NetworkTool>("Deserialization error: " + e.Message);
                 return null;
             }
         }
@@ -80,7 +80,7 @@ namespace Marsion
             }
             catch(Exception e)
             {
-                Managers.Logger.LogError<NetworkTool>("Serialization error : " + e.Message);
+                Logger.LogError<NetworkTool>("Serialization error : " + e.Message);
                 return new byte[0];
             }
         }
@@ -89,7 +89,7 @@ namespace Marsion
         {
             if (bytes == null || bytes.Length == 0)
             {
-                Managers.Logger.LogWarning<NetworkTool>("Attempted to deserialize from null or empty byte array.");
+                Logger.LogWarning<NetworkTool>("Attempted to deserialize from null or empty byte array.");
                 return default;
             }
 
@@ -104,7 +104,7 @@ namespace Marsion
             }
             catch (Exception e)
             {
-                Managers.Logger.LogError<NetworkTool>("Deserialization error : " + e.Message);
+                Logger.LogError<NetworkTool>("Deserialization error : " + e.Message);
                 return default;
             }
         }

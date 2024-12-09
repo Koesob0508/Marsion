@@ -33,7 +33,7 @@ namespace Marsion
 
             var type = state.GetType();
             register.Add(type, state);
-            Managers.Logger.LogState<BaseStateMachine>($"{Handler.Name}, Registered : ", "black", type);
+            Logger.LogState<BaseStateMachine>($"{Handler.Name}, Registered : ", "black", type);
         }
 
         public void Initialize()
@@ -47,7 +47,7 @@ namespace Marsion
 
             OnAfterInitialize();
 
-            Managers.Logger.LogState<BaseStateMachine>($"{Handler.Name}, Initialized! ", "yellow");
+            Logger.LogState<BaseStateMachine>($"{Handler.Name}, Initialized! ", "yellow");
         }
 
         protected virtual void OnBeforeInitialize() { }
@@ -81,7 +81,7 @@ namespace Marsion
             stack.Push(state);
             state.OnEnterState();
 
-            Managers.Logger.LogState<BaseStateMachine>($"{Handler.Name}, {stack.Count}, Push state : ", "green", type);
+            Logger.LogState<BaseStateMachine>($"{Handler.Name}, {stack.Count}, Push state : ", "green", type);
         }
 
         public void PopState(bool isSilent = false)
@@ -90,13 +90,13 @@ namespace Marsion
 
             var state = stack.Pop();
 
-            Managers.Logger.LogState<BaseStateMachine>($"{Handler.Name}, {stack.Count}, Pop state : ", "purple", state.GetType());
+            Logger.LogState<BaseStateMachine>($"{Handler.Name}, {stack.Count}, Pop state : ", "purple", state.GetType());
             state.OnExitState();
 
             if (!isSilent)
             {
                 Current?.OnEnterState();
-                Managers.Logger.LogState<BaseStateMachine>($"Current State : ", "purple", Current.GetType());
+                Logger.LogState<BaseStateMachine>($"Current State : ", "purple", Current.GetType());
             }
         }
 

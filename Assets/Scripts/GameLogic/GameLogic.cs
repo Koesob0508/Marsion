@@ -53,7 +53,7 @@ namespace Marsion.Logic
 
         public Card DrawCard(Player player)
         {
-            Managers.Logger.Log<GameLogic>("Card draw", colorName: "yellow");
+            Logger.Log<GameLogic>("Card draw", colorName: "yellow");
 
             Card card = null;
 
@@ -69,7 +69,7 @@ namespace Marsion.Logic
             }
             else
             {
-                Managers.Logger.Log<GameLogic>("Can't draw", colorName: "yellow");
+                Logger.Log<GameLogic>("Can't draw", colorName: "yellow");
             }
 
             return card;
@@ -109,7 +109,7 @@ namespace Marsion.Logic
 
             if (AlivePlayers.Count != 2)
             {
-                Managers.Logger.Log<GameLogic>("End game", colorName: "yellow");
+                Logger.Log<GameLogic>("End game", colorName: "yellow");
                 return true;
             }
 

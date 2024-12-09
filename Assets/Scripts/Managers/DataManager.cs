@@ -19,7 +19,7 @@ namespace Marsion
         // 데이터 초기화 메서드
         public void Init()
         {
-            Managers.Logger.Log<DataManager>("Data initialized", colorName: ColorCodes.CommonManager);
+            Logger.Log<DataManager>("Data initialized", colorName: ColorCodes.CommonManager);
             dataLists = new();
             dataDictionaries = new();
 

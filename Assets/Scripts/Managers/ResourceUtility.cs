@@ -20,7 +20,7 @@ namespace Marsion
 
             if(original == null)
             {
-                Managers.Logger.Log<ResourceUtility>($"Failed to load prefab : {path}");
+                Logger.Log<ResourceUtility>($"Failed to load prefab : {path}");
                 return null;
             }
 
@@ -40,7 +40,7 @@ namespace Marsion
 
             if (original == null)
             {
-                Managers.Logger.Log<ResourceUtility>($"Failed to load prefab : {path}");
+                Logger.Log<ResourceUtility>($"Failed to load prefab : {path}");
                 return default;
             }
 

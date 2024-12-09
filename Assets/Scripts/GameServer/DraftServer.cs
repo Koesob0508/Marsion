@@ -26,7 +26,7 @@ namespace Marsion
 
         public void Init()
         {
-            Managers.Logger.Log<DraftServer>($"Draft Server initialized", colorName: ColorCodes.Server);
+            Logger.Log<DraftServer>($"Draft Server initialized", colorName: ColorCodes.Server);
 
             Commands = new();
             DraftDictionary = new();
@@ -65,7 +65,7 @@ namespace Marsion
 
         private void OnReceiveStartDraft(ulong clientID, SerializedData sdata)
         {
-            Managers.Logger.Log<DraftServer>($"Start Draft from Client : {clientID}", colorName: ColorCodes.Server);
+            Logger.Log<DraftServer>($"Start Draft from Client : {clientID}", colorName: ColorCodes.Server);
 
             SendInitState(clientID);
             SendStartDraft(clientID);
@@ -73,11 +73,11 @@ namespace Marsion
 
         private void OnReceiveSelect(ulong clientID, SerializedData sdata)
         {
-            Managers.Logger.Log<DraftServer>($"Select from Client : {clientID}", colorName: ColorCodes.Server);
+            Logger.Log<DraftServer>($"Select from Client : {clientID}", colorName: ColorCodes.Server);
 
             int index = sdata.GetInt();
 
-            Managers.Logger.Log<DraftServer>($"Client {clientID} select {index}", colorName: ColorCodes.Server);
+            Logger.Log<DraftServer>($"Client {clientID} select {index}", colorName: ColorCodes.Server);
 
             if(DraftDictionary.TryGetValue(clientID, out var state))
             {
@@ -85,7 +85,7 @@ namespace Marsion
             }
             else
             {
-                Managers.Logger.LogWarning<DraftServer>($"Client {clientID} has not state", colorName: ColorCodes.Server);
+                Logger.LogWarning<DraftServer>($"Client {clientID} has not state", colorName: ColorCodes.Server);
             }
 
             SendUdpateState(clientID);
@@ -93,7 +93,7 @@ namespace Marsion
 
         private void OnReceiveReady(ulong clientID, SerializedData sdata)
         {
-            Managers.Logger.Log<DraftServer>($"Ready from Client : {clientID}", colorName: ColorCodes.Server);
+            Logger.Log<DraftServer>($"Ready from Client : {clientID}", colorName: ColorCodes.Server);
 
             DraftDictionary.TryGetValue(clientID, out var state);
 
@@ -139,7 +139,7 @@ namespace Marsion
             }
             else
             {
-                Managers.Logger.LogWarning<DraftServer>($"Client({clientID}) has not draft state", colorName: ColorCodes.Server);
+                Logger.LogWarning<DraftServer>($"Client({clientID}) has not draft state", colorName: ColorCodes.Server);
             }
         }
 
@@ -176,7 +176,7 @@ namespace Marsion
             }
             else
             {
-                Managers.Logger.Log<DraftServer>($"Client({clientID}) has not state", colorName: ColorCodes.Server);
+                Logger.Log<DraftServer>($"Client({clientID}) has not state", colorName: ColorCodes.Server);
                 draftedDeck = null;
                 return false;
             }
@@ -197,7 +197,7 @@ namespace Marsion
             }
             else
             {
-                Managers.Logger.Log<DraftServer>($"Client(ID : {clientID}) Draft State already exists", colorName: ColorCodes.Server);
+                Logger.Log<DraftServer>($"Client(ID : {clientID}) Draft State already exists", colorName: ColorCodes.Server);
             }
         }
     }

@@ -15,7 +15,7 @@ namespace Marsion
 
         public void Init()
         {
-            Managers.Logger.Log<ClientManager>("Client Manager initialized", colorName: ColorCodes.Client);
+            Logger.Log<ClientManager>("Client Manager initialized", colorName: ColorCodes.Client);
 
             Input = new InputManager();
             Draft = new DraftClient();
