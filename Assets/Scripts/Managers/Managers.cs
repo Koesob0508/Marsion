@@ -14,7 +14,7 @@ namespace Marsion
         [SerializeField] ClientManager _client;
 
         public IResourceManager Resource { get; private set; }
-        public static UIUtility UI { get; private set; }
+        public static UIManager UI { get; private set; }
         public static CardManager Card { get; private set; }
 
         public static DataManager Data { get; private set; }
@@ -41,7 +41,7 @@ namespace Marsion
                 IAddressableLoader addressableLoader = factory.CreateAddressableLoader();
                 Instance.Resource = factory.CreateResource(resourceLoader, addressableLoader);
 
-                UI = new UIUtility();
+                UI = new UIManager();
                 Card = new CardManager();
                 Data = new DataManager();
 

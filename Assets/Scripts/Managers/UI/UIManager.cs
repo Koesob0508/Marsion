@@ -4,12 +4,19 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class UIUtility
+    public class UIManager : IUIManager
     {
+        private readonly IResourceManager _resourceManager;
+
         int _order = 10;
 
-        Stack<UI_Popup> _popupStack = new Stack<UI_Popup>();
         UI_Scene _sceneUI = null;
+        Stack<UI_Popup> _popupStack = new Stack<UI_Popup>();
+
+        public UIManager(IResourceManager resourceManager)
+        {
+            _resourceManager = resourceManager;
+        }
 
         public GameObject Root
         {
@@ -44,12 +51,11 @@ namespace Marsion
         {
             if (string.IsNullOrEmpty(name)) { name = typeof(T).Name; }
 
-            GameObject go = Managers.Instance.Resource.Instantiate($"Prefabs/UI/Scene/{name}");
-
+            GameObject go = _resourceManager.Instantiate($"Prefabs/UI/Scene/{name}");
             T scene = go.GetOrAddComponent<T>();
-            _sceneUI = scene;
-
             go.transform.SetParent(Root.transform);
+
+            _sceneUI = scene;
 
             return scene;
         }
@@ -58,11 +64,12 @@ namespace Marsion
         {
             if (string.IsNullOrEmpty(name)) { name = typeof(T).Name; }
 
-            GameObject go = Managers.Instance.Resource.Instantiate($"Prefabs/UI/Popup/{name}");
+            GameObject go = _resourceManager.Instantiate($"Prefabs/UI/Popup/{name}");
             T popup = go.GetOrAddComponent<T>();
+            go.transform.SetParent(Root.transform);
+
             _popupStack.Push(popup);
 
-            go.transform.SetParent(Root.transform);
             return popup;
         }
 
@@ -70,7 +77,7 @@ namespace Marsion
         {
             if (string.IsNullOrEmpty(name)) { name = typeof(T).Name; }
 
-            GameObject go = Managers.Instance.Resource.Instantiate($"Prefabs/UI/SubItem/{name}");
+            GameObject go = _resourceManager.Instantiate($"Prefabs/UI/SubItem/{name}");
 
             if (parent != null) { go.transform.SetParent(parent); }
 
@@ -82,18 +89,16 @@ namespace Marsion
             if (_popupStack.Count == 0) return;
 
             UI_Popup popup = _popupStack.Pop();
-            Managers.Instance.Resource.Destroy(popup.gameObject);
-            popup = null;
+            _resourceManager.Destroy(popup.gameObject);
             _order--;
         }
 
         public void ClosePopupUI(UI_Popup popup)
         {
             if (_popupStack.Count == 0) return;
-
             if (_popupStack.Peek() != popup)
             {
-                Debug.LogWarning("Close Popup Failed");
+                Logger.LogWarning<UIManager>("Close Popup Failed");
                 return;
             }
 

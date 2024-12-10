@@ -1,4 +1,4 @@
-﻿namespace Marsion.UI
+﻿namespace Marsion
 {
     public class UI_Popup : UI_Base
     {
