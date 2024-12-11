@@ -11,62 +11,72 @@ namespace Marsion.Tests
     [TestFixture]
     public class NetworkManagerExTests
     {
+        private Mock<IManagers> MockManagers;
+        private GameObject networkManagerGameObject;
+
+        [UnitySetUp]
+        public IEnumerator GlobalSetUp()
+        {
+            if (SceneManager.GetActiveScene().name != "TestScene")
+            {
+                yield return SceneManager.LoadSceneAsync("TestScene");
+            }
+        }
+
         [UnitySetUp]
         public IEnumerator SetUp()
         {
-            yield return SceneManager.LoadSceneAsync("TestScene");
+            yield return null;
+
+            if (NetworkManager.Singleton == null)
+            {
+                networkManagerGameObject = new GameObject("@NetworkManager");
+                networkManagerGameObject.AddComponent<NetworkManager>();
+            }
+
+            var managersFactory = new DefaultManagersFactory();
+            var networkWrapper = managersFactory.CreateNetworkManagerWrapper();
+            var networkEx = new NetworkManagerEx(networkWrapper);
+
+            MockManagers = new Mock<IManagers>();
+            MockManagers
+                .Setup(m => m.NetworkEx)
+                .Returns(networkEx);
         }
 
-        // NetworkManager 감지
+        [UnityTearDown]
+        public void TearDown()
+        {
+            if (NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.Shutdown();
+                Object.Destroy(networkManagerGameObject);
+            }
+
+            MockManagers = null;
+        }
+
         [UnityTest]
         public IEnumerator AfterSceneLoaded_NetworkManager_Should_BeNotNull()
         {
-            var networkManager = GameObject.Find("@NetworkManager").GetComponent<NetworkManager>();
-            // Assert: Verify the scene is correctly loaded
-            Assert.IsNotNull(networkManager);
-
+            var networkManager = GameObject.Find("@NetworkManager")?.GetComponent<NetworkManager>();
+            Assert.IsNotNull(networkManager, "NetworkManager should not be null after the scene is loaded.");
             yield break;
         }
 
-        // 어차피 factory에서 NetworkManager 찾는 작업을 한다.
         [UnityTest]
         public IEnumerator NetworkManager_Should_BeNotNull()
         {
             yield return null;
-
-            var managersFactory = new DefaultManagersFactory();
-            var networkWrapper = managersFactory.CreateNetworkManagerWrapper();
-            var networkEx = new NetworkManagerEx(networkWrapper);
-            var mockManagers = new Mock<IManagers>();
-
-            mockManagers
-                .Setup(m => m.NetworkEx)
-                .Returns(networkEx);
-
-            Assert.IsNotNull(mockManagers.Object.NetworkEx);
+            Assert.IsNotNull(MockManagers.Object.NetworkEx);
         }
 
-        // Managers.NetworkEx에서 StartHost, IsHost 확인
         [UnityTest]
         public IEnumerator NetworkEx_StartHost_IsHost()
         {
             yield return null;
-
-            // Arrange
-            var managersFactory = new DefaultManagersFactory();
-            var networkWrapper = managersFactory.CreateNetworkManagerWrapper();
-            var networkEx = new NetworkManagerEx(networkWrapper);
-            var mockManagers = new Mock<IManagers>();
-
-            mockManagers
-                .Setup(m => m.NetworkEx)
-                .Returns(networkEx);
-
-            // Act
-            mockManagers.Object.NetworkEx.StartHost();
-
-            // Assert
-            Assert.IsTrue(NetworkManager.Singleton.IsHost);
+            MockManagers.Object.NetworkEx.StartHost();
+            Assert.IsTrue(NetworkManager.Singleton.IsHost, "NetworkManager should be in host mode.");
         }
     }
 }
