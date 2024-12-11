@@ -7,7 +7,7 @@ namespace Marsion
     {
         private void Start()
         {
-            IManagerFactory factory = new DefaultManagerFactory();
+            IManagersFactory factory = new DefaultManagersFactory();
 
             Managers.Init(factory);
         }

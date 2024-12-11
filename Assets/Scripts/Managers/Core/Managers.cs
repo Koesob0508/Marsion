@@ -23,7 +23,7 @@ namespace Marsion
         public static ServerManager Server { get { return Instance._server; } }
         public static ClientManager Client { get { return Instance._client; } }
 
-        public static void Init(IManagerFactory factory)
+        public static void Init(IManagersFactory factory)
         {
             if (Instance == null)
             {

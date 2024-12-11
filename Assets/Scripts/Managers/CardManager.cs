@@ -15,7 +15,7 @@ namespace Marsion
             {
                 copiedCards = new();
 
-                foreach (var cardData in Managers.Instance.Data.CardList)
+                foreach (var cardData in Managers.Instance.Data.GetDictionary<CardSO>().Values)
                 {
                     copiedCards.Add(cardData.ID);
                 }
@@ -65,7 +65,7 @@ namespace Marsion
             {
                 copiedCards = new List<string>();
 
-                foreach (var cardSO in Managers.Instance.Data.GetDictionary<CardSO>())
+                foreach (var cardSO in Managers.Instance.Data.GetDictionary<CardSO>().Values)
                 {
                     copiedCards.Add(cardSO.ID);
                 }

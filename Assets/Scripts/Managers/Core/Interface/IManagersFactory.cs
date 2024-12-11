@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public interface IManagerFactory
+    public interface IManagersFactory
     {
         IResourceLoader CreateResourceLoader();
         IAddressableLoader CreateAddressableLoader();
@@ -17,7 +17,7 @@ namespace Marsion
         INetworkManagerEx CreateNetworkManagerEx(INetworkWrapper networkManagerWrapper);
     }
 
-    public class DefaultManagerFactory : IManagerFactory
+    public class DefaultManagersFactory : IManagersFactory
     {
         public IResourceLoader CreateResourceLoader() => new DefaultResourceLoader();
         public IAddressableLoader CreateAddressableLoader() => new DefaultAddressableLoader();
