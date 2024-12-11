@@ -64,7 +64,7 @@ namespace Marsion
         {
             Logger.Log<DraftClient>($"Received start draft", colorName: ColorCodes.Client);
 
-            Managers.UI.ShowPopupUI<UI_DraftPanel>();
+            Managers.Instance.UI.ShowPopupUI<UI_DraftPanel>();
         }
 
         private void OnReceiveUpdateState(SerializedData sdata)

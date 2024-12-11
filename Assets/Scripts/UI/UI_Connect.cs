@@ -91,7 +91,7 @@ namespace Marsion
         {
             Button_StartDraft.interactable = false;
 
-            Managers.UI.ClosePopupUI(this);
+            Managers.Instance.UI.ClosePopupUI(this);
 
             Logger.Log<UI_Connect>($"Start Draft", colorName: ColorCodes.CommonUI);
             Managers.Client.Draft.RequestStartDraft();

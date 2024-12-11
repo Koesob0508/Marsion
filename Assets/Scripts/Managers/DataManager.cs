@@ -5,23 +5,20 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class DataManager
+    public class DataManager : IDataManager
     {
-        // 각 타입별로 리스트와 딕셔너리를 관리하기 위해 Dictionary 사용
-        private Dictionary<Type, IList> dataLists;
-        private Dictionary<Type, IDictionary> dataDictionaries;
+        private readonly IResourceManager _resourceManager;
+        private readonly Dictionary<Type, IDictionary> _dataDictionaries = new();
 
-        public List<CardSO> CardList { get { return GetList<CardSO>(); } }
-        public List<PortraitSO> PortraitList { get { return GetList<PortraitSO>(); } }
-        public Dictionary<string, CardSO> CardDictionary { get { return GetDictionary<CardSO>(); } }
-        public Dictionary<string, PortraitSO> PortraitDictionary { get { return GetDictionary<PortraitSO>(); } }
+        public DataManager(IResourceManager resourceManager)
+        {
+            _resourceManager = resourceManager;
+        }
 
         // 데이터 초기화 메서드
         public void Init()
         {
             Logger.Log<DataManager>("Data initialized", colorName: ColorCodes.CommonManager);
-            dataLists = new();
-            dataDictionaries = new();
 
             Load<CardSO>("CardSO");
             Load<PortraitSO>("PortraitSO");
@@ -30,51 +27,55 @@ namespace Marsion
         // 제네릭 Load 메서드 (Object 타입을 상속하는 경우에 대응)
         public void Load<T>(string path = "") where T : UnityEngine.Object, IIdentifiable
         {
-            // 해당 타입에 대한 리스트 및 딕셔너리 확보
-            if (!dataLists.ContainsKey(typeof(T)))
+            if(string.IsNullOrEmpty(path))
             {
-                dataLists[typeof(T)] = new List<T>();
-                dataDictionaries[typeof(T)] = new Dictionary<string, T>();
+                Logger.LogError<DataManager>($"Path is null or empty for {typeof(T).Name}", colorName: ColorCodes.CommonManager);
+                return;
             }
 
-            var list = (List<T>)dataLists[typeof(T)];
-            var dictionary = (Dictionary<string, T>)dataDictionaries[typeof(T)];
+            EnsureTypeRegistered<T>();
 
-            // 리소스 로드 및 리스트에 추가
-            T[] loadedItems = Managers.Instance.Resource.LoadAll<T>(path);
-            list.AddRange(loadedItems);
+            var dictionary = (Dictionary<string, T>)_dataDictionaries[typeof(T)];
 
-            // ID를 키로 딕셔너리에 추가
-            foreach (var item in list)
+            T[] assets = _resourceManager.LoadAll<T>(path);
+
+            foreach(var asset in assets)
             {
-                dictionary.Add(item.ID, item); // T 타입이 IIdentifiable 인터페이스를 구현한다고 가정
+                if(!dictionary.ContainsKey(asset.ID))
+                {
+                    dictionary[asset.ID] = asset;
+                }
             }
         }
 
-        // 특정 타입의 리스트를 가져오는 메서드
-        public List<T> GetList<T>() where T : UnityEngine.Object
+        public IEnumerator LoadFromAddressables<T>(string label) where T : UnityEngine.Object, IIdentifiable
         {
-            if (dataLists.TryGetValue(typeof(T), out IList list))
+            if (string.IsNullOrEmpty(label))
             {
-                return (List<T>)list;
+                Logger.LogError<DataManager>($"Label is null or empty for {typeof(T).Name}", colorName: ColorCodes.CommonManager);
+                yield break;
             }
-            return null;
+
+            EnsureTypeRegistered<T>();
         }
 
         // 특정 타입의 딕셔너리를 가져오는 메서드
-        public Dictionary<string, T> GetDictionary<T>() where T : UnityEngine.Object
+        public Dictionary<string, T> GetDictionary<T>() where T : UnityEngine.Object, IIdentifiable
         {
-            if (dataDictionaries.TryGetValue(typeof(T), out IDictionary dictionary))
+            if (_dataDictionaries.TryGetValue(typeof(T), out var dictionary))
             {
-                return (Dictionary<string, T>)dictionary;
+                return dictionary as Dictionary<string, T>;
             }
             return null;
         }
-    }
 
-    // ID를 기준으로 Dictionary에 추가하기 위해 IIdentifiable 인터페이스 정의
-    public interface IIdentifiable
-    {
-        string ID { get; }
+        private void EnsureTypeRegistered<T>() where T : UnityEngine.Object, IIdentifiable
+        {
+            if(!_dataDictionaries.ContainsKey(typeof(T)))
+            {
+                Logger.Log<DataManager>($"Registering type : {typeof(T).Name}", colorName: ColorCodes.CommonManager);
+                _dataDictionaries[typeof(T)] = new Dictionary<string, T>();
+            }
+        }
     }
 }

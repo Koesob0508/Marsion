@@ -4,7 +4,7 @@
     {
         public override void Init()
         {
-            Managers.UI.SetCanvas(gameObject, false);
+            Managers.Instance.UI.SetCanvas(gameObject, false);
         }
     }
 }

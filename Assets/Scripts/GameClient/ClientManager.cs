@@ -23,7 +23,7 @@ namespace Marsion
             //Game.Init();
             Game.Init();
 
-            Managers.UI.ShowPopupUI<UI_Connect>();
+            Managers.Instance.UI.ShowPopupUI<UI_Connect>();
         }
 
         private void Update()

@@ -14,10 +14,11 @@ namespace Marsion
         [SerializeField] ClientManager _client;
 
         public IResourceManager Resource { get; private set; }
-        public static UIManager UI { get; private set; }
+        public IUIManager UI { get; private set; }
         public static CardManager Card { get; private set; }
 
-        public static DataManager Data { get; private set; }
+        public IDataManager Data { get; private set; }
+        public INetworkManagerEx NetworkEx { get; private set; }
         public static MarsNetwork Network { get { return Instance._network; } }
         public static ServerManager Server { get { return Instance._server; } }
         public static ClientManager Client { get { return Instance._client; } }
@@ -41,11 +42,14 @@ namespace Marsion
                 IAddressableLoader addressableLoader = factory.CreateAddressableLoader();
                 Instance.Resource = factory.CreateResource(resourceLoader, addressableLoader);
 
-                UI = new UIManager();
-                Card = new CardManager();
-                Data = new DataManager();
+                Instance.UI = factory.CreateUI(Instance.Resource);
+                Instance.Data = factory.CreateData(Instance.Resource);
+                INetworkWrapper networkWrapper = factory.CreateNetworkManagerWrapper();
+                Instance.NetworkEx = factory.CreateNetworkManagerEx(networkWrapper);
 
-                Data.Init();
+                Card = new CardManager();
+
+                Instance.Data.Init();
                 Network.Init();
                 Server.Init();
                 Client.Init();
@@ -54,7 +58,7 @@ namespace Marsion
 
         public static void Clear()
         {
-            UI.Clear();
+            Instance.UI.Clear();
         }
     }
 }

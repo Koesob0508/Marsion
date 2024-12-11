@@ -20,7 +20,7 @@ namespace Marsion.UI
 
         public void Setup(string soID)
         {
-            if (Managers.Data.CardDictionary.TryGetValue(soID, out var cardSO))
+            if (Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(soID, out var cardSO))
             {
                 Text_Name.text = cardSO.Name;
                 Cost = cardSO.Mana;

@@ -10,6 +10,7 @@ namespace Marsion
         void ClosePopupUI();
         void ClosePopupUI(UI_Popup popup);
         void CloseAllPopupUI();
+        void SetCanvas(GameObject go, bool sort = true);
         void Clear();
     }
 }

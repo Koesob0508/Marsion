@@ -202,7 +202,7 @@ namespace Marsion
             clip.OnPlay += () =>
             {
                 Logger.Log<GameClient>("Game end", colorName: ColorCodes.Client);
-                UI_EndGame ui = Managers.UI.ShowPopupUI<UI_EndGame>();
+                UI_EndGame ui = Managers.Instance.UI.ShowPopupUI<UI_EndGame>();
 
                 if(winnerData.value > 10)
                 {

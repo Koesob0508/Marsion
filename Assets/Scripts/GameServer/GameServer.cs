@@ -222,7 +222,7 @@ namespace Marsion.Server
 
             foreach(var soID in deck)
             {
-                if(Managers.Data.CardDictionary.TryGetValue(soID.SomeText, out var cardSO))
+                if(Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(soID.SomeText, out var cardSO))
                 {
                     resultDeck.Add(new Card(id, cardSO));
                 }

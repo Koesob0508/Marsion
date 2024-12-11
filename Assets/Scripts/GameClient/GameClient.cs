@@ -155,7 +155,7 @@ namespace Marsion.Client
             gameEndClip.OnPlay += () =>
             {
                 Logger.Log<GameClient>("Game end.");
-                UI_EndGame ui = Managers.UI.ShowPopupUI<UI_EndGame>();
+                UI_EndGame ui = Managers.Instance.UI.ShowPopupUI<UI_EndGame>();
 
                 if (clientID == -1)
                 {

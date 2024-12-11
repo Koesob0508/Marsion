@@ -15,7 +15,7 @@ namespace Marsion
             {
                 copiedCards = new();
 
-                foreach(var cardData in Managers.Data.CardList)
+                foreach (var cardData in Managers.Instance.Data.CardList)
                 {
                     copiedCards.Add(cardData.ID);
                 }
@@ -33,7 +33,7 @@ namespace Marsion
 
                 foreach (var cardID in copiedCards)
                 {
-                    if(Managers.Data.GetDictionary<CardSO>().TryGetValue(cardID, out var cardSO))
+                    if(Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(cardID, out var cardSO))
                     {
                         if ((int)cardSO.Grade == grade)
                         {
@@ -65,7 +65,7 @@ namespace Marsion
             {
                 copiedCards = new List<string>();
 
-                foreach (var cardSO in Managers.Data.CardList)
+                foreach (var cardSO in Managers.Instance.Data.GetDictionary<CardSO>())
                 {
                     copiedCards.Add(cardSO.ID);
                 }
@@ -83,7 +83,7 @@ namespace Marsion
 
                 foreach (var cardID in copiedCards)
                 {
-                    if(Managers.Data.GetDictionary<CardSO>().TryGetValue(cardID, out var card))
+                    if(Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(cardID, out var card))
                     {
                         if ((int)card.Grade != grade)
                         {
