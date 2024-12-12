@@ -10,7 +10,6 @@ using UnityEngine.TestTools;
 
 namespace Marsion.Tests
 {
-    [TestFixture]
     public class NetworkManagerExTests
     {
         private Mock<IManagers> MockManagers;
@@ -156,7 +155,7 @@ namespace Marsion.Tests
         }
 
         [UnityTest]
-        public IEnumerator Two_NetworkManager()
+        public IEnumerator CustomNetworkManager_Could_StartHost()
         {
             yield return null;
 
@@ -183,15 +182,47 @@ namespace Marsion.Tests
 
             hostNetwork.StartHost();
 
-            //var guestNetworkGameObject = new GameObject("@GuestNetwork");
-            //var guestNetwork = guestNetworkGameObject.AddComponent<NetworkManager>();
-            //guestNetwork.NetworkConfig.ConnectionData = new byte[] { 2 };
+            Assert.IsTrue(hostNetwork.IsHost, "Start host is not work");
 
-            //hostNetwork.StartHost();
-            //guestNetwork.StartClient();
+            hostNetwork.Shutdown();
+            UnityEngine.Object.Destroy(hostNetwork.gameObject);
+
+            yield break;
+        }
+
+        [UnityTest]
+        public IEnumerator Two_NetworkManager()
+        {
+            yield return null;
+
+            if(NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.Shutdown();
+                UnityEngine.Object.Destroy(NetworkManager.Singleton.gameObject);
+            }
+            MockManagers = null;
+
+            var hostNetworkObject = new GameObject("@HostNetwork");
+            var hostNetwork = hostNetworkObject.AddComponent<NetworkManager>();
+            var hostTransport = hostNetworkObject.AddComponent<UnityTransport>();
+            hostTransport.ConnectionData.Port = 7777;
+
+            hostNetwork.NetworkConfig = new NetworkConfig
+            { NetworkTransport = hostTransport };
+
+            var guestNetworkObject = new GameObject("@GuestNetwork");
+            var guestNetwork = guestNetworkObject.AddComponent<NetworkManager>();
+            var guestTransport = guestNetworkObject.AddComponent<UnityTransport>();
+            guestTransport.ConnectionData.Port = 7778;
+
+            guestNetwork.NetworkConfig = new NetworkConfig
+            { NetworkTransport = guestTransport };
+
+            hostNetwork.StartHost();
+            guestNetwork.StartClient();
 
             Assert.IsTrue(hostNetwork.IsHost, "Start host is not work");
-            // Assert.IsTrue(guestNetwork.IsClient, "Start guest is not work");
+            Assert.IsTrue(guestNetwork.IsClient, "Start Client is not work.");
 
             yield break;
         }
