@@ -1,7 +1,9 @@
 ﻿using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -45,14 +47,15 @@ namespace Marsion.Tests
         }
 
         [UnityTearDown]
-        public void TearDown()
+        public IEnumerator TearDown()
         {
+            yield return null;
+
             if (NetworkManager.Singleton != null)
             {
                 NetworkManager.Singleton.Shutdown();
-                Object.Destroy(networkManagerGameObject);
+                UnityEngine.Object.Destroy(networkManagerGameObject);
             }
-
             MockManagers = null;
         }
 
@@ -74,9 +77,123 @@ namespace Marsion.Tests
         [UnityTest]
         public IEnumerator NetworkEx_StartHost_IsHost()
         {
-            yield return null;
+            yield return new WaitForSeconds(0.5f);
             MockManagers.Object.NetworkEx.StartHost();
             Assert.IsTrue(NetworkManager.Singleton.IsHost, "NetworkManager should be in host mode.");
+        }
+
+        [UnityTest]
+        public IEnumerator OnConnect_Should_Invoke()
+        {
+            bool isInvoked = false;
+
+            MockManagers.Object.NetworkEx.OnConnect += () =>
+            {
+                isInvoked = true;
+            };
+
+            yield return new WaitForSeconds(0.5f);
+            MockManagers.Object.NetworkEx.StartHost();
+
+            Assert.IsTrue(isInvoked);
+        }
+
+        [UnityTest]
+        public IEnumerator Messaging_Subscribe_Send_Listen()
+        {
+            bool hasListen = false;
+
+            yield return new WaitForSeconds(0.5f);
+            MockManagers.Object.NetworkEx.StartHost();
+            ulong id = MockManagers.Object.NetworkEx.LocalClientID;
+
+            MockManagers.Object.NetworkEx.SubscribeMessage("HostTest", (senderID, reader) =>
+            {
+                if (senderID == MockManagers.Object.NetworkEx.LocalClientID)
+                    hasListen = true;
+            });
+
+            Action<FastBufferWriter> messageWriter = (writer) =>
+            {
+                writer.WriteValueSafe("TestMessage");
+                writer.WriteValueSafe(12345);
+            };
+
+            MockManagers.Object.NetworkEx.SendMessage("HostTest", id, messageWriter, NetworkDelivery.Reliable);
+
+            Assert.IsTrue(hasListen);
+        }
+
+        [UnityTest]
+        public IEnumerator Messaging_Write_Read_Correctly()
+        {
+            string stringValue = "";
+            int intValue = 0;
+
+            yield return new WaitForSeconds(0.5f);
+            MockManagers.Object.NetworkEx.StartHost();
+            ulong id = MockManagers.Object.NetworkEx.LocalClientID;
+
+            MockManagers.Object.NetworkEx.SubscribeMessage("HostTest", (senderID, reader) =>
+            {
+                if (senderID == MockManagers.Object.NetworkEx.LocalClientID)
+                {
+                    reader.ReadValueSafe(out stringValue);
+                    reader.ReadValueSafe(out intValue);
+                }
+            });
+
+            Action<FastBufferWriter> messageWriter = (writer) =>
+            {
+                writer.WriteValueSafe("TestMessage");
+                writer.WriteValueSafe(12345);
+            };
+
+            MockManagers.Object.NetworkEx.SendMessage("HostTest", id, messageWriter, NetworkDelivery.Reliable);
+
+            Assert.AreEqual("TestMessage", stringValue);
+            Assert.AreEqual(12345, intValue);
+        }
+
+        [UnityTest]
+        public IEnumerator Two_NetworkManager()
+        {
+            yield return null;
+
+            // 일단 현재 네트워크 전부 삭제한다.
+
+            if (NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.Shutdown();
+                UnityEngine.Object.Destroy(NetworkManager.Singleton.gameObject);
+            }
+            MockManagers = null;
+
+            var hostNetworkGameObject = new GameObject("@HostNetwork");
+            var hostNetwork = hostNetworkGameObject.AddComponent<NetworkManager>();
+            var hostTransport = hostNetworkGameObject.AddComponent<UnityTransport>();
+            hostTransport.ConnectionData.Port = 7778;
+
+            hostNetwork.NetworkConfig = new NetworkConfig
+            {
+                NetworkTransport = hostTransport
+            };
+
+            Debug.Log(hostNetwork.NetworkConfig is null);
+
+            hostNetwork.StartHost();
+
+            //var guestNetworkGameObject = new GameObject("@GuestNetwork");
+            //var guestNetwork = guestNetworkGameObject.AddComponent<NetworkManager>();
+            //guestNetwork.NetworkConfig.ConnectionData = new byte[] { 2 };
+
+            //hostNetwork.StartHost();
+            //guestNetwork.StartClient();
+
+            Assert.IsTrue(hostNetwork.IsHost, "Start host is not work");
+            // Assert.IsTrue(guestNetwork.IsClient, "Start guest is not work");
+
+            yield break;
         }
     }
 }
