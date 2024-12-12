@@ -25,6 +25,7 @@ namespace Marsion.Tests
                 var hostObject = new GameObject("@HostNetwork");
                 hostNetwork = hostObject.AddComponent<NetworkManager>();
                 var hostTransport = hostObject.AddComponent<UnityTransport>();
+                hostTransport.ConnectionData.Address = "127.0.0.1";
                 hostTransport.ConnectionData.Port = 7777;
 
                 hostNetwork.NetworkConfig = new NetworkConfig
@@ -38,7 +39,8 @@ namespace Marsion.Tests
                 var guestObject = new GameObject("@GuestNetwork");
                 guestNetwork = guestObject.AddComponent<NetworkManager>();
                 var guestTransport = guestObject.AddComponent<UnityTransport>();
-                guestTransport.ConnectionData.Port = 7778;
+                guestTransport.ConnectionData.Address = "127.0.0.1";
+                guestTransport.ConnectionData.Port = 7777;
 
                 guestNetwork.NetworkConfig = new NetworkConfig
                 {
@@ -66,6 +68,8 @@ namespace Marsion.Tests
 
             HostManagers.Object.NetworkEx.StartHost();
             GuestManagers.Object.NetworkEx.StartClient();
+
+            yield return new WaitForSeconds(0.5f);
         }
 
         [UnityTearDown]
