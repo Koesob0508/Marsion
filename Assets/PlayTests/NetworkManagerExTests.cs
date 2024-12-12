@@ -37,7 +37,7 @@ namespace Marsion.Tests
 
             var managersFactory = new DefaultManagersFactory();
             var networkWrapper = managersFactory.CreateNetworkManagerWrapper();
-            var networkEx = new NetworkManagerEx(networkWrapper);
+            var networkEx = managersFactory.CreateNetworkManagerEx(networkWrapper);
 
             MockManagers = new Mock<IManagers>();
             MockManagers
@@ -76,7 +76,7 @@ namespace Marsion.Tests
         [UnityTest]
         public IEnumerator NetworkEx_StartHost_IsHost()
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return null;
             MockManagers.Object.NetworkEx.StartHost();
             Assert.IsTrue(NetworkManager.Singleton.IsHost, "NetworkManager should be in host mode.");
         }
@@ -91,7 +91,7 @@ namespace Marsion.Tests
                 isInvoked = true;
             };
 
-            yield return new WaitForSeconds(0.5f);
+            yield return null;
             MockManagers.Object.NetworkEx.StartHost();
 
             Assert.IsTrue(isInvoked);
@@ -102,7 +102,7 @@ namespace Marsion.Tests
         {
             bool hasListen = false;
 
-            yield return new WaitForSeconds(0.5f);
+            yield return null;
             MockManagers.Object.NetworkEx.StartHost();
             ulong id = MockManagers.Object.NetworkEx.LocalClientID;
 
@@ -129,7 +129,7 @@ namespace Marsion.Tests
             string stringValue = "";
             int intValue = 0;
 
-            yield return new WaitForSeconds(0.5f);
+            yield return null;
             MockManagers.Object.NetworkEx.StartHost();
             ulong id = MockManagers.Object.NetworkEx.LocalClientID;
 

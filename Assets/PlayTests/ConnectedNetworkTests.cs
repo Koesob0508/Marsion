@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -9,6 +10,8 @@ namespace Marsion.Tests
 {
     public class ConnectedNetworkTests
     {
+        Mock<IManagers> HostManagers;
+        Mock<IManagers> GuestManagers;
         NetworkManager hostNetwork;
         NetworkManager guestNetwork;
 
@@ -43,8 +46,26 @@ namespace Marsion.Tests
                 };
             }
 
-            hostNetwork.StartHost();
-            guestNetwork.StartClient();
+            var hostFactory = new DefaultManagersFactory();
+            var hostWrapper = hostFactory.CreateNetworkManagerWrapper(hostNetwork);
+            var hostNetworkEx = hostFactory.CreateNetworkManagerEx(hostWrapper);
+
+            HostManagers = new Mock<IManagers>();
+            HostManagers
+                .Setup(HM => HM.NetworkEx)
+                .Returns(hostNetworkEx);
+
+            var guestFactory = new DefaultManagersFactory();
+            var guestWrapper = guestFactory.CreateNetworkManagerWrapper(guestNetwork);
+            var guestNetworkEx = guestFactory.CreateNetworkManagerEx(guestWrapper);
+
+            GuestManagers = new Mock<IManagers>();
+            GuestManagers
+                .Setup(GM => GM.NetworkEx)
+                .Returns(guestNetworkEx);
+
+            HostManagers.Object.NetworkEx.StartHost();
+            GuestManagers.Object.NetworkEx.StartClient();
         }
 
         [UnityTearDown]
@@ -52,15 +73,16 @@ namespace Marsion.Tests
         {
             yield return null;
 
-            if(hostNetwork != null)
+            if(HostManagers.Object.NetworkEx != null)
             {
-                hostNetwork.Shutdown();
+                HostManagers.Object.NetworkEx.Shutdown();
                 Object.Destroy(hostNetwork);
             }
+            HostManagers = null;
 
-            if(guestNetwork != null)
+            if(GuestManagers.Object.NetworkEx != null)
             {
-                guestNetwork.Shutdown();
+                GuestManagers.Object.NetworkEx.Shutdown();
                 Object.Destroy(guestNetwork);
             }
         }
@@ -70,8 +92,11 @@ namespace Marsion.Tests
         {
             yield return null;
 
-            Assert.IsTrue(hostNetwork.IsHost);
-            Assert.IsTrue(guestNetwork.IsClient);
+            Debug.Log(HostManagers.Object.NetworkEx.LocalClientID);
+            Debug.Log(GuestManagers.Object.NetworkEx.LocalClientID);
+
+            Assert.IsTrue(HostManagers.Object.NetworkEx.IsHost);
+            Assert.IsTrue(GuestManagers.Object.NetworkEx.IsClient);
 
             yield break;
         }
@@ -81,10 +106,21 @@ namespace Marsion.Tests
         {
             yield return null;
 
-            Assert.IsTrue(hostNetwork.IsHost);
-            Assert.IsTrue(guestNetwork.IsClient);
+            Assert.IsTrue(HostManagers.Object.NetworkEx.IsHost);
+            Assert.IsTrue(GuestManagers.Object.NetworkEx.IsClient);
 
             yield break;
+        }
+
+        [UnityTest]
+        public IEnumerator Host_Send_Client_Should_Received()
+        {
+            string expectedString = "TestMessage";
+            int expectedInt = 1234;
+
+            yield return null;
+
+            
         }
     }
 }
