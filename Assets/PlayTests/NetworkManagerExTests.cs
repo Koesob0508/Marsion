@@ -160,71 +160,43 @@ namespace Marsion.Tests
             yield return null;
 
             // 일단 현재 네트워크 전부 삭제한다.
+            // ConnectedNetworkTet로 패스
 
-            if (NetworkManager.Singleton != null)
-            {
-                NetworkManager.Singleton.Shutdown();
-                UnityEngine.Object.Destroy(NetworkManager.Singleton.gameObject);
-            }
-            MockManagers = null;
+            //if (NetworkManager.Singleton != null)
+            //{
+            //    NetworkManager.Singleton.Shutdown();
+            //    UnityEngine.Object.Destroy(NetworkManager.Singleton.gameObject);
+            //}
+            //MockManagers = null;
 
-            var hostNetworkGameObject = new GameObject("@HostNetwork");
-            var hostNetwork = hostNetworkGameObject.AddComponent<NetworkManager>();
-            var hostTransport = hostNetworkGameObject.AddComponent<UnityTransport>();
-            hostTransport.ConnectionData.Port = 7778;
+            //var hostNetworkGameObject = new GameObject("@HostNetwork");
+            //var hostNetwork = hostNetworkGameObject.AddComponent<NetworkManager>();
+            //var hostTransport = hostNetworkGameObject.AddComponent<UnityTransport>();
+            //hostTransport.ConnectionData.Port = 7778;
 
-            hostNetwork.NetworkConfig = new NetworkConfig
-            {
-                NetworkTransport = hostTransport
-            };
+            //hostNetwork.NetworkConfig = new NetworkConfig
+            //{
+            //    NetworkTransport = hostTransport
+            //};
 
-            Debug.Log(hostNetwork.NetworkConfig is null);
+            //Debug.Log(hostNetwork.NetworkConfig is null);
 
-            hostNetwork.StartHost();
+            //hostNetwork.StartHost();
 
-            Assert.IsTrue(hostNetwork.IsHost, "Start host is not work");
+            //Assert.IsTrue(hostNetwork.IsHost, "Start host is not work");
 
-            hostNetwork.Shutdown();
-            UnityEngine.Object.Destroy(hostNetwork.gameObject);
+            ////hostNetwork.Shutdown();
+            ////UnityEngine.Object.Destroy(hostNetwork.gameObject);
+            //hostNetworkGameObject = null;
+            //hostNetwork = null;
 
-            yield break;
-        }
+            //if (NetworkManager.Singleton != null)
+            //{
+            //    NetworkManager.Singleton.Shutdown();
+            //    UnityEngine.Object.Destroy(NetworkManager.Singleton.gameObject);
+            //}
 
-        [UnityTest]
-        public IEnumerator Two_NetworkManager()
-        {
-            yield return null;
-
-            if(NetworkManager.Singleton != null)
-            {
-                NetworkManager.Singleton.Shutdown();
-                UnityEngine.Object.Destroy(NetworkManager.Singleton.gameObject);
-            }
-            MockManagers = null;
-
-            var hostNetworkObject = new GameObject("@HostNetwork");
-            var hostNetwork = hostNetworkObject.AddComponent<NetworkManager>();
-            var hostTransport = hostNetworkObject.AddComponent<UnityTransport>();
-            hostTransport.ConnectionData.Port = 7777;
-
-            hostNetwork.NetworkConfig = new NetworkConfig
-            { NetworkTransport = hostTransport };
-
-            var guestNetworkObject = new GameObject("@GuestNetwork");
-            var guestNetwork = guestNetworkObject.AddComponent<NetworkManager>();
-            var guestTransport = guestNetworkObject.AddComponent<UnityTransport>();
-            guestTransport.ConnectionData.Port = 7778;
-
-            guestNetwork.NetworkConfig = new NetworkConfig
-            { NetworkTransport = guestTransport };
-
-            hostNetwork.StartHost();
-            guestNetwork.StartClient();
-
-            Assert.IsTrue(hostNetwork.IsHost, "Start host is not work");
-            Assert.IsTrue(guestNetwork.IsClient, "Start Client is not work.");
-
-            yield break;
+            //yield break;
         }
     }
 }
