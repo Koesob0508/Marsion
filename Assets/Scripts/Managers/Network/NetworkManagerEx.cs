@@ -8,12 +8,10 @@ namespace Marsion
     public class NetworkManagerEx : INetworkManagerEx
     {
         private readonly INetworkWrapper networkWrapper;
-        private readonly NetworkEventHandler eventHandler;
 
         public NetworkManagerEx(INetworkWrapper networkWrapper)
         {
             this.networkWrapper = networkWrapper ?? throw new ArgumentNullException(nameof(networkWrapper));
-            this.eventHandler = new NetworkEventHandler(networkWrapper);
         }
 
         // Properties
@@ -28,23 +26,23 @@ namespace Marsion
         // Events
         public event Action OnConnect
         {
-            add => eventHandler.OnConnect += value;
-            remove => eventHandler.OnConnect -= value;
+            add => networkWrapper.OnConnect += value;
+            remove => networkWrapper.OnConnect -= value;
         }
         public event Action OnDisconnect
         {
-            add => eventHandler.OnDisconnect += value;
-            remove => eventHandler.OnDisconnect -= value;
+            add => networkWrapper.OnDisconnect += value;
+            remove => networkWrapper.OnDisconnect -= value;
         }
         public event Action<ulong> OnClientConnected
         {
-            add => eventHandler.OnClientConnected += value;
-            remove => eventHandler.OnClientConnected -= value;
+            add => networkWrapper.OnClientConnected += value;
+            remove => networkWrapper.OnClientConnected -= value;
         }
         public event Action<ulong> OnClientDisconnected
         {
-            add => eventHandler.OnClientDisconnected += value;
-            remove => eventHandler.OnClientDisconnected -= value;
+            add => networkWrapper.OnClientDisconnected += value;
+            remove => networkWrapper.OnClientDisconnected -= value;
         }
 
         // Messaging
@@ -111,8 +109,6 @@ namespace Marsion
         public void Clear()
         {
             UnsubscribeAllMessages();
-
-            eventHandler.Clear();
         }
 
         // Private methods

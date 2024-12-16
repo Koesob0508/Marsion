@@ -11,6 +11,15 @@ namespace Marsion
         public NetworkManagerWrapper(NetworkManager networkManager)
         {
             this.networkManager = networkManager ?? throw new ArgumentNullException(nameof(networkManager));
+
+            this.networkManager.OnClientConnectedCallback += OnClientConnectedHandler;
+            this.networkManager.OnClientDisconnectCallback += OnClientDisconnectedHandler;
+        }
+
+        public void Clear()
+        {
+            networkManager.OnClientConnectedCallback -= OnClientConnectedHandler;
+            networkManager.OnClientDisconnectCallback -= OnClientDisconnectedHandler;
         }
 
         public ulong LocalClientID => networkManager.LocalClientId;
@@ -25,8 +34,8 @@ namespace Marsion
 
         public event Action OnConnect;
         public event Action OnDisconnect;
-        public event Action<ulong> OnClientConnectedCallback;
-        public event Action<ulong> OnClientDisconnectCallback;
+        public event Action<ulong> OnClientConnected;
+        public event Action<ulong> OnClientDisconnected;
 
 
         public void StartHost()
@@ -51,6 +60,16 @@ namespace Marsion
         {
             networkManager.Shutdown();
             OnDisconnect?.Invoke();
+        }
+
+        private void OnClientConnectedHandler(ulong clientID)
+        {
+            OnClientConnected?.Invoke(clientID);
+        }
+
+        private void OnClientDisconnectedHandler(ulong clientID)
+        {
+            OnClientDisconnected?.Invoke(clientID);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Marsion
         ICustomMessagingManager CustomMessagingManager { get; }
         event Action OnConnect;
         event Action OnDisconnect;
-        event Action<ulong> OnClientConnectedCallback;
-        event Action<ulong> OnClientDisconnectCallback;
+        event Action<ulong> OnClientConnected;
+        event Action<ulong> OnClientDisconnected;
     }
 }
