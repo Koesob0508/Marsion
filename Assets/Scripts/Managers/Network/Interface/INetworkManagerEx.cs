@@ -6,8 +6,8 @@ namespace Marsion
 {
     public interface INetworkManagerEx
     {
-        ulong LocalClientID { get; }
-        ulong ServerClientID { get; }
+        ulong LocalID { get; }
+        ulong ServerID { get; }
         bool IsServer { get; }
         bool IsClient { get; }
         bool IsHost { get; }

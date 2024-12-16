@@ -99,8 +99,8 @@ namespace Marsion.Tests
 
             yield return new WaitForSeconds(0.5f);
 
-            Debug.Log(HostManagers.Object.NetworkEx.LocalClientID);
-            Debug.Log(GuestManagers.Object.NetworkEx.LocalClientID);
+            Debug.Log(HostManagers.Object.NetworkEx.LocalID);
+            Debug.Log(GuestManagers.Object.NetworkEx.LocalID);
 
             Assert.IsTrue(HostManagers.Object.NetworkEx.IsHost);
             Assert.IsTrue(GuestManagers.Object.NetworkEx.IsClient);
@@ -138,15 +138,10 @@ namespace Marsion.Tests
                 isClientConnected = true;
             };
 
-            yield return new WaitForSeconds(1f);
-
             HostManagers.Object.NetworkEx.StartHost();
-
-            yield return new WaitForSeconds(1f);
-
             GuestManagers.Object.NetworkEx.StartClient();
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
 
             //var connectedClients = HostManagers.Object.NetworkEx.ConnectedClientsIDs;
             //foreach (var clientId in connectedClients)
@@ -170,9 +165,9 @@ namespace Marsion.Tests
             string expectedString = "TestMessage";
             int expectedInt = 1234;
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.5f); // 메시지 처리 시간 대기
 
-            ulong targetID = GuestManagers.Object.NetworkEx.LocalClientID;
+            ulong targetID = GuestManagers.Object.NetworkEx.LocalID;
 
             string receivedString = "";
             int receivedInt = 0;
@@ -192,7 +187,12 @@ namespace Marsion.Tests
 
             HostManagers.Object.NetworkEx.SendMessage("Host", targetID, messageWriter, NetworkDelivery.Reliable);
 
-            yield return new WaitForSeconds(0.5f); // 메시지 처리 시간 대기
+            float timeout = 1f;
+            float startTime = Time.time;
+
+            yield return new WaitUntil(() => expectedBool || (Time.time - startTime) > timeout);
+            Debug.Log($"Time : {Time.time - startTime})");
+            //yield return new WaitForSeconds(0.5f); // 메시지 처리 시간 대기
 
             Assert.IsTrue(expectedBool);
             Assert.AreEqual(expectedString, receivedString);

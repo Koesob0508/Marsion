@@ -104,11 +104,11 @@ namespace Marsion.Tests
 
             yield return null;
             MockManagers.Object.NetworkEx.StartHost();
-            ulong id = MockManagers.Object.NetworkEx.LocalClientID;
+            ulong id = MockManagers.Object.NetworkEx.LocalID;
 
             MockManagers.Object.NetworkEx.SubscribeMessage("HostTest", (senderID, reader) =>
             {
-                if (senderID == MockManagers.Object.NetworkEx.LocalClientID)
+                if (senderID == MockManagers.Object.NetworkEx.LocalID)
                     hasListen = true;
             });
 
@@ -131,11 +131,11 @@ namespace Marsion.Tests
 
             yield return null;
             MockManagers.Object.NetworkEx.StartHost();
-            ulong id = MockManagers.Object.NetworkEx.LocalClientID;
+            ulong id = MockManagers.Object.NetworkEx.LocalID;
 
             MockManagers.Object.NetworkEx.SubscribeMessage("HostTest", (senderID, reader) =>
             {
-                if (senderID == MockManagers.Object.NetworkEx.LocalClientID)
+                if (senderID == MockManagers.Object.NetworkEx.LocalID)
                 {
                     reader.ReadValueSafe(out stringValue);
                     reader.ReadValueSafe(out intValue);

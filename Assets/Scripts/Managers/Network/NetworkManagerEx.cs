@@ -15,8 +15,8 @@ namespace Marsion
         }
 
         // Properties
-        public ulong LocalClientID => networkWrapper.LocalClientID;
-        public ulong ServerClientID => networkWrapper.ServerClientID;
+        public ulong LocalID => networkWrapper.LocalClientID;
+        public ulong ServerID => networkWrapper.ServerClientID;
         public bool IsServer => networkWrapper.IsServer;
         public bool IsClient => networkWrapper.IsClient;
         public bool IsHost => IsClient && IsServer;
