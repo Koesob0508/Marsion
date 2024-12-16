@@ -15,7 +15,12 @@ namespace Marsion.Tests
         [UnityTest]
         public IEnumerator ManagersInitializer_SetsManagersInstance_WhenSceneLoads()
         {
-            yield return null;
+            var mockFactory = new Mock<IManagersFactory>();
+            Managers.Init(mockFactory.Object);
+
+            Assert.IsNotNull(Managers.Instance);
+
+            yield break;
         }
     }
 }

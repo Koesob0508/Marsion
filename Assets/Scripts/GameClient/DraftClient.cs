@@ -8,7 +8,9 @@ namespace Marsion
 {
     public class DraftClient
     {
-        private Dictionary<ushort, Action<SerializedData>> Commands;
+        private readonly IManagers _managers;
+
+        private Dictionary<ushort, Action<SerializedData>> _commands = new();
         public DraftState State { get; private set; }
 
         // shortcuts
@@ -17,36 +19,47 @@ namespace Marsion
 
         public Action OnStateUpdate;
 
+        public DraftClient(IManagers managers)
+        {
+            _managers = managers ?? throw new ArgumentNullException(nameof(managers));
+        }
+
         public void Init()
         {
             Logger.Log<DraftClient>($"Draft Client initialized", colorName: ColorCodes.Client);
-
-            Commands = new();
 
             RegisterCommand(DraftCommand.ServerInitState, OnReceiveInitState);
             RegisterCommand(DraftCommand.ServerStartDraft, OnReceiveStartDraft);
             RegisterCommand(DraftCommand.ServerUpdateState, OnReceiveUpdateState);
 
-            Managers.Instance.NetworkEx.SubscribeMessage("DraftServer", OnReceivedCommand);
+            _managers.NetworkEx.SubscribeMessage("DraftServer", OnReceivedCommand);
         }
 
         private void RegisterCommand(ushort tag, Action<SerializedData> callback)
         {
-            Commands.Add(tag, callback);
+            if(!_commands.TryAdd(tag, callback))
+            {
+                Logger.LogWarning<DraftClient>($"Command {tag} is already registered.");
+            }
         }
 
         private void OnReceivedCommand(ulong clientID, FastBufferReader reader)
         {
-            reader.ReadValueSafe(out ushort tag);
+            reader.ReadValueSafe(out ushort tag);  
             SerializedData sdata = new SerializedData(reader);
             ExecuteCommand(tag, sdata);
         }
 
         private void ExecuteCommand(ushort tag, SerializedData sdata)
         {
-            bool found = Commands.TryGetValue(tag, out var command);
-            if (found)
+            if(_commands.TryGetValue(tag, out var command))
+            {
                 command.Invoke(sdata);
+            }
+            else
+            {
+                Logger.LogWarning<DraftClient>($"Unknown command received: {tag}");
+            }
         }
 
         #region OnReceive
@@ -54,8 +67,7 @@ namespace Marsion
         {
             Logger.Log<DraftClient>($"Received init state", colorName: ColorCodes.Client);
 
-            SerializedDraftState sState = sdata.Get<SerializedDraftState>();
-
+            var sState = sdata.Get<SerializedDraftState>();
             State = new DraftState(sState);
         }
 
@@ -63,15 +75,14 @@ namespace Marsion
         {
             Logger.Log<DraftClient>($"Received start draft", colorName: ColorCodes.Client);
 
-            Managers.Instance.UI.ShowPopupUI<UI_DraftPanel>();
+            _managers.UI.ShowPopupUI<UI_DraftPanel>();
         }
 
         private void OnReceiveUpdateState(SerializedData sdata)
         {
             Logger.Log<DraftClient>($"Received updated state", colorName: ColorCodes.Client);
 
-            SerializedDraftState sState = sdata.Get<SerializedDraftState>();
-
+            var sState = sdata.Get<SerializedDraftState>();
             State = new DraftState(sState);
 
             OnStateUpdate?.Invoke();
@@ -104,7 +115,7 @@ namespace Marsion
                 writer.WriteValueSafe(index);
             };
 
-            Managers.Instance.NetworkEx.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
+            _managers.NetworkEx.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
         }
 
         private void Send(ushort tag)
@@ -114,7 +125,7 @@ namespace Marsion
                 writer.WriteValueSafe(tag);
             };
 
-            Managers.Instance.NetworkEx.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
+            _managers.NetworkEx.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
         }
 
         private void Send<T>(ushort tag, T data, NetworkDelivery delivery) where T : INetworkSerializable
@@ -125,7 +136,7 @@ namespace Marsion
                 writer.WriteNetworkSerializable(data);
             };
 
-            Managers.Instance.NetworkEx.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
+            _managers.NetworkEx.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
         }
 
         #endregion

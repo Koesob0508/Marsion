@@ -30,13 +30,6 @@ namespace Marsion
             reader.ReadNetworkSerializable(out T val);
             return val;
         }
-
-        public void PreRead()
-        {
-            int size = reader.Length - reader.Position;
-            bytes = new byte[size];
-            reader.ReadBytesSafe(ref bytes, size);
-        }
     }
 
     public class SerializedUlong : INetworkSerializable

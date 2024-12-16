@@ -18,7 +18,7 @@ namespace Marsion
             Logger.Log<ClientManager>("Client Manager initialized", colorName: ColorCodes.Client);
 
             Input = new InputManager();
-            Draft = new DraftClient();
+            Draft = new DraftClient(Managers.Instance);
             Draft.Init();
             //Game.Init();
             Game.Init();

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class Managers : MonoBehaviour
+    public class Managers : MonoBehaviour, IManagers
     {
         public static Managers Instance { get; private set; }
 
@@ -13,12 +13,17 @@ namespace Marsion
         [SerializeField] ServerManager _server;
         [SerializeField] ClientManager _client;
 
-        public IResourceManager Resource { get; private set; }
-        public IUIManager UI { get; private set; }
+        private IResourceManager _resource;
+        private IUIManager _ui;
+        private IDataManager _data;
+        private INetworkManagerEx _networkEx;
+
+        public IResourceManager Resource => _resource;
+        public IUIManager UI => _ui;
         public static CardManager Card { get; private set; }
 
-        public IDataManager Data { get; private set; }
-        public INetworkManagerEx NetworkEx { get; private set; }
+        public IDataManager Data => _data;
+        public INetworkManagerEx NetworkEx => _networkEx;
         public static MarsNetwork Network { get { return Instance._network; } }
         public static ServerManager Server { get { return Instance._server; } }
         public static ClientManager Client { get { return Instance._client; } }
@@ -40,16 +45,17 @@ namespace Marsion
 
                 IResourceLoader resourceLoader = factory.CreateResourceLoader();
                 IAddressableLoader addressableLoader = factory.CreateAddressableLoader();
-                Instance.Resource = factory.CreateResource(resourceLoader, addressableLoader);
+                Instance._resource = factory.CreateResource(resourceLoader, addressableLoader);
 
-                Instance.UI = factory.CreateUI(Instance.Resource);
-                Instance.Data = factory.CreateData(Instance.Resource);
+                Instance._ui = factory.CreateUI(Instance.Resource);
+                Instance._data = factory.CreateData(Instance.Resource);
+
                 INetworkWrapper networkWrapper = factory.CreateNetworkManagerWrapper();
-                Instance.NetworkEx = factory.CreateNetworkManagerEx(networkWrapper);
+                Instance._networkEx = factory.CreateNetworkManagerEx(networkWrapper);
 
                 Card = new CardManager();
 
-                Instance.Data.Init();
+                Instance._data.Init();
                 Network.Init();
                 Server.Init();
                 Client.Init();
