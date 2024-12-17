@@ -22,12 +22,12 @@ namespace Marsion.Client
                 // Player
                 if(player.PlayerID == Managers.Client.Game.PlayerID)
                 {
-                    Player_Sprite.sprite = Managers.Data.PortraitDictionary[player.Portrait].Sprite;
+                    Player_Sprite.sprite = Managers.Instance.Data.GetDictionary<PortraitSO>()[player.Portrait].Sprite;
                 }
                 // Enemy
                 else
                 {
-                    Enemy_Sprite.sprite = Managers.Data.PortraitDictionary[player.Portrait].Sprite;
+                    Enemy_Sprite.sprite = Managers.Instance.Data.GetDictionary<PortraitSO>()[player.Portrait].Sprite;
                 }
             }
         }

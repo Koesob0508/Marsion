@@ -8,46 +8,58 @@ namespace Marsion
 {
     public class DraftClient
     {
-        private Dictionary<ushort, Action<SerializedData>> Commands;
+        private readonly IManagers _managers;
+
+        private Dictionary<ushort, Action<SerializedData>> _commands = new();
         public DraftState State { get; private set; }
 
         // shortcuts
-        private bool IsHost { get { return Managers.Network.IsHost; } }
-        private ulong ServerID { get { return Managers.Network.ServerID; } }
-        private NetworkMessaging Messaging { get { return Managers.Network.Messaging; } }
+        private bool IsHost { get { return _managers.Network.IsHost; } }
+        private ulong ServerID { get { return _managers.Network.ServerID; } }
 
         public Action OnStateUpdate;
+
+        public DraftClient(IManagers managers)
+        {
+            _managers = managers ?? throw new ArgumentNullException(nameof(managers));
+        }
 
         public void Init()
         {
             Logger.Log<DraftClient>($"Draft Client initialized", colorName: ColorCodes.Client);
 
-            Commands = new();
-
             RegisterCommand(DraftCommand.ServerInitState, OnReceiveInitState);
             RegisterCommand(DraftCommand.ServerStartDraft, OnReceiveStartDraft);
             RegisterCommand(DraftCommand.ServerUpdateState, OnReceiveUpdateState);
 
-            Managers.Network.Messaging.SubscribeMessage("DraftServer", OnReceiveCommand);
+            _managers.Network.SubscribeMessage("DraftServer", OnReceivedCommand);
         }
 
         private void RegisterCommand(ushort tag, Action<SerializedData> callback)
         {
-            Commands.Add(tag, callback);
+            if(!_commands.TryAdd(tag, callback))
+            {
+                Logger.LogWarning<DraftClient>($"Command {tag} is already registered.");
+            }
         }
 
-        private void OnReceiveCommand(ulong clientID, FastBufferReader reader)
+        private void OnReceivedCommand(ulong clientID, FastBufferReader reader)
         {
-            reader.ReadValueSafe(out ushort tag);
+            reader.ReadValueSafe(out ushort tag);  
             SerializedData sdata = new SerializedData(reader);
             ExecuteCommand(tag, sdata);
         }
 
         private void ExecuteCommand(ushort tag, SerializedData sdata)
         {
-            bool found = Commands.TryGetValue(tag, out var command);
-            if (found)
+            if(_commands.TryGetValue(tag, out var command))
+            {
                 command.Invoke(sdata);
+            }
+            else
+            {
+                Logger.LogWarning<DraftClient>($"Unknown command received: {tag}");
+            }
         }
 
         #region OnReceive
@@ -55,8 +67,7 @@ namespace Marsion
         {
             Logger.Log<DraftClient>($"Received init state", colorName: ColorCodes.Client);
 
-            SerializedDraftState sState = sdata.Get<SerializedDraftState>();
-
+            var sState = sdata.Get<SerializedDraftState>();
             State = new DraftState(sState);
         }
 
@@ -64,15 +75,14 @@ namespace Marsion
         {
             Logger.Log<DraftClient>($"Received start draft", colorName: ColorCodes.Client);
 
-            Managers.UI.ShowPopupUI<UI_DraftPanel>();
+            _managers.UI.ShowPopupUI<UI_DraftPanel>();
         }
 
         private void OnReceiveUpdateState(SerializedData sdata)
         {
             Logger.Log<DraftClient>($"Received updated state", colorName: ColorCodes.Client);
 
-            SerializedDraftState sState = sdata.Get<SerializedDraftState>();
-
+            var sState = sdata.Get<SerializedDraftState>();
             State = new DraftState(sState);
 
             OnStateUpdate?.Invoke();
@@ -99,28 +109,34 @@ namespace Marsion
 
         private void SendSelect(int index)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(DraftCommand.ClientSelect);
-            writer.WriteValueSafe(index);
-            Messaging.Send("DraftClient", ServerID, writer, NetworkDelivery.ReliableSequenced);
-            writer.Dispose();
+            Action<FastBufferWriter> writeAction = (writer) =>
+            {
+                writer.WriteValueSafe(DraftCommand.ClientSelect);
+                writer.WriteValueSafe(index);
+            };
+
+            _managers.Network.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
         }
 
         private void Send(ushort tag)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(tag);
-            Messaging.Send("DraftClient", ServerID, writer, NetworkDelivery.Reliable);
-            writer.Dispose();
+            Action<FastBufferWriter> writeAction = (writer) =>
+            {
+                writer.WriteValueSafe(tag);
+            };
+
+            _managers.Network.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
         }
 
         private void Send<T>(ushort tag, T data, NetworkDelivery delivery) where T : INetworkSerializable
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(tag);
-            writer.WriteNetworkSerializable(data);
-            Messaging.Send("DraftClient", ServerID, writer, delivery);
-            writer.Dispose();
+            Action<FastBufferWriter> writeAction = (writer) =>
+            {
+                writer.WriteValueSafe(tag);
+                writer.WriteNetworkSerializable(data);
+            };
+
+            _managers.Network.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
         }
 
         #endregion

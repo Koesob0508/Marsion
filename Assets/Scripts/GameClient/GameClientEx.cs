@@ -26,10 +26,9 @@ namespace Marsion
         private Dictionary<ushort, Action<SerializedData>> Commands;
 
         public GameData Data { get; private set; }
-        public ulong ServerID => Managers.Network.ServerID;
-        public ulong PlayerID => Managers.Network.ClientID;
+        public ulong ServerID => Managers.Instance.Network.ServerID;
+        public ulong PlayerID => Managers.Instance.Network.LocalID;
         public ulong EnemyID { get; private set; }
-        private NetworkMessaging Messaging => Managers.Network.Messaging;
 
         public IHandView Hand => hand;
 
@@ -67,7 +66,7 @@ namespace Marsion
             RegisterCommand(GameCommand.ServerAttackCardResult, OnReceivedAttackCardResult);
             RegisterCommand(GameCommand.ServerDeadCards, OnReceivedDeadCards);
 
-            Messaging.SubscribeMessage("GameServer", OnReceivedCommand);
+            Managers.Instance.Network.SubscribeMessage("GameServer", OnReceivedCommand);
         }
 
         private void Clear()
@@ -201,8 +200,8 @@ namespace Marsion
 
             clip.OnPlay += () =>
             {
-                Logger.Log<GameClient>("Game end", colorName: ColorCodes.Client);
-                UI_EndGame ui = Managers.UI.ShowPopupUI<UI_EndGame>();
+                Logger.Log<GameClientEx>("Game end", colorName: ColorCodes.Client);
+                UI_EndGame ui = Managers.Instance.UI.ShowPopupUI<UI_EndGame>();
 
                 if(winnerData.value > 10)
                 {
@@ -399,19 +398,22 @@ namespace Marsion
 
         private void Send(ushort type)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(type);
-            Messaging.Send("GameClient", ServerID, writer, NetworkDelivery.Reliable);
-            writer.Dispose();
+            Managers.Instance.Network.SendMessage("GameClient", ServerID,
+                (writer) =>
+                {
+                    writer.WriteValueSafe(type);
+                },
+                NetworkDelivery.Reliable);
         }
 
         private void Send<T>(ushort type, T data, NetworkDelivery delivery) where T : INetworkSerializable
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(type);
-            writer.WriteNetworkSerializable(data);
-            Messaging.Send("GameClient", ServerID, writer, delivery);
-            writer.Dispose();
+            Managers.Instance.Network.SendMessage("GameClient", ServerID,
+                (writer) =>
+                {
+                    writer.WriteValueSafe(type);
+                    writer.WriteNetworkSerializable(data);
+                }, NetworkDelivery.ReliableSequenced);
         }
 
         #endregion

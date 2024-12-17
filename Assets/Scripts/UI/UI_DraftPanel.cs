@@ -202,7 +202,7 @@ namespace Marsion.UI
             }
             else
             {
-                var content_Card = Managers.UI.MakeSubItem<Content_Card>(Content_Root.transform);
+                var content_Card = Managers.Instance.UI.MakeSubItem<Content_Card>(Content_Root.transform);
                 content_Card.Setup(soID);
                 content_Card.IncreaseCount();
                 contentsDictionary.Add(soID, content_Card.gameObject);
@@ -216,7 +216,7 @@ namespace Marsion.UI
                 bool IsZero = value.GetComponent<Content_Card>().DecreaseCount();
                 if (IsZero)
                 {
-                    Managers.Resource.Destroy(value);
+                    Managers.Instance.Resource.Destroy(value);
                     contentsDictionary.Remove(soID);
                 }
             }

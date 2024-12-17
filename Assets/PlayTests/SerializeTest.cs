@@ -22,7 +22,7 @@ public class SerializeTest
         string json = NetworkTool.JsonSerialize(originalCard);
 
         // 3. FastBufferWriter 초기화
-        var bufferWriter = new FastBufferWriter(1024, Allocator.Temp, MarsNetwork.MessageSizeMax);
+        var bufferWriter = new FastBufferWriter(1024, Allocator.Temp, 1024 * 1024);
 
         // 5. JSON 문자열을 FastBufferWriter에 기록
         bufferWriter.WriteValueSafe(json);
@@ -74,7 +74,7 @@ public class SerializeTest
         string json = NetworkTool.JsonSerialize(originalDictionary);
 
         // 4. FastBufferWriter 초기화
-        var bufferWriter = new FastBufferWriter(1024, Allocator.Temp, MarsNetwork.MessageSizeMax);
+        var bufferWriter = new FastBufferWriter(1024, Allocator.Temp, 1024 * 1024);
 
         // 5. JSON 문자열을 FastBufferWriter에 기록
         bufferWriter.WriteValueSafe(json);
@@ -119,7 +119,7 @@ public class SerializeTest
         string json = NetworkTool.JsonSerialize(originalPlayer);
 
         // 3. FastBufferWriter 초기화
-        var bufferWriter = new FastBufferWriter(1024, Allocator.Temp, MarsNetwork.MessageSizeMax);
+        var bufferWriter = new FastBufferWriter(1024, Allocator.Temp, 1024 * 1024);
 
         // 4. JSON 문자열을 FastBufferWriter에 기록
         bufferWriter.WriteValueSafe(json);
@@ -180,7 +180,7 @@ public class SerializeTest
         string json = NetworkTool.JsonSerialize(originalGameData);
 
         // 3. FastBufferWriter 초기화
-        var bufferWriter = new FastBufferWriter(1024, Allocator.Temp, MarsNetwork.MessageSizeMax);
+        var bufferWriter = new FastBufferWriter(1024, Allocator.Temp, 1024 * 1024);
 
         // 4. JSON 문자열을 FastBufferWriter에 기록
         bufferWriter.WriteValueSafe(json);
