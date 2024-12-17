@@ -72,7 +72,7 @@ namespace Marsion
 
             try
             {
-                FastBufferWriter writer = new FastBufferWriter(size, Allocator.Temp, MarsNetwork.MessageSizeMax);
+                FastBufferWriter writer = new FastBufferWriter(size, Allocator.Temp, 1024 * 1024);
                 writer.WriteNetworkSerializable(obj);
                 byte[] bytes = writer.ToArray();
                 writer.Dispose();

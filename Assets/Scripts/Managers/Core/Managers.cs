@@ -9,22 +9,19 @@ namespace Marsion
     {
         public static Managers Instance { get; private set; }
 
-        [SerializeField] MarsNetwork _network;
         [SerializeField] ServerManager _server;
         [SerializeField] ClientManager _client;
 
         private IResourceManager _resource;
         private IUIManager _ui;
         private IDataManager _data;
-        private INetworkManagerEx _networkEx;
+        private INetworkManager _network;
 
         public IResourceManager Resource => _resource;
         public IUIManager UI => _ui;
         public static CardManager Card { get; private set; }
-
         public IDataManager Data => _data;
-        public INetworkManagerEx NetworkEx => _networkEx;
-        public static MarsNetwork Network { get { return Instance._network; } }
+        public INetworkManager Network => _network;
         public static ServerManager Server { get { return Instance._server; } }
         public static ClientManager Client { get { return Instance._client; } }
 
@@ -51,15 +48,13 @@ namespace Marsion
                 Instance._data = factory.CreateData(Instance.Resource);
 
                 INetworkManagerWrapper networkWrapper = factory.CreateNetworkManagerWrapper();
-                Instance._networkEx = factory.CreateNetworkManagerEx(networkWrapper);
+                Instance._network = factory.CreateNetworkManager(networkWrapper);
 
                 Card = new CardManager();
 
                 Instance._data.Init();
-
-                //Instance._networkEx.Init();
-                //Server.Init();
-                //Client.Init();
+                Server.Init();
+                Client.Init();
             }
         }
 

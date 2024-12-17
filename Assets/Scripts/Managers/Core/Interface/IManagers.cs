@@ -9,6 +9,6 @@
         IResourceManager Resource { get; }
         IUIManager UI { get; }
         IDataManager Data { get; }
-        INetworkManagerEx NetworkEx { get; }
+        INetworkManager Network { get; }
     }
 }

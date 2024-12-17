@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class NetworkManagerEx : INetworkManagerEx
+    public class NetworkManagerEx : INetworkManager
     {
         private readonly INetworkManagerWrapper networkWrapper;
         private readonly ICustomMessagingManager messagingManager;

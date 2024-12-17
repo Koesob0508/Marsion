@@ -16,7 +16,6 @@ namespace Marsion
 
         private GameLogicEx Logic;
         private GameData Data => Logic.Data;
-        private NetworkMessaging Messaging => Managers.Network.Messaging;
 
         private List<ulong> ConnectedClients = new();
         private Dictionary<ushort, Action<ulong, SerializedData>> Commands = new();
@@ -46,7 +45,7 @@ namespace Marsion
             Logic.OnCardDied += SendDeadCards;
             Logic.OnGameEnded += SendEndGame;
 
-            Managers.Network.Messaging.SubscribeMessage("GameClient", OnReceivedCommand);
+            Managers.Instance.Network.SubscribeMessage("GameClient", OnReceivedCommand);
         }
 
         public void Clear()
@@ -251,54 +250,54 @@ namespace Marsion
 
         private void Send(ulong target, ushort tag)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(tag);
-            Managers.Network.Messaging.Send("GameServer", target, writer, NetworkDelivery.ReliableSequenced);
-            writer.Dispose();
+            Managers.Instance.Network.SendMessage("GameServer", target, (writer) =>
+            {
+                writer.WriteValueSafe(tag);
+            }, NetworkDelivery.ReliableSequenced);
         }
 
         private void Send(ulong target, ushort tag, INetworkSerializable data, NetworkDelivery delivery)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(tag);
-            writer.WriteNetworkSerializable(data);
-            Managers.Network.Messaging.Send("GameServer", target, writer, delivery);
-            writer.Dispose();
+            Managers.Instance.Network.SendMessage("GameServer", target, (writer) =>
+            {
+                writer.WriteValueSafe(tag);
+                writer.WriteNetworkSerializable(data);
+            }, delivery);
         }
 
         private void SendToAll(ushort tag)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(tag);
             foreach(ulong clientID in ConnectedClients)
             {
-                Messaging.Send("GameServer", clientID, writer, NetworkDelivery.ReliableSequenced);
+                Managers.Instance.Network.SendMessage("GameServer", clientID, (writer) =>
+                {
+                    writer.WriteValueSafe(tag);
+                }, NetworkDelivery.ReliableSequenced);
             }
-            writer.Dispose();
         }
 
         private void SendToAll(ushort tag, string data, NetworkDelivery delivery)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(tag);
-            writer.WriteValueSafe(data);
             foreach(var clientID in ConnectedClients)
             {
-                Messaging.Send("GameServer", clientID, writer, delivery);
+                Managers.Instance.Network.SendMessage("GameServer", clientID, (writer) =>
+                {
+                    writer.WriteValueSafe(tag);
+                    writer.WriteValueSafe(data);
+                }, delivery);
             }
-            writer.Dispose();
         }
 
         private void SendToAll(ushort tag, INetworkSerializable data, NetworkDelivery delivery)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(tag);
-            writer.WriteNetworkSerializable(data);
             foreach(var clientID in ConnectedClients)
             {
-                Messaging.Send("GameServer", clientID, writer, delivery);
+                Managers.Instance.Network.SendMessage("GameServer", clientID, (writer) =>
+                {
+                    writer.WriteValueSafe(tag);
+                    writer.WriteNetworkSerializable(data);
+                }, delivery);
             }
-            writer.Dispose();
         }
 
         #endregion

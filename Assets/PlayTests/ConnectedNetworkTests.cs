@@ -53,20 +53,20 @@ namespace Marsion.Tests
 
             var hostFactory = new DefaultManagersFactory();
             var hostWrapper = hostFactory.CreateNetworkManagerWrapper(hostNetwork);
-            var hostNetworkEx = hostFactory.CreateNetworkManagerEx(hostWrapper);
+            var hostNetworkEx = hostFactory.CreateNetworkManager(hostWrapper);
 
             HostManagers = new Mock<IManagers>();
             HostManagers
-                .Setup(HM => HM.NetworkEx)
+                .Setup(HM => HM.Network)
                 .Returns(hostNetworkEx);
 
             var guestFactory = new DefaultManagersFactory();
             var guestWrapper = guestFactory.CreateNetworkManagerWrapper(guestNetwork);
-            var guestNetworkEx = guestFactory.CreateNetworkManagerEx(guestWrapper);
+            var guestNetworkEx = guestFactory.CreateNetworkManager(guestWrapper);
 
             GuestManagers = new Mock<IManagers>();
             GuestManagers
-                .Setup(GM => GM.NetworkEx)
+                .Setup(GM => GM.Network)
                 .Returns(guestNetworkEx);
 
             //HostManagers.Object.NetworkEx.StartHost();
@@ -80,16 +80,16 @@ namespace Marsion.Tests
         {
             yield return null;
 
-            if(HostManagers.Object.NetworkEx != null)
+            if(HostManagers.Object.Network != null)
             {
-                HostManagers.Object.NetworkEx.Shutdown();
+                HostManagers.Object.Network.Shutdown();
                 UnityEngine.Object.Destroy(hostNetwork);
             }
             HostManagers = null;
 
-            if(GuestManagers.Object.NetworkEx != null)
+            if(GuestManagers.Object.Network != null)
             {
-                GuestManagers.Object.NetworkEx.Shutdown();
+                GuestManagers.Object.Network.Shutdown();
                 UnityEngine.Object.Destroy(guestNetwork);
             }
         }
@@ -97,16 +97,16 @@ namespace Marsion.Tests
         [UnityTest]
         public IEnumerator SetUpTest()
         {
-            HostManagers.Object.NetworkEx.StartHost();
-            GuestManagers.Object.NetworkEx.StartClient();
+            HostManagers.Object.Network.StartHost();
+            GuestManagers.Object.Network.StartClient();
 
             yield return wait;
 
-            Debug.Log(HostManagers.Object.NetworkEx.LocalID);
-            Debug.Log(GuestManagers.Object.NetworkEx.LocalID);
+            Debug.Log(HostManagers.Object.Network.LocalID);
+            Debug.Log(GuestManagers.Object.Network.LocalID);
 
-            Assert.IsTrue(HostManagers.Object.NetworkEx.IsHost);
-            Assert.IsTrue(GuestManagers.Object.NetworkEx.IsClient);
+            Assert.IsTrue(HostManagers.Object.Network.IsHost);
+            Assert.IsTrue(GuestManagers.Object.Network.IsClient);
 
             yield break;
         }
@@ -114,13 +114,13 @@ namespace Marsion.Tests
         [UnityTest]
         public IEnumerator TearDownTest()
         {
-            HostManagers.Object.NetworkEx.StartHost();
-            GuestManagers.Object.NetworkEx.StartClient();
+            HostManagers.Object.Network.StartHost();
+            GuestManagers.Object.Network.StartClient();
 
             yield return wait;
 
-            Assert.IsTrue(HostManagers.Object.NetworkEx.IsHost);
-            Assert.IsTrue(GuestManagers.Object.NetworkEx.IsClient);
+            Assert.IsTrue(HostManagers.Object.Network.IsHost);
+            Assert.IsTrue(GuestManagers.Object.Network.IsClient);
 
             yield break;
         }
@@ -130,12 +130,12 @@ namespace Marsion.Tests
         {
             bool isConnected = false;
 
-            HostManagers.Object.NetworkEx.OnConnect += () =>
+            HostManagers.Object.Network.OnConnect += () =>
             {
                 isConnected = true;
             };
 
-            HostManagers.Object.NetworkEx.StartHost();
+            HostManagers.Object.Network.StartHost();
 
             yield return wait;
 
@@ -153,20 +153,20 @@ namespace Marsion.Tests
                 Debug.Log($"Client connected with ID: {clientID}");
             };
 
-            HostManagers.Object.NetworkEx.OnClientConnected += (clientID) =>
+            HostManagers.Object.Network.OnClientConnected += (clientID) =>
             {
                 Debug.Log($"Client connected with ID: {clientID}");
                 isClientConnected = true;
             };
 
             // Act
-            HostManagers.Object.NetworkEx.StartHost();
-            GuestManagers.Object.NetworkEx.StartClient();
+            HostManagers.Object.Network.StartHost();
+            GuestManagers.Object.Network.StartClient();
 
             yield return wait;
 
             // Assert
-            Assert.IsTrue(GuestManagers.Object.NetworkEx.IsClient, "Guest is not properly connected.");
+            Assert.IsTrue(GuestManagers.Object.Network.IsClient, "Guest is not properly connected.");
             Assert.IsTrue(isClientConnected, "OnClientConnected callback was not invoked.");
         }
 
@@ -177,19 +177,19 @@ namespace Marsion.Tests
         public IEnumerator Subscribe_Message_Before_Start_Should_Register_After_Start()
         {
             // Arrange
-            HostManagers.Object.NetworkEx.StartHost();
-            GuestManagers.Object.NetworkEx.StartClient();
+            HostManagers.Object.Network.StartHost();
+            GuestManagers.Object.Network.StartClient();
             yield return wait;
 
-            GuestManagers.Object.NetworkEx.SubscribeMessage("TestMessage", (clientID, reader) =>
+            GuestManagers.Object.Network.SubscribeMessage("TestMessage", (clientID, reader) =>
             {
                 Debug.Log($"Test Message ClientID : {clientID}");
             });
             
-            var targetID = GuestManagers.Object.NetworkEx.LocalID;
+            var targetID = GuestManagers.Object.Network.LocalID;
 
             // Act
-            HostManagers.Object.NetworkEx.SendMessage("TestMessage", targetID, (writer) =>
+            HostManagers.Object.Network.SendMessage("TestMessage", targetID, (writer) =>
             {
                 Debug.Log("Test Message");
             },
@@ -197,15 +197,15 @@ namespace Marsion.Tests
 
             yield return wait;
 
-            LogAssert.Expect(LogType.Log, $"Test Message ClientID : {HostManagers.Object.NetworkEx.LocalID}");
+            LogAssert.Expect(LogType.Log, $"Test Message ClientID : {HostManagers.Object.Network.LocalID}");
         }
 
         [UnityTest]
         public IEnumerator Host_Send_Client_Should_Received()
         {
             // Arrange
-            HostManagers.Object.NetworkEx.StartHost();
-            GuestManagers.Object.NetworkEx.StartClient();
+            HostManagers.Object.Network.StartHost();
+            GuestManagers.Object.Network.StartClient();
 
             yield return wait;
 
@@ -213,12 +213,12 @@ namespace Marsion.Tests
             string expectedString = "TestMessage";
             int expectedInt = 1234;
 
-            ulong targetID = GuestManagers.Object.NetworkEx.LocalID;
+            ulong targetID = GuestManagers.Object.Network.LocalID;
 
             string receivedString = "";
             int receivedInt = 0;
 
-            GuestManagers.Object.NetworkEx.SubscribeMessage("Host", (senderID, reader) =>
+            GuestManagers.Object.Network.SubscribeMessage("Host", (senderID, reader) =>
             {
                 expectedBool = true;
                 reader.ReadValueSafe(out receivedString);
@@ -232,7 +232,7 @@ namespace Marsion.Tests
             };
 
             // Act
-            HostManagers.Object.NetworkEx.SendMessage("Host", targetID, messageWriter, NetworkDelivery.Reliable);
+            HostManagers.Object.Network.SendMessage("Host", targetID, messageWriter, NetworkDelivery.Reliable);
 
             float timeout = 1f;
             float startTime = Time.time;

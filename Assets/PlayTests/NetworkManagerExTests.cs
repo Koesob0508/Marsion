@@ -37,11 +37,11 @@ namespace Marsion.Tests
 
             var managersFactory = new DefaultManagersFactory();
             var networkWrapper = managersFactory.CreateNetworkManagerWrapper();
-            var networkEx = managersFactory.CreateNetworkManagerEx(networkWrapper);
+            var networkEx = managersFactory.CreateNetworkManager(networkWrapper);
 
             MockManagers = new Mock<IManagers>();
             MockManagers
-                .Setup(m => m.NetworkEx)
+                .Setup(m => m.Network)
                 .Returns(networkEx);
         }
 
@@ -70,14 +70,14 @@ namespace Marsion.Tests
         public IEnumerator NetworkManager_Should_BeNotNull()
         {
             yield return null;
-            Assert.IsNotNull(MockManagers.Object.NetworkEx);
+            Assert.IsNotNull(MockManagers.Object.Network);
         }
 
         [UnityTest]
         public IEnumerator NetworkEx_StartHost_IsHost()
         {
             yield return null;
-            MockManagers.Object.NetworkEx.StartHost();
+            MockManagers.Object.Network.StartHost();
             Assert.IsTrue(NetworkManager.Singleton.IsHost, "NetworkManager should be in host mode.");
         }
 
@@ -86,13 +86,13 @@ namespace Marsion.Tests
         {
             bool isInvoked = false;
 
-            MockManagers.Object.NetworkEx.OnConnect += () =>
+            MockManagers.Object.Network.OnConnect += () =>
             {
                 isInvoked = true;
             };
 
             yield return null;
-            MockManagers.Object.NetworkEx.StartHost();
+            MockManagers.Object.Network.StartHost();
 
             Assert.IsTrue(isInvoked);
         }
@@ -103,12 +103,12 @@ namespace Marsion.Tests
             bool hasListen = false;
 
             yield return null;
-            MockManagers.Object.NetworkEx.StartHost();
-            ulong id = MockManagers.Object.NetworkEx.LocalID;
+            MockManagers.Object.Network.StartHost();
+            ulong id = MockManagers.Object.Network.LocalID;
 
-            MockManagers.Object.NetworkEx.SubscribeMessage("HostTest", (senderID, reader) =>
+            MockManagers.Object.Network.SubscribeMessage("HostTest", (senderID, reader) =>
             {
-                if (senderID == MockManagers.Object.NetworkEx.LocalID)
+                if (senderID == MockManagers.Object.Network.LocalID)
                     hasListen = true;
             });
 
@@ -118,7 +118,7 @@ namespace Marsion.Tests
                 writer.WriteValueSafe(12345);
             };
 
-            MockManagers.Object.NetworkEx.SendMessage("HostTest", id, messageWriter, NetworkDelivery.Reliable);
+            MockManagers.Object.Network.SendMessage("HostTest", id, messageWriter, NetworkDelivery.Reliable);
 
             Assert.IsTrue(hasListen);
         }
@@ -130,12 +130,12 @@ namespace Marsion.Tests
             int intValue = 0;
 
             yield return null;
-            MockManagers.Object.NetworkEx.StartHost();
-            ulong id = MockManagers.Object.NetworkEx.LocalID;
+            MockManagers.Object.Network.StartHost();
+            ulong id = MockManagers.Object.Network.LocalID;
 
-            MockManagers.Object.NetworkEx.SubscribeMessage("HostTest", (senderID, reader) =>
+            MockManagers.Object.Network.SubscribeMessage("HostTest", (senderID, reader) =>
             {
-                if (senderID == MockManagers.Object.NetworkEx.LocalID)
+                if (senderID == MockManagers.Object.Network.LocalID)
                 {
                     reader.ReadValueSafe(out stringValue);
                     reader.ReadValueSafe(out intValue);
@@ -148,7 +148,7 @@ namespace Marsion.Tests
                 writer.WriteValueSafe(12345);
             };
 
-            MockManagers.Object.NetworkEx.SendMessage("HostTest", id, messageWriter, NetworkDelivery.Reliable);
+            MockManagers.Object.Network.SendMessage("HostTest", id, messageWriter, NetworkDelivery.Reliable);
 
             Assert.AreEqual("TestMessage", stringValue);
             Assert.AreEqual(12345, intValue);

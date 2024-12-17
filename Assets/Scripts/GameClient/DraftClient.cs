@@ -14,8 +14,8 @@ namespace Marsion
         public DraftState State { get; private set; }
 
         // shortcuts
-        private bool IsHost { get { return _managers.NetworkEx.IsHost; } }
-        private ulong ServerID { get { return _managers.NetworkEx.ServerID; } }
+        private bool IsHost { get { return _managers.Network.IsHost; } }
+        private ulong ServerID { get { return _managers.Network.ServerID; } }
 
         public Action OnStateUpdate;
 
@@ -32,7 +32,7 @@ namespace Marsion
             RegisterCommand(DraftCommand.ServerStartDraft, OnReceiveStartDraft);
             RegisterCommand(DraftCommand.ServerUpdateState, OnReceiveUpdateState);
 
-            _managers.NetworkEx.SubscribeMessage("DraftServer", OnReceivedCommand);
+            _managers.Network.SubscribeMessage("DraftServer", OnReceivedCommand);
         }
 
         private void RegisterCommand(ushort tag, Action<SerializedData> callback)
@@ -115,7 +115,7 @@ namespace Marsion
                 writer.WriteValueSafe(index);
             };
 
-            _managers.NetworkEx.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
+            _managers.Network.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
         }
 
         private void Send(ushort tag)
@@ -125,7 +125,7 @@ namespace Marsion
                 writer.WriteValueSafe(tag);
             };
 
-            _managers.NetworkEx.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
+            _managers.Network.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
         }
 
         private void Send<T>(ushort tag, T data, NetworkDelivery delivery) where T : INetworkSerializable
@@ -136,7 +136,7 @@ namespace Marsion
                 writer.WriteNetworkSerializable(data);
             };
 
-            _managers.NetworkEx.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
+            _managers.Network.SendMessage("DraftClient", ServerID, writeAction, NetworkDelivery.ReliableSequenced);
         }
 
         #endregion

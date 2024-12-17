@@ -346,7 +346,7 @@ namespace Marsion.Server
 
         private bool AreAllPlayersConnected()
         {
-            return Managers.Network.ConnectedClientsCount == 2;
+            return Managers.Instance.Network.ConnectedClientsIDs.Count == 2;
         }
 
         private Player GetPlayer(ulong clientID)

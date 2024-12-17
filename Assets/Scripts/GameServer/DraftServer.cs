@@ -19,8 +19,6 @@ namespace Marsion
         private Dictionary<ushort, Action<ulong, SerializedData>> Commands;
         private Dictionary<ulong, DraftState> DraftDictionary;
         private Queue<int> InitialTypeSequence;
-        
-        private NetworkMessaging Messaging { get { return Managers.Network.Messaging; } }
 
         public Action OnUpdateDraftState;
 
@@ -39,7 +37,7 @@ namespace Marsion
             RegisterCommand(DraftCommand.ClientSelect, OnReceiveSelect);
             RegisterCommand(DraftCommand.ClientReady, OnReceiveReady);
 
-            Messaging.SubscribeMessage("DraftClient", OnReceiveCommand);
+            Managers.Instance.Network.SubscribeMessage("DraftClient", OnReceiveCommand);
         }
 
         private void RegisterCommand(ushort type, Action<ulong, SerializedData> callback)
@@ -146,19 +144,19 @@ namespace Marsion
         // Generic send
         private void Send(ulong target, ushort tag)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(tag);
-            Messaging.Send("DraftServer", target, writer, NetworkDelivery.ReliableSequenced);
-            writer.Dispose();
+            Managers.Instance.Network.SendMessage("DraftServer", target, (writer) =>
+            {
+                writer.WriteValueSafe(tag);
+            }, NetworkDelivery.ReliableSequenced);
         }
 
         private void Send(ulong target, ushort tag, INetworkSerializable data, NetworkDelivery delivery)
         {
-            FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MarsNetwork.MessageSizeMax);
-            writer.WriteValueSafe(tag);
-            writer.WriteNetworkSerializable(data);
-            Messaging.Send("DraftServer", target, writer, delivery);
-            writer.Dispose();
+            Managers.Instance.Network.SendMessage("DraftServer", target, (writer) =>
+            {
+                writer.WriteValueSafe(tag);
+                writer.WriteNetworkSerializable(data);
+            }, NetworkDelivery.ReliableSequenced);
         }
 
         #endregion
