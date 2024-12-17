@@ -36,8 +36,8 @@ namespace Marsion.Tests
             }
 
             var managersFactory = new DefaultManagersFactory();
-            var networkWrapper = managersFactory.CreateNetworkManagerWrapper();
-            var networkEx = managersFactory.CreateNetworkManager(networkWrapper);
+            var networkWrapper = managersFactory.CreateNetworkWrapper();
+            var networkEx = managersFactory.CreateNetworkEx(networkWrapper);
 
             MockManagers = new Mock<IManagers>();
             MockManagers

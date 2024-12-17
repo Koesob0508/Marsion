@@ -32,7 +32,7 @@ namespace Marsion.Tests
             var mockUIManager = new Mock<IUIManager>();
             var mockDataManager = new Mock<IDataManager>();
             var mockNetworkWrapper = new Mock<INetworkManagerWrapper>();
-            var mockNetworkEx = new Mock<INetworkManager>();
+            var mockNetworkEx = new Mock<INetworkManagerEx>();
 
             mockFactory.Setup(f => f.CreateResourceLoader()).Returns(mockResourceLoader.Object);
             mockFactory.Setup(f => f.CreateAddressableLoader()).Returns(mockAddressableLoader.Object);
@@ -40,8 +40,8 @@ namespace Marsion.Tests
                        .Returns(mockResourceManager.Object);
             mockFactory.Setup(f => f.CreateUI(It.IsAny<IResourceManager>())).Returns(mockUIManager.Object);
             mockFactory.Setup(f => f.CreateData(It.IsAny<IResourceManager>())).Returns(mockDataManager.Object);
-            mockFactory.Setup(f => f.CreateNetworkManagerWrapper()).Returns(mockNetworkWrapper.Object);
-            mockFactory.Setup(f => f.CreateNetworkManager(It.IsAny<INetworkManagerWrapper>())).Returns(mockNetworkEx.Object);
+            mockFactory.Setup(f => f.CreateNetworkWrapper()).Returns(mockNetworkWrapper.Object);
+            mockFactory.Setup(f => f.CreateNetworkEx(It.IsAny<INetworkManagerWrapper>())).Returns(mockNetworkEx.Object);
 
             // Act
             Managers.Init(mockFactory.Object);

@@ -6,14 +6,19 @@ namespace Marsion
 {
     // Server는 WRGBYK 중 B 계열을 사용합니다.
 
-    public class ServerManager : MonoBehaviour
+    public class ServerManager : MonoBehaviour, IServerManager
     {
-        public GameServer Game;
-        public GameServerEx GameEx;
-        public DraftServer Draft;
+        private INetworkManagerEx _networkManager;
+        private IServerFactory _serverFactory;
 
-        public void Init()
+        public GameServerEx GameServer { get; private set; }
+        public DraftServer DraftServer { get; private set; }
+
+        public void Init(INetworkManagerEx networkManager, IServerFactory serverFactory)
         {
+            _networkManager = networkManager;
+            _serverFactory = serverFactory;
+
             Logger.Log<ServerManager>("Server Manager initialized", colorName: ColorCodes.Server);
 
             Managers.Instance.Network.OnConnect += OnConnect;
@@ -22,7 +27,7 @@ namespace Marsion
 
         private void OnConnect()
         {
-            if (!Managers.Instance.Network.IsHost)
+            if (!_networkManager.IsHost)
             {
                 Logger.Log<ServerManager>("This is not host client", colorName: ColorCodes.Server);
 
@@ -33,26 +38,19 @@ namespace Marsion
 
             Logger.Log<ServerManager>("OnConnect");
 
-            Draft = new DraftServer();
-            Draft.Init();
+            DraftServer = _serverFactory.CreateDraftServer();
+            DraftServer.Init();
 
-            //Game.Init();
-            GameEx.Init();
+            GameServer = _serverFactory.CreateGameServerEx();
+            GameServer.Init();
 
             RegisterClient(Managers.Instance.Network.LocalID);
         }
 
-        private void Clear()
-        {
-            Logger.Log<ServerManager>("Server Manager cleared", colorName: ColorCodes.Server);
-
-            Game.Clear();
-            Managers.Instance.Network.OnClientConnected -= OnClientJoin;
-        }
 
         private void OnClientJoin(ulong clientID)
         {
-            if(clientID != Managers.Instance.Network.ServerID)
+            if(clientID != _networkManager.ServerID)
             {
                 Logger.Log<ServerManager>("OnClientJoin");
                 RegisterClient(clientID);
@@ -62,8 +60,16 @@ namespace Marsion
         private void RegisterClient(ulong clientID)
         {
             Logger.Log<ServerManager>($"Client(ID : {clientID}) regist", colorName: ColorCodes.Server);
+            DraftServer.AddState(clientID);
+        }
 
-            Draft.AddState(clientID);
+        private void Clear()
+        {
+            Logger.Log<ServerManager>("Server Manager cleared", colorName: ColorCodes.Server);
+            DraftServer = null;
+            GameServer = null;
+            _networkManager.OnClientConnected -= OnClientJoin;
+            _networkManager.OnConnect -= OnConnect;
         }
     }
 }

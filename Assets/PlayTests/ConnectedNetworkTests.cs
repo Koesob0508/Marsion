@@ -52,8 +52,8 @@ namespace Marsion.Tests
             }
 
             var hostFactory = new DefaultManagersFactory();
-            var hostWrapper = hostFactory.CreateNetworkManagerWrapper(hostNetwork);
-            var hostNetworkEx = hostFactory.CreateNetworkManager(hostWrapper);
+            var hostWrapper = hostFactory.CreateNetworkWrapper(hostNetwork);
+            var hostNetworkEx = hostFactory.CreateNetworkEx(hostWrapper);
 
             HostManagers = new Mock<IManagers>();
             HostManagers
@@ -61,8 +61,8 @@ namespace Marsion.Tests
                 .Returns(hostNetworkEx);
 
             var guestFactory = new DefaultManagersFactory();
-            var guestWrapper = guestFactory.CreateNetworkManagerWrapper(guestNetwork);
-            var guestNetworkEx = guestFactory.CreateNetworkManager(guestWrapper);
+            var guestWrapper = guestFactory.CreateNetworkWrapper(guestNetwork);
+            var guestNetworkEx = guestFactory.CreateNetworkEx(guestWrapper);
 
             GuestManagers = new Mock<IManagers>();
             GuestManagers

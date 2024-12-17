@@ -17,12 +17,15 @@ namespace Marsion
         private GameLogicEx Logic;
         private GameData Data => Logic.Data;
 
-        private List<ulong> ConnectedClients = new();
-        private Dictionary<ushort, Action<ulong, SerializedData>> Commands = new();
+        private List<ulong> ConnectedClients;
+        private Dictionary<ushort, Action<ulong, SerializedData>> Commands;
 
         public void Init()
         {
             Logger.Log<GameServerEx>($"Game Server initialized", colorName: ColorCodes.Server);
+
+            ConnectedClients = new();
+            Commands = new();
 
             Upstream.Init();
             Downstream.Init();

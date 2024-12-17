@@ -4,7 +4,7 @@ using Unity.Netcode;
 
 namespace Marsion
 {
-    public interface INetworkManager
+    public interface INetworkManagerEx
     {
         ulong LocalID { get; }
         ulong ServerID { get; }

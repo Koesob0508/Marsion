@@ -31,7 +31,7 @@ namespace Marsion.Tests
         {
             // Arrange
             var mockManagers = new Mock<IManagers>();
-            var mockNetworkEx = new Mock<INetworkManager>();
+            var mockNetworkEx = new Mock<INetworkManagerEx>();
 
             // Mock factory methods to return placeholders.
 
@@ -61,8 +61,8 @@ namespace Marsion.Tests
         public IEnumerator DraftClient_Should_Receives()
         {
             var defaultFactory = new DefaultManagersFactory();
-            var mockWrapper = defaultFactory.CreateNetworkManagerWrapper();
-            var mockNetworkEx = defaultFactory.CreateNetworkManager(mockWrapper);
+            var mockWrapper = defaultFactory.CreateNetworkWrapper();
+            var mockNetworkEx = defaultFactory.CreateNetworkEx(mockWrapper);
 
             yield return null;
 

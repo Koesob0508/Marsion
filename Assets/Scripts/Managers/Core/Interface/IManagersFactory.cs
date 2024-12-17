@@ -10,10 +10,12 @@ namespace Marsion
         IResourceManager CreateResource(IResourceLoader resourceLoader, IAddressableLoader addressableLoader);
         IUIManager CreateUI(IResourceManager resourceManager);
         IDataManager CreateData(IResourceManager resourceManager);
-        NetworkManager CreateNetworkManager();
-        INetworkManagerWrapper CreateNetworkManagerWrapper(NetworkManager networkManager);
-        INetworkManagerWrapper CreateNetworkManagerWrapper();
-        INetworkManager CreateNetworkManager(INetworkManagerWrapper networkManagerWrapper);
+        NetworkManager CreateNetwork();
+        INetworkManagerWrapper CreateNetworkWrapper(NetworkManager networkManager);
+        INetworkManagerWrapper CreateNetworkWrapper();
+        INetworkManagerEx CreateNetworkEx(INetworkManagerWrapper networkManagerWrapper);
+        IServerManager CreateServer();
+        IServerFactory CreateServerFactory();
     }
 
     public class DefaultManagersFactory : IManagersFactory
@@ -23,35 +25,40 @@ namespace Marsion
         public IResourceManager CreateResource(IResourceLoader resourceLoader, IAddressableLoader addressableLoader) => new ResourceManager(resourceLoader, addressableLoader);
         public IUIManager CreateUI(IResourceManager resourceManager) => new UIManager(resourceManager);
         public IDataManager CreateData(IResourceManager resourceManager) => new DataManager(resourceManager);
-        public NetworkManager CreateNetworkManager()
+        public NetworkManager CreateNetwork()
         {
             var existingManager = UnityEngine.Object.FindAnyObjectByType<NetworkManager>();
             if (existingManager == null)
             {
                 throw new InvalidOperationException("NetworkManager is not found in the scene. " +
-                    "Ensure a NetworkManager is pre-placed in the scene or properly configured in the test environment.");
+                    "Ensure a NetworkManager is pre-placed in the scene or properly configured in the environment.");
             }
             return existingManager;
         }
-        public INetworkManagerWrapper CreateNetworkManagerWrapper(NetworkManager networkManager)
+        public INetworkManagerWrapper CreateNetworkWrapper(NetworkManager networkManager) => new NetworkManagerWrapper(networkManager);
+        public INetworkManagerWrapper CreateNetworkWrapper()
         {
-            return new NetworkManagerWrapper(networkManager);
-        }
-        public INetworkManagerWrapper CreateNetworkManagerWrapper()
-        {
-            var networkManager = CreateNetworkManager();
+            var networkManager = CreateNetwork();
 
             if (networkManager == null)
             {
                 throw new InvalidOperationException("NetworkManager is not found in the scene. " +
-                    "Ensure a NetworkManager is pre-placed in the scene or properly configured in the test environment.");
+                    "Ensure a NetworkManager is pre-placed in the scene or properly configured in the nvironment.");
             }
 
-            return CreateNetworkManagerWrapper(networkManager);
+            return CreateNetworkWrapper(networkManager);
         }
-        public INetworkManager CreateNetworkManager(INetworkManagerWrapper networkManagerWrapper)
+        public INetworkManagerEx CreateNetworkEx(INetworkManagerWrapper networkManagerWrapper) => new NetworkManagerEx(networkManagerWrapper);
+        public IServerManager CreateServer()
         {
-            return new NetworkManagerEx(networkManagerWrapper);
+            var existingManager = UnityEngine.Object.FindAnyObjectByType<ServerManager>();
+            if (existingManager == null)
+            {
+                throw new InvalidOperationException("ServerManager is not found in the scene. " +
+                    "Ensure a ServerManager is pre-placed in the scene or properly configured in environment.");
+            }
+            return existingManager;
         }
+        public IServerFactory CreateServerFactory() => new DefaultServerFactory();
     }
 }

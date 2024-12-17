@@ -95,7 +95,7 @@ namespace Marsion
 
             DraftDictionary.TryGetValue(clientID, out var state);
 
-            Managers.Server.GameEx.Ready(clientID, state.CurrentDeck);
+            Managers.Instance.Server.GameServer.Ready(clientID, state.CurrentDeck);
         }
 
         #endregion
