@@ -11,7 +11,6 @@ namespace Marsion.Tests
 {
     public class ConnectedNetworkTests
     {
-        float timeout = 2f;
         WaitForSeconds wait = new WaitForSeconds(0.5f);
 
         Mock<IManagers> HostManagers;
@@ -184,7 +183,7 @@ namespace Marsion.Tests
 
             GuestManagers.Object.NetworkEx.SubscribeMessage("TestMessage", (clientID, reader) =>
             {
-                Debug.Log(clientID);
+                Debug.Log($"Test Message ClientID : {clientID}");
             });
             
             var targetID = GuestManagers.Object.NetworkEx.LocalID;
@@ -196,7 +195,9 @@ namespace Marsion.Tests
             },
             NetworkDelivery.ReliableSequenced);
 
-            Assert.Pass();
+            yield return wait;
+
+            LogAssert.Expect(LogType.Log, $"Test Message ClientID : {HostManagers.Object.NetworkEx.LocalID}");
         }
 
         [UnityTest]

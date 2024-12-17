@@ -13,7 +13,6 @@ namespace Marsion
         bool IsHost { get; }
         bool IsConnected { get; }
         IReadOnlyList<ulong> ConnectedClientsIDs { get; }
-        CustomMessagingManager CustomMessagingManager { get; }
 
         event Action OnConnect;
         event Action OnDisconnect;
@@ -21,7 +20,7 @@ namespace Marsion
         event Action<ulong> OnClientDisconnected;
 
         void SubscribeMessage(string messageType, Action<ulong, FastBufferReader> handler);
-        void UnsubscribeMessage(string messageType);
+        void UnsubscribeMessage(string messageType, Action<ulong, FastBufferReader> handler);
         void SendMessage(string messageType, ulong target, Action<FastBufferWriter> writeAction, NetworkDelivery deliery);
         void BroadcastMessage(string messageType, Action<FastBufferWriter> writeAction, NetworkDelivery delivery);
         void StartHost();

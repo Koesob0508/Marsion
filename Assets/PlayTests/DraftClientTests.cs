@@ -70,16 +70,16 @@ namespace Marsion.Tests
 
             mockManagers.Setup(m => m.NetworkEx).Returns(mockNetworkEx);
 
-            if(mockManagers.Object.NetworkEx.CustomMessagingManager == null) Debug.Log("CM null");
-
             var draftClient = new DraftClient(mockManagers.Object);
 
             draftClient.Init();
 
+            mockManagers.Object.NetworkEx.StartHost();
+
             // 이제 mockManagers.NetworkEx를 통해서 Send를 해봐야지
             ushort testCommand = DraftCommand.ServerInitState;
             ulong targetID = mockManagers.Object.NetworkEx.LocalID;
-            SerializedDraftState sdata = null;
+            SerializedDraftState sdata = new SerializedDraftState();
 
             Action<FastBufferWriter> writeAction = (writer) =>
             {
@@ -92,8 +92,6 @@ namespace Marsion.Tests
             yield return new WaitForSeconds(0.5f);
 
             LogAssert.Expect(LogType.Log, $"[DraftClient] <color={ColorCodes.Client}><b>Received init state</b></color>");
-
-            yield break;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Marsion
         ulong ServerClientID { get; }
         bool IsServer { get; }
         bool IsClient { get; }
+        bool IsConnected { get; }
         void StartHost();
         void StartServer();
         void StartClient();

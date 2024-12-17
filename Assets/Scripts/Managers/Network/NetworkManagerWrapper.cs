@@ -27,6 +27,7 @@ namespace Marsion
         public ulong ServerClientID => NetworkManager.ServerClientId;
         public bool IsServer => networkManager.IsServer;
         public bool IsClient => networkManager.IsClient;
+        public bool IsConnected => IsServer || IsClient;
 
         public event Action OnConnect;
         public event Action OnDisconnect;

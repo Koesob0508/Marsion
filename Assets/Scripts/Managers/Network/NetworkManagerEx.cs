@@ -9,10 +9,12 @@ namespace Marsion
     public class NetworkManagerEx : INetworkManagerEx
     {
         private readonly INetworkManagerWrapper networkWrapper;
+        private readonly ICustomMessagingManager messagingManager;
 
         public NetworkManagerEx(INetworkManagerWrapper networkWrapper)
         {
             this.networkWrapper = networkWrapper ?? throw new ArgumentNullException(nameof(networkWrapper));
+            messagingManager = new CustomMessagingManagerWrapper(this.networkWrapper);
         }
 
         // Properties
@@ -23,7 +25,6 @@ namespace Marsion
         public bool IsHost => IsClient && IsServer;
         public bool IsConnected => IsClient || IsServer;
         public IReadOnlyList<ulong> ConnectedClientsIDs => networkWrapper.ConnectedClientsIDs;
-        public CustomMessagingManager CustomMessagingManager => networkWrapper.CustomMessagingManager;
 
         // Events
         public event Action OnConnect
@@ -47,26 +48,14 @@ namespace Marsion
             remove => networkWrapper.OnClientDisconnected -= value;
         }
 
-        // Messaging
-        protected readonly Dictionary<string, Action<ulong, FastBufferReader>> messageHandlers = new();
-
         public void SubscribeMessage(string messageType, Action<ulong, FastBufferReader> handler)
         {
-            if (messageHandlers.ContainsKey(messageType))
-            {
-                throw new InvalidOperationException($"A message handler for '{messageType}' is already registered.");
-            }
-
-            messageHandlers[messageType] = handler;
-            RegisterMessage(messageType, handler);
+            messagingManager.SubscribeMessage(messageType, handler);
         }
 
-        public void UnsubscribeMessage(string messageType)
+        public void UnsubscribeMessage(string messageType, Action<ulong, FastBufferReader> handler)
         {
-            if (messageHandlers.Remove(messageType))
-            {
-                networkWrapper.CustomMessagingManager.UnregisterNamedMessageHandler(messageType);
-            }
+            messagingManager.UnsubscribeMessage(messageType, handler);
         }
 
         public void SendMessage(string messageType, ulong target, Action<FastBufferWriter> writeAction, NetworkDelivery delivery)
@@ -110,46 +99,7 @@ namespace Marsion
 
         public void Clear()
         {
-            UnsubscribeAllMessages();
-        }
-
-        // Private methods
-        private void RegisterMessage(string messageType, Action<ulong, FastBufferReader> handler)
-        {
-            try
-            {
-                networkWrapper.CustomMessagingManager.RegisterNamedMessageHandler(messageType, (clientId, reader) =>
-                {
-                    Debug.Log(messageType == null);
-
-                    if (messageHandlers.TryGetValue(messageType, out var callback))
-                    {
-                        callback(clientId, reader);
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError<NetworkManagerEx>($"Failed to register message handler for {messageType}: {ex.Message}");
-            }
-        }
-
-        private void UnsubscribeAllMessages()
-        {
-            foreach (var messageType in messageHandlers.Keys)
-            {
-                try
-                {
-                    networkWrapper.CustomMessagingManager.UnregisterNamedMessageHandler(messageType);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogWarning<NetworkManagerEx>($"Failed to unregister message handler for {messageType}: {ex.Message}");
-
-                }
-            }
-
-            messageHandlers.Clear();
+            messagingManager.UnsubscribeAllMessages();
         }
     }
 }
