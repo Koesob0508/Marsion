@@ -50,15 +50,16 @@ namespace Marsion
                 Instance._ui = factory.CreateUI(Instance.Resource);
                 Instance._data = factory.CreateData(Instance.Resource);
 
-                INetworkWrapper networkWrapper = factory.CreateNetworkManagerWrapper();
+                INetworkManagerWrapper networkWrapper = factory.CreateNetworkManagerWrapper();
                 Instance._networkEx = factory.CreateNetworkManagerEx(networkWrapper);
 
                 Card = new CardManager();
 
                 Instance._data.Init();
-                Network.Init();
-                Server.Init();
-                Client.Init();
+
+                //Instance._networkEx.Init();
+                //Server.Init();
+                //Client.Init();
             }
         }
 

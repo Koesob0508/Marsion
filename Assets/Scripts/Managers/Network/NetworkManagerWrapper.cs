@@ -4,14 +4,15 @@ using Unity.Netcode;
 
 namespace Marsion
 {
-    public class NetworkManagerWrapper : INetworkWrapper
+    public class NetworkManagerWrapper : INetworkManagerWrapper
     {
         private readonly NetworkManager networkManager;
+        public IReadOnlyList<ulong> ConnectedClientsIDs => networkManager.ConnectedClientsIds;
+        public CustomMessagingManager CustomMessagingManager => networkManager.CustomMessagingManager;
 
         public NetworkManagerWrapper(NetworkManager networkManager)
         {
             this.networkManager = networkManager ?? throw new ArgumentNullException(nameof(networkManager));
-
             this.networkManager.OnClientConnectedCallback += OnClientConnectedHandler;
             this.networkManager.OnClientDisconnectCallback += OnClientDisconnectedHandler;
         }
@@ -27,16 +28,10 @@ namespace Marsion
         public bool IsServer => networkManager.IsServer;
         public bool IsClient => networkManager.IsClient;
 
-        public IReadOnlyList<ulong> ConnectedClientsIDs =>
-            networkManager.ConnectedClientsIds;
-        public ICustomMessagingManager CustomMessagingManager =>
-            new CustomMessagingManagerWrapper(networkManager.CustomMessagingManager);
-
         public event Action OnConnect;
         public event Action OnDisconnect;
         public event Action<ulong> OnClientConnected;
         public event Action<ulong> OnClientDisconnected;
-
 
         public void StartHost()
         {

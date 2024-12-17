@@ -5,6 +5,13 @@ using System;
 
 namespace Marsion
 {
+    /// <summary>
+    ///     NetworkMessaging의 역할
+    ///     NetworkManager.CustomMessagingManager는 Start- 메서드를 실행시키기 전까지 초기화 되지 않는다.
+    ///     따라서 메시지를 구독할 수도 보낼 수도 없다.
+    ///     NetworkMessaging은, Start- 메서드가 실행되기 전까지 해당 구독들을 등록 대기시켜뒀다가
+    ///     OnConnect가 됨에 따라서 실제 CustomMessagingManager에 등록하는 작업을 하는 클래스이다.
+    /// </summary>
     public class NetworkMessaging
     {
         private MarsNetwork network;

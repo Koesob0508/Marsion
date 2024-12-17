@@ -12,9 +12,9 @@ namespace Marsion
         IUIManager CreateUI(IResourceManager resourceManager);
         IDataManager CreateData(IResourceManager resourceManager);
         NetworkManager CreateNetworkManager();
-        INetworkWrapper CreateNetworkManagerWrapper(NetworkManager networkManager);
-        INetworkWrapper CreateNetworkManagerWrapper();
-        INetworkManagerEx CreateNetworkManagerEx(INetworkWrapper networkManagerWrapper);
+        INetworkManagerWrapper CreateNetworkManagerWrapper(NetworkManager networkManager);
+        INetworkManagerWrapper CreateNetworkManagerWrapper();
+        INetworkManagerEx CreateNetworkManagerEx(INetworkManagerWrapper networkManagerWrapper);
     }
 
     public class DefaultManagersFactory : IManagersFactory
@@ -34,11 +34,11 @@ namespace Marsion
             }
             return existingManager;
         }
-        public INetworkWrapper CreateNetworkManagerWrapper(NetworkManager networkManager)
+        public INetworkManagerWrapper CreateNetworkManagerWrapper(NetworkManager networkManager)
         {
             return new NetworkManagerWrapper(networkManager);
         }
-        public INetworkWrapper CreateNetworkManagerWrapper()
+        public INetworkManagerWrapper CreateNetworkManagerWrapper()
         {
             var networkManager = CreateNetworkManager();
 
@@ -50,7 +50,7 @@ namespace Marsion
 
             return CreateNetworkManagerWrapper(networkManager);
         }
-        public INetworkManagerEx CreateNetworkManagerEx(INetworkWrapper networkManagerWrapper)
+        public INetworkManagerEx CreateNetworkManagerEx(INetworkManagerWrapper networkManagerWrapper)
         {
             return new NetworkManagerEx(networkManagerWrapper);
         }

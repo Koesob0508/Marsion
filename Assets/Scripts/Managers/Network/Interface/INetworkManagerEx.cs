@@ -13,6 +13,7 @@ namespace Marsion
         bool IsHost { get; }
         bool IsConnected { get; }
         IReadOnlyList<ulong> ConnectedClientsIDs { get; }
+        CustomMessagingManager CustomMessagingManager { get; }
 
         event Action OnConnect;
         event Action OnDisconnect;

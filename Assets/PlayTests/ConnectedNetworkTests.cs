@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -10,6 +11,9 @@ namespace Marsion.Tests
 {
     public class ConnectedNetworkTests
     {
+        float timeout = 2f;
+        WaitForSeconds wait = new WaitForSeconds(0.5f);
+
         Mock<IManagers> HostManagers;
         Mock<IManagers> GuestManagers;
         NetworkManager hostNetwork;
@@ -69,7 +73,7 @@ namespace Marsion.Tests
             //HostManagers.Object.NetworkEx.StartHost();
             //GuestManagers.Object.NetworkEx.StartClient();
 
-            yield return new WaitForSeconds(0.5f);
+            yield return wait;
         }
 
         [UnityTearDown]
@@ -80,14 +84,14 @@ namespace Marsion.Tests
             if(HostManagers.Object.NetworkEx != null)
             {
                 HostManagers.Object.NetworkEx.Shutdown();
-                Object.Destroy(hostNetwork);
+                UnityEngine.Object.Destroy(hostNetwork);
             }
             HostManagers = null;
 
             if(GuestManagers.Object.NetworkEx != null)
             {
                 GuestManagers.Object.NetworkEx.Shutdown();
-                Object.Destroy(guestNetwork);
+                UnityEngine.Object.Destroy(guestNetwork);
             }
         }
 
@@ -97,7 +101,7 @@ namespace Marsion.Tests
             HostManagers.Object.NetworkEx.StartHost();
             GuestManagers.Object.NetworkEx.StartClient();
 
-            yield return new WaitForSeconds(0.5f);
+            yield return wait;
 
             Debug.Log(HostManagers.Object.NetworkEx.LocalID);
             Debug.Log(GuestManagers.Object.NetworkEx.LocalID);
@@ -114,7 +118,7 @@ namespace Marsion.Tests
             HostManagers.Object.NetworkEx.StartHost();
             GuestManagers.Object.NetworkEx.StartClient();
 
-            yield return new WaitForSeconds(0.5f);
+            yield return wait;
 
             Assert.IsTrue(HostManagers.Object.NetworkEx.IsHost);
             Assert.IsTrue(GuestManagers.Object.NetworkEx.IsClient);
@@ -123,8 +127,26 @@ namespace Marsion.Tests
         }
 
         [UnityTest]
+        public IEnumerator OnConnected_Callback_Should_Invoke()
+        {
+            bool isConnected = false;
+
+            HostManagers.Object.NetworkEx.OnConnect += () =>
+            {
+                isConnected = true;
+            };
+
+            HostManagers.Object.NetworkEx.StartHost();
+
+            yield return wait;
+
+            Assert.IsTrue(isConnected, "OnClientConnected callback was not invoked.");
+        }
+
+        [UnityTest]
         public IEnumerator OnClientConnected_Callback_Should_Invoke()
         {
+            // Arrange
             // OnClientConnected 핸들러 등록
             bool isClientConnected = false;
             hostNetwork.OnClientConnectedCallback += (clientID) =>
@@ -138,34 +160,57 @@ namespace Marsion.Tests
                 isClientConnected = true;
             };
 
+            // Act
             HostManagers.Object.NetworkEx.StartHost();
             GuestManagers.Object.NetworkEx.StartClient();
 
-            yield return new WaitForSeconds(0.5f);
+            yield return wait;
 
-            //var connectedClients = HostManagers.Object.NetworkEx.ConnectedClientsIDs;
-            //foreach (var clientId in connectedClients)
-            //{
-            //    Debug.Log($"Existing connected client ID: {clientId}");
-            //    isClientConnected = true; // 이미 연결된 클라이언트를 검증
-            //}
-
-            // 검증
+            // Assert
             Assert.IsTrue(GuestManagers.Object.NetworkEx.IsClient, "Guest is not properly connected.");
             Assert.IsTrue(isClientConnected, "OnClientConnected callback was not invoked.");
+        }
+
+        /// <summary>
+        ///     네트워크 연결 전에도 CustomMessaging은 등록 가능해야 합니다.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Subscribe_Message_Before_Start_Should_Register_After_Start()
+        {
+            // Arrange
+            HostManagers.Object.NetworkEx.StartHost();
+            GuestManagers.Object.NetworkEx.StartClient();
+            yield return wait;
+
+            GuestManagers.Object.NetworkEx.SubscribeMessage("TestMessage", (clientID, reader) =>
+            {
+                Debug.Log(clientID);
+            });
+            
+            var targetID = GuestManagers.Object.NetworkEx.LocalID;
+
+            // Act
+            HostManagers.Object.NetworkEx.SendMessage("TestMessage", targetID, (writer) =>
+            {
+                Debug.Log("Test Message");
+            },
+            NetworkDelivery.ReliableSequenced);
+
+            Assert.Pass();
         }
 
         [UnityTest]
         public IEnumerator Host_Send_Client_Should_Received()
         {
+            // Arrange
             HostManagers.Object.NetworkEx.StartHost();
             GuestManagers.Object.NetworkEx.StartClient();
+
+            yield return wait;
 
             bool expectedBool = false;
             string expectedString = "TestMessage";
             int expectedInt = 1234;
-
-            yield return new WaitForSeconds(0.5f); // 메시지 처리 시간 대기
 
             ulong targetID = GuestManagers.Object.NetworkEx.LocalID;
 
@@ -179,12 +224,13 @@ namespace Marsion.Tests
                 reader.ReadValueSafe(out receivedInt);
             });
 
-            System.Action<FastBufferWriter> messageWriter = (writer) =>
+            Action<FastBufferWriter> messageWriter = (writer) =>
             {
                 writer.WriteValueSafe(expectedString);
                 writer.WriteValueSafe(expectedInt);
             };
 
+            // Act
             HostManagers.Object.NetworkEx.SendMessage("Host", targetID, messageWriter, NetworkDelivery.Reliable);
 
             float timeout = 1f;
@@ -192,13 +238,11 @@ namespace Marsion.Tests
 
             yield return new WaitUntil(() => expectedBool || (Time.time - startTime) > timeout);
             Debug.Log($"Time : {Time.time - startTime})");
-            //yield return new WaitForSeconds(0.5f); // 메시지 처리 시간 대기
 
+            // Assert
             Assert.IsTrue(expectedBool);
             Assert.AreEqual(expectedString, receivedString);
             Assert.AreEqual(expectedInt, receivedInt);
-
-            yield break;
         }
     }
 }

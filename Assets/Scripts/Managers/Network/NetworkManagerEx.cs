@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Collections;
+using UnityEngine;
 
 namespace Marsion
 {
     public class NetworkManagerEx : INetworkManagerEx
     {
-        private readonly INetworkWrapper networkWrapper;
+        private readonly INetworkManagerWrapper networkWrapper;
 
-        public NetworkManagerEx(INetworkWrapper networkWrapper)
+        public NetworkManagerEx(INetworkManagerWrapper networkWrapper)
         {
             this.networkWrapper = networkWrapper ?? throw new ArgumentNullException(nameof(networkWrapper));
         }
@@ -22,6 +23,7 @@ namespace Marsion
         public bool IsHost => IsClient && IsServer;
         public bool IsConnected => IsClient || IsServer;
         public IReadOnlyList<ulong> ConnectedClientsIDs => networkWrapper.ConnectedClientsIDs;
+        public CustomMessagingManager CustomMessagingManager => networkWrapper.CustomMessagingManager;
 
         // Events
         public event Action OnConnect
@@ -72,7 +74,7 @@ namespace Marsion
             using (var writer = new FastBufferWriter(128, Allocator.Temp, 1024 * 1024))
             {
                 writeAction(writer);
-                networkWrapper.CustomMessagingManager.SendMessage(messageType, target, writer, delivery);
+                networkWrapper.CustomMessagingManager.SendNamedMessage(messageType, target, writer, delivery);
             }
         }
 
@@ -81,7 +83,7 @@ namespace Marsion
             using (var writer = new FastBufferWriter(128, Allocator.Temp, 1024 * 1024))
             {
                 writeAction(writer);
-                networkWrapper.CustomMessagingManager.SendMessage(messageType, ConnectedClientsIDs, writer, delivery);
+                networkWrapper.CustomMessagingManager.SendNamedMessage(messageType, ConnectedClientsIDs, writer, delivery);
             }
         }
 
@@ -118,6 +120,8 @@ namespace Marsion
             {
                 networkWrapper.CustomMessagingManager.RegisterNamedMessageHandler(messageType, (clientId, reader) =>
                 {
+                    Debug.Log(messageType == null);
+
                     if (messageHandlers.TryGetValue(messageType, out var callback))
                     {
                         callback(clientId, reader);

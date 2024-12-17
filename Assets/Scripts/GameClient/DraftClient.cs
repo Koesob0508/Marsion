@@ -14,8 +14,8 @@ namespace Marsion
         public DraftState State { get; private set; }
 
         // shortcuts
-        private bool IsHost { get { return Managers.Instance.NetworkEx.IsHost; } }
-        private ulong ServerID { get { return Managers.Instance.NetworkEx.ServerID; } }
+        private bool IsHost { get { return _managers.NetworkEx.IsHost; } }
+        private ulong ServerID { get { return _managers.NetworkEx.ServerID; } }
 
         public Action OnStateUpdate;
 

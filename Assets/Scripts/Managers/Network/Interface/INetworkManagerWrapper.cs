@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 
 namespace Marsion
 {
-    public interface INetworkWrapper
+    public interface INetworkManagerWrapper
     {
         ulong LocalClientID { get; }
         ulong ServerClientID { get; }
@@ -14,7 +15,7 @@ namespace Marsion
         void StartClient();
         void Shutdown();
         IReadOnlyList<ulong> ConnectedClientsIDs { get; }
-        ICustomMessagingManager CustomMessagingManager { get; }
+        CustomMessagingManager CustomMessagingManager { get; }
         event Action OnConnect;
         event Action OnDisconnect;
         event Action<ulong> OnClientConnected;

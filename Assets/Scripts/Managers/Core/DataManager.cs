@@ -20,8 +20,8 @@ namespace Marsion
         {
             Logger.Log<DataManager>("Data initialized", colorName: ColorCodes.CommonManager);
 
-            //Load<CardSO>("CardSO");
-            //Load<PortraitSO>("PortraitSO");
+            Load<CardSO>("CardSO");
+            Load<PortraitSO>("PortraitSO");
         }
 
         // 제네릭 Load 메서드 (Object 타입을 상속하는 경우에 대응)
