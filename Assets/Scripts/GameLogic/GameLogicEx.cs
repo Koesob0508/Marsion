@@ -6,6 +6,8 @@ namespace Marsion
 {
     public class GameLogicEx
     {
+        private readonly CommandInvoker commandInvoker = new();
+
         public GameData Data;
         public event Action OnDataUpdated;
         public event Action OnGameStarted;
@@ -198,9 +200,9 @@ namespace Marsion
                 return;
             }
 
-            player.PayMana(card.Mana);
-            player.Hand.Remove(card);
-            player.Field.Insert(index, card);
+            var playCardCommand = new PlayCardCommand(player, card, index);
+            commandInvoker.AddCommand(playCardCommand);
+            commandInvoker.ExecuteCommands();
 
             OnCardPlayed?.Invoke(true, player.PlayerID, card.UID);
             OnCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
@@ -210,10 +212,9 @@ namespace Marsion
 
         public void TryAttack(Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
-            Logger.Log<GameLogic>("Try attack", colorName: ColorCodes.Logic);
-
-            attacker.Damage(defender.Attack);
-            defender.Damage(attacker.Attack);
+            var attackCommand = new AttackCommand(attackPlayer, attacker, defendPlayer, defender);
+            commandInvoker.AddCommand(attackCommand);
+            commandInvoker.ExecuteCommands();
 
             OnDataUpdated?.Invoke();
             OnCardAttacked?.Invoke(true, attackPlayer.PlayerID, attacker.UID, defendPlayer.PlayerID, defender.UID);
