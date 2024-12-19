@@ -1,11 +1,9 @@
-﻿using Marsion.Server;
-
-namespace Marsion
+﻿namespace Marsion
 {
     public interface IServerManager
     {
         DraftServer DraftServer { get; }
-        GameServerEx GameServer { get; }
-        void Init(INetworkManagerEx networkManager, IServerFactory serverFactory);
+        IGameModel GameModel { get; }
+        void Init(IServerManagerFactory serverFactory);
     }
 }

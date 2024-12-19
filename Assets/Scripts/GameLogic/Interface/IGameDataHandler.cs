@@ -1,0 +1,20 @@
+﻿using System.Collections.Generic;
+
+namespace Marsion
+{
+    public interface IGameDataHandler
+    {
+        IGameData GameData { get; }
+
+        Player GetPlayer(ulong playerID);
+        Player GetOpponentPlayer(ulong playerID);
+        Card GetCardFromHand(ulong playerID, string cardUID);
+        Card GetCardFromField(ulong playerID, string cardUID);
+
+        void SetPlayerDeck(ulong playerID, List<string> deck);
+        void AddCardToHand(ulong playerID, Card card);
+        void RemoveCardFromHand(ulong playerID, string cardUID);
+        void AddCardToField(ulong playerID, Card card);
+        void RemoveCardFromField(ulong playerID, string cardUID);
+    }
+}

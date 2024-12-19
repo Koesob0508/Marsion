@@ -20,7 +20,7 @@
             attackerCard.Damage(defenderCard.Attack);
             defenderCard.Damage(attackerCard.Attack);
 
-            Logger.Log<GameLogicEx>($"{attackerCard.Name} attacked {defenderCard.Name}", colorName: ColorCodes.Logic);
+            Logger.Log<DefaultGameLogic>($"{attackerCard.Name} attacked {defenderCard.Name}", colorName: ColorCodes.Logic);
         }
     }
 }

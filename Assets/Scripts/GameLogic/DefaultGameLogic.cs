@@ -4,11 +4,12 @@ using System.Collections.Generic;
 
 namespace Marsion
 {
-    public class GameLogicEx
+    public class DefaultGameLogic : IGameLogicEx
     {
         private readonly CommandInvoker commandInvoker = new();
 
         public GameData Data;
+        public IGameDataHandler GameDataHandler;
         public event Action OnDataUpdated;
         public event Action OnGameStarted;
         public event Action OnManaChanged;
@@ -21,14 +22,19 @@ namespace Marsion
         public event Action<List<string>> OnCardDied;
         public event Action<ulong> OnGameEnded;
 
-        public GameLogicEx(GameData data)
+        public DefaultGameLogic(GameData data)
         {
             Data = data;
         }
 
+        public DefaultGameLogic(IGameDataHandler gameDataHandler)
+        {
+            GameDataHandler = gameDataHandler;
+        }
+
         public void SetPlayerDeck(ulong clientID, List<string> deck)
         {
-            Logger.Log<GameLogicEx>($"Set player deck", colorName: ColorCodes.Logic);
+            Logger.Log<DefaultGameLogic>($"Set player deck", colorName: ColorCodes.Logic);
             Player player = Data.GetPlayer(clientID);
             List<Card> resultDeck = new List<Card>();
 
@@ -40,7 +46,7 @@ namespace Marsion
                 }
                 else
                 {
-                    Logger.Log<GameLogicEx>($"{soID} CardSO not found", colorName: ColorCodes.Logic);
+                    Logger.Log<DefaultGameLogic>($"{soID} CardSO not found", colorName: ColorCodes.Logic);
                 }
             }
 
@@ -51,7 +57,7 @@ namespace Marsion
 
         public void StartGame()
         {
-            Logger.Log<GameLogicEx>($"Start Game", colorName: ColorCodes.Logic);
+            Logger.Log<DefaultGameLogic>($"Start Game", colorName: ColorCodes.Logic);
 
             // 초상화 설정
             Random random = new Random();
@@ -93,9 +99,14 @@ namespace Marsion
             StartTurn();
         }
 
-        private void StartTurn()
+        public void EndGame()
         {
-            Logger.Log<GameLogicEx>($"Start Turn", colorName: ColorCodes.Logic);
+
+        }
+
+        public void StartTurn()
+        {
+            Logger.Log<DefaultGameLogic>($"Start Turn", colorName: ColorCodes.Logic);
 
             Data.TurnCount++;
 
@@ -114,7 +125,7 @@ namespace Marsion
 
         public void EndTurn()
         {
-            Logger.Log<GameLogicEx>($"End turn", colorName: ColorCodes.Logic);
+            Logger.Log<DefaultGameLogic>($"End turn", colorName: ColorCodes.Logic);
 
             Data.CurrentPlayer = Data.CurrentPlayer == Data.GetPlayer(0) ? Data.GetPlayer(1) : Data.GetPlayer(0);
 
@@ -187,13 +198,18 @@ namespace Marsion
             drawnCards = outCards;
         }
 
+        public void TrySpawnCard(ulong playerID, string cardUID, int index)
+        {
+
+        }
+
         public void TrySpawnCard(Player player, Card card, int index)
         {
             Logger.Log<GameLogic>("Try spawn card", colorName: ColorCodes.Logic);
 
             if (!(player.Mana >= card.Mana))
             {
-                Logger.Log<GameLogicEx>("Spawn try failed", colorName: ColorCodes.Logic);
+                Logger.Log<DefaultGameLogic>("Spawn try failed", colorName: ColorCodes.Logic);
                 OnCardPlayed?.Invoke(false, player.PlayerID, card.UID);
                 OnCardSpawned?.Invoke(false, player.PlayerID, card.UID, index);
 
@@ -208,6 +224,11 @@ namespace Marsion
             OnCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
             OnDataUpdated?.Invoke();
             OnManaChanged?.Invoke();
+        }
+
+        public void TryAttack(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
+        {
+
         }
 
         public void TryAttack(Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
@@ -292,6 +313,11 @@ namespace Marsion
                     }
                 }
             }
+        }
+
+        public void Clear()
+        {
+
         }
     }
 }

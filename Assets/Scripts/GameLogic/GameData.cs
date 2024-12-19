@@ -1,12 +1,10 @@
-﻿using Marsion;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
-namespace Marsion.Logic
+namespace Marsion
 {
     [Serializable]
-    public class GameData
+    public class GameData : IGameData
     {
         public Player[] Players;
         public Player CurrentPlayer;

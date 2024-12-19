@@ -54,7 +54,7 @@ namespace Marsion
 
     public class SerializedGameData : INetworkSerializable
     {
-        public GameData GameData;
+        public IGameData GameData;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {

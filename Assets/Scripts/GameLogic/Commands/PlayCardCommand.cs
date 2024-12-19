@@ -17,14 +17,14 @@
         {
             if(player.Mana < card.Mana)
             {
-                Logger.Log<GameLogicEx>($"Not enoufh mana to play {card.Name}", colorName: ColorCodes.Logic);
+                Logger.Log<DefaultGameLogic>($"Not enoufh mana to play {card.Name}", colorName: ColorCodes.Logic);
                 return;
             }
             player.PayMana(card.Mana);
             player.Hand.Remove(card);
             player.Field.Insert(index, card);
 
-            Logger.Log<GameLogicEx>($"Played card : {card.Name} at position {index}", colorName: ColorCodes.Logic);
+            Logger.Log<DefaultGameLogic>($"Played card : {card.Name} at position {index}", colorName: ColorCodes.Logic);
         }
     }
 }

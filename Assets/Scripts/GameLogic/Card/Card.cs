@@ -2,6 +2,7 @@
 using Marsion.Logic;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Marsion
 {
@@ -28,6 +29,7 @@ namespace Marsion
         public int Health { get; private set; }
         public bool IsDead { get; private set; }
         //public List<CardAbility> Abilities { get; private set; }
+        public List<ITrigger> Triggers { get; private set; }
 
         [JsonIgnore] public Action OnPlay;
         [JsonIgnore] public Action OnLastWill;
@@ -87,6 +89,18 @@ namespace Marsion
 
             // Abilities를 깊은 복사하려면 Abilities 리스트가 필요함
             // Abilities = original.Abilities.Select(ability => new CardAbility(ability)).ToList(); // CardAbility 클래스에 복사 생성자 필요
+        }
+
+        public void AddTrigger(ITrigger trigger)
+        {
+            Triggers.Add(trigger);
+            trigger.Register();
+        }
+
+        public void RemoveTrigger(ITrigger trigger)
+        {
+            trigger.Unregister();
+            Triggers.Remove(trigger);
         }
 
         public void SetHP(int amount)

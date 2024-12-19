@@ -141,7 +141,7 @@ namespace Marsion
             {
                 Logger.Log<GameClientEx>($"Received updated data", colorName: ColorCodes.Client);
 
-                Data = sGameData.GameData;
+                Data = (GameData)sGameData.GameData;
 
                 OnDataUpdated?.Invoke();
             };

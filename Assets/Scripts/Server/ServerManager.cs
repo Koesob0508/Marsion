@@ -1,23 +1,19 @@
-﻿using Marsion.Server;
-using Unity.Netcode;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Marsion
 {
-    // Server는 WRGBYK 중 B 계열을 사용합니다.
-
     public class ServerManager : MonoBehaviour, IServerManager
     {
+        private IServerManagerFactory _serverFactory;
         private INetworkManagerEx _networkManager;
-        private IServerFactory _serverFactory;
 
-        public GameServerEx GameServer { get; private set; }
+        public IGameModel GameModel { get; private set; }
         public DraftServer DraftServer { get; private set; }
 
-        public void Init(INetworkManagerEx networkManager, IServerFactory serverFactory)
+        public void Init(IServerManagerFactory serverFactory)
         {
-            _networkManager = networkManager;
             _serverFactory = serverFactory;
+            _networkManager = serverFactory.CreateNetworkManager();
 
             Logger.Log<ServerManager>("Server Manager initialized", colorName: ColorCodes.Server);
 
@@ -41,8 +37,9 @@ namespace Marsion
             DraftServer = _serverFactory.CreateDraftServer();
             DraftServer.Init();
 
-            GameServer = _serverFactory.CreateGameServerEx();
-            GameServer.Init();
+            GameModel = _serverFactory.CreateGameModel();
+            IGameModelFactory gameFactory = _serverFactory.CreateGameFactory(_networkManager); 
+            GameModel.Init(gameFactory);
 
             RegisterClient(Managers.Instance.Network.LocalID);
         }
@@ -67,7 +64,7 @@ namespace Marsion
         {
             Logger.Log<ServerManager>("Server Manager cleared", colorName: ColorCodes.Server);
             DraftServer = null;
-            GameServer = null;
+            GameModel = null;
             _networkManager.OnClientConnected -= OnClientJoin;
             _networkManager.OnConnect -= OnConnect;
         }
