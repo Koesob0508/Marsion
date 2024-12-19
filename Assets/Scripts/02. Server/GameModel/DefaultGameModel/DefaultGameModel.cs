@@ -274,13 +274,13 @@ namespace Marsion
 
         #endregion
 
-        #region Send Utilities
+       #region Send Utilities
 
         private void SendToAll(ushort tag, INetworkSerializable data = null, NetworkDelivery delivery = NetworkDelivery.ReliableSequenced)
         {
             foreach(ulong clientID in ConnectedClients)
             {
-                Managers.Instance.Network.SendMessage("GameServer", clientID, (writer) =>
+                _networkManager.SendMessage("GameServer", clientID, (writer) =>
                 {
                     writer.WriteValueSafe(tag);
                     if (data != null)

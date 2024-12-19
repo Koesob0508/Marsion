@@ -17,8 +17,8 @@ namespace Marsion
 
             Logger.Log<ServerManager>("Server Manager initialized", colorName: ColorCodes.Server);
 
-            Managers.Instance.Network.OnConnect += OnConnect;
-            Managers.Instance.Network.OnClientConnected += OnClientJoin;
+            _networkManager.OnConnect += OnConnect;
+            _networkManager.OnClientConnected += OnClientJoin;
         }
 
         private void OnConnect()
@@ -41,9 +41,8 @@ namespace Marsion
             IGameModelFactory gameFactory = _serverFactory.CreateGameFactory(_networkManager); 
             GameModel.Init(gameFactory);
 
-            RegisterClient(Managers.Instance.Network.LocalID);
+            RegisterClient(_networkManager.LocalID);
         }
-
 
         private void OnClientJoin(ulong clientID)
         {

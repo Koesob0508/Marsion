@@ -1657,8 +1657,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1196809806}
-  - component: {fileID: 1196809810}
-  - component: {fileID: 1196809809}
   - component: {fileID: 1196809808}
   - component: {fileID: 1196809807}
   m_Layer: 0
@@ -1747,33 +1745,6 @@ MonoBehaviour:
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 1
---- !u!114 &1196809809
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1196809805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe0bc285cd557a044a22e39f2eb568b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1196809810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1196809805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2aaef86acb333844fbf8214dc8e6253f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  network: {fileID: 0}
-  transport: {fileID: 0}
-  IsConnected: 0
 --- !u!1 &1209038518
 GameObject:
   m_ObjectHideFlags: 0
@@ -3086,9 +3057,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2058955357}
-  - component: {fileID: 2058955358}
+  - component: {fileID: 2058955359}
   m_Layer: 0
-  m_Name: '@GameServerEx'
+  m_Name: '@DefaultGameModel'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3111,7 +3082,7 @@ Transform:
   - {fileID: 1707179927}
   m_Father: {fileID: 1842888364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2058955358
+--- !u!114 &2058955359
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3120,12 +3091,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2058955356}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5b666c4a8871324bb9e3beeab96bccc, type: 3}
+  m_Script: {fileID: 11500000, guid: d902aa51f3f59054a86c976c8fdfe65d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Upstream: {fileID: 757649172}
   Downstream: {fileID: 1707179928}
-  ConnectedClients: []
 --- !u!1 &2089929320
 GameObject:
   m_ObjectHideFlags: 0
