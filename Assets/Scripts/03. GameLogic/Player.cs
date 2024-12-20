@@ -23,10 +23,23 @@ namespace Marsion
         public List<Card> Hand = new List<Card>();
         public List<Card> Field = new List<Card>();
 
+        public int Health => Card.HP;
+        public int MaxHealth => Card.MaxHP;
+
         [JsonProperty]
         public int Mana { get; private set; }
         [JsonProperty]
         public int MaxMana { get; private set; }
+
+        public void SetPlayerPortrait(string portraitID)
+        {
+            Portrait = portraitID;
+        }
+
+        public void SetPlayerDeck(List<string> deck)
+        {
+
+        }
 
         public bool TryGetHandCard(string uid, out Card card)
         {
@@ -86,11 +99,6 @@ namespace Marsion
         public void PayMana(int amount)
         {
             Mana -= amount;
-        }
-
-        public void SetPlayerPortrait(string portraitID)
-        {
-            Portrait = portraitID;
         }
     }
 }

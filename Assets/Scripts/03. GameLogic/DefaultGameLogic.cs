@@ -1,6 +1,7 @@
 ﻿using Marsion.Logic;
 using System;
 using System.Collections.Generic;
+using UnityEngine.Playables;
 
 namespace Marsion
 {
@@ -30,6 +31,13 @@ namespace Marsion
         public void StartGame()
         {
             Logger.Log<DefaultGameLogic>($"Start Game", colorName: ColorCodes.Logic);
+
+            // playerID로 접근하는식으로 바꿀 필요 있다.
+            foreach (var player in _dataHandler.GameData.Players)
+            {
+                _dataHandler.ShuffleDeck(player);
+                _dataHandler.DrawCard(player, out var mulliganTarget, 3);
+            }
 
             // 후 플레이어는 카드 한 장 드로우
             _dataHandler.DrawCard(_dataHandler.GetOpponentPlayer(_dataHandler.CurrentPlayer.PlayerID), out var _);
@@ -139,9 +147,9 @@ namespace Marsion
 
             List<ulong> alivePlayerIDs = new();
 
-            foreach(var player in _dataHandler.Players)
+            foreach(var player in _dataHandler.GameData.Players)
             {
-                if(player.Card.Health > 0)
+                if(player.Health > 0)
                 {
                     alivePlayerIDs.Add(player.PlayerID);
                 }
@@ -161,7 +169,7 @@ namespace Marsion
         {
             List<string> result = new();
 
-            foreach (var player in _dataHandler.Players)
+            foreach (var player in _dataHandler.GameData.Players)
             {
                 foreach (Card card in player.Field)
                 {
@@ -180,7 +188,7 @@ namespace Marsion
         {
             List<Card> deadCards = new();
 
-            foreach (var player in _dataHandler.Players)
+            foreach (var player in _dataHandler.GameData.Players)
             {
                 foreach (Card card in player.Field)
                 {
@@ -193,7 +201,7 @@ namespace Marsion
 
             foreach(var card in deadCards)
             {
-                foreach(var player in _dataHandler.Players)
+                foreach(var player in _dataHandler.GameData.Players)
                 {
                     if(player.Field.Contains(card))
                     {

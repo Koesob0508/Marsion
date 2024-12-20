@@ -31,7 +31,7 @@ namespace Marsion
             _dataHandler = gameModelFactory.CreateGameDataHandler(gameData);
             _gameLogic = gameModelFactory.CreateGameLogicEx(_dataHandler);
 
-            _dataHandler.Init();
+            _dataHandler.Init(); // GameData 초기화
 
             Upstream.Init();
             Downstream.Init();
@@ -89,7 +89,7 @@ namespace Marsion
             clip.OnPlay += () =>
             {
                 ConnectedClients.Add(clientID);
-                _dataHandler.SetPlayerDeck(clientID, deck);
+                _dataHandler.RegisterPlayerDeck(clientID, deck);
 
                 if (ConnectedClients.Count == 2)
                 {

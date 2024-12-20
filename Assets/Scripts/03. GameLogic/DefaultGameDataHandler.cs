@@ -9,6 +9,7 @@ namespace Marsion
     public class DefaultGameDataHandler : IGameDataHandler
     {
         public IGameData GameData { get; }
+        private readonly Dictionary<ulong, List<string>> readyPlayerDeck = new();
 
         public Player CurrentPlayer => GameData.CurrentPlayer;
 
@@ -21,7 +22,45 @@ namespace Marsion
         {
             var dataConfig = new DefaultGameDataConfig();
             GameData.Init(dataConfig);
+        }
 
+        /// <summary>
+        ///     두 명의 플레이어가 준비되기 전까지 실제 GameData의 덱 등록은 대기시킨다.
+        /// </summary>
+        /// <param name="playerID"></param>
+        /// <param name="deck"></param>
+        public void RegisterPlayerDeck(ulong playerID, List<string> deck)
+        {
+            Logger.Log<DefaultGameDataHandler>($"Set player deck", colorName: ColorCodes.Logic);
+
+            if(!readyPlayerDeck.ContainsKey(playerID))
+            {
+                readyPlayerDeck[playerID] = deck;
+            }
+            else
+            {
+                Logger.LogWarning<DefaultGameDataHandler>($"Player ID has ready deck already.", colorName: ColorCodes.Logic);
+            }
+            //Player player = GetPlayer(playerID);
+            //List<Card> resultDeck = new List<Card>();
+
+            //foreach (var soID in deck)
+            //{
+            //    if (Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(soID, out var cardSO))
+            //    {
+            //        resultDeck.Add(new Card(playerID, cardSO));
+            //    }
+            //    else
+            //    {
+            //        Logger.Log<DefaultGameDataHandler>($"{soID} CardSO not found", colorName: ColorCodes.Logic);
+            //    }
+            //}
+
+            //player.Deck = resultDeck;
+        }
+
+        public void SetPlayers()
+        {
             #region 초상화 설정. 추후 외부에서 등록하도록 바뀔 예정
             Random random = new Random();
             int number1 = random.Next(3, 13); // Next의 두 번째 인자는 상한을 포함하지 않으므로 13을 사용
@@ -37,18 +76,15 @@ namespace Marsion
             SetPlayerPortrait(0, number1.ToString());
             SetPlayerPortrait(1, number2.ToString());
 
-            foreach (var player in GameData.Players)
-            {
-                ShuffleDeck(player);
-                DrawCard(player, out var mulliganTarget, dataConfig.CountOfStartHand);
-            }
+            // 덱 등록
+            SetPlayerDeck(0);
+            SetPlayerDeck(1);
         }
 
         // 사전 작업
-        private void SetPlayerPortrait(ulong playerID, string portraitID)
-        {
-            GameData.GetPlayer(playerID).SetPlayerPortrait(portraitID);
-        }
+        private void SetPlayerPortrait(ulong playerID, string portraitID) => GameData.GetPlayer(playerID).SetPlayerPortrait(portraitID);
+
+        private void SetPlayerDeck(ulong playerID) => GameData.GetPlayer(playerID).SetPlayerDeck(readyPlayerDeck[playerID]);
 
         public Player GetPlayer(ulong playerID) => GameData.GetPlayer(playerID);
 
@@ -92,27 +128,6 @@ namespace Marsion
         public void RemoveCardFromHand(ulong playerID, string cardUID)
         {
             throw new NotImplementedException();
-        }
-
-        public void SetPlayerDeck(ulong playerID, List<string> deck)
-        {
-            Logger.Log<DefaultGameDataHandler>($"Set player deck", colorName: ColorCodes.Logic);
-            Player player = GetPlayer(playerID);
-            List<Card> resultDeck = new List<Card>();
-
-            foreach (var soID in deck)
-            {
-                if (Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(soID, out var cardSO))
-                {
-                    resultDeck.Add(new Card(playerID, cardSO));
-                }
-                else
-                {
-                    Logger.Log<DefaultGameDataHandler>($"{soID} CardSO not found", colorName: ColorCodes.Logic);
-                }
-            }
-
-            player.Deck = resultDeck;
         }
 
         public void ShuffleDeck(Player player)
