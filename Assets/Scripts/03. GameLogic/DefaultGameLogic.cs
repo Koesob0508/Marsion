@@ -32,6 +32,8 @@ namespace Marsion
         {
             Logger.Log<DefaultGameLogic>($"Start Game", colorName: ColorCodes.Logic);
 
+            _dataHandler.SetPlayers(); // 초상화와 덱 등록
+
             // playerID로 접근하는식으로 바꿀 필요 있다.
             foreach (var player in _dataHandler.GameData.Players)
             {
