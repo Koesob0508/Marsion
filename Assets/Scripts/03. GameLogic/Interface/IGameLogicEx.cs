@@ -21,10 +21,9 @@ namespace Marsion
         void EndGame();
         void StartTurn();
         void EndTurn();
+
         void TrySpawnCard(Player player, Card card, int index);
-        void TrySpawnCard(ulong playerID, string cardUID, int index);
         void TryAttack(Player attacker, Card attackerCard, Player defender, Card defenderCard);
-        void TryAttack(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID);
         void Clear();
     }
 }

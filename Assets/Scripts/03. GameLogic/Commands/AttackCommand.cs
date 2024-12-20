@@ -17,8 +17,8 @@
 
         public void Execute()
         {
-            attackerCard.Damage(defenderCard.Attack);
-            defenderCard.Damage(attackerCard.Attack);
+            attackerCard.TakeDamage(defenderCard.Attack);
+            defenderCard.TakeDamage(attackerCard.Attack);
 
             Logger.Log<DefaultGameLogic>($"{attackerCard.Name} attacked {defenderCard.Name}", colorName: ColorCodes.Logic);
         }

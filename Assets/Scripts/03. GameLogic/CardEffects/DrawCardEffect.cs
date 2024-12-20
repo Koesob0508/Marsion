@@ -11,7 +11,7 @@ namespace Marsion
             _drawCount = drawCount;
         }
 
-        public void Apply(Card source, GameData gameData, DefaultGameLogic gameLogic)
+        public void Apply(Card source, DefaultGameData gameData, DefaultGameLogic gameLogic)
         {
             //var player = gameData.GetPlayer(source.OwnerID);
             //for (int i = 0; i < _drawCount; i++)

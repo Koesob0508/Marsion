@@ -15,21 +15,25 @@ namespace Marsion
         Legendary = 4
     }
 
+    /// <summary>
+    /// 카드 클래스, 카드의 행동, 상태태 관리
+    /// </summary>
     public class Card : IDamageable
     {
         public ulong PlayerID { get; private set; }
         public string UID { get; private set; }
         public string Name { get; private set; }
         public GradeType Grade { get; private set; }
-        public int Mana { get; private set; }
+        public int ManaCost { get; private set; }
         public string FullArtPath { get; private set; }
         public string BoardArtPath { get; private set; }
         public string AbilityExplain { get; private set; }
         public int Attack { get; private set; }
-        public int Health { get; private set; }
+        public int MaxHP { get; private set; }
+        public int HP { get; private set; }
         public bool IsDead { get; private set; }
         //public List<CardAbility> Abilities { get; private set; }
-        public List<ITrigger> Triggers { get; private set; }
+        //public List<ITrigger> Triggers { get; private set; }
 
         [JsonIgnore] public Action OnPlay;
         [JsonIgnore] public Action OnLastWill;
@@ -47,12 +51,12 @@ namespace Marsion
             UID = Guid.NewGuid().ToString();
             Name = so.Name;
             Grade = so.Grade;
-            Mana = so.Mana;
+            ManaCost = so.Mana;
             FullArtPath = so.FullArtPath;
             BoardArtPath = so.BoardArtPath;
             AbilityExplain = so.AbilityExplain;
             Attack = so.Attack;
-            Health = so.Health;
+            HP = so.Health;
             IsDead = false;
             //Abilities = so.Abilities;
         }
@@ -63,12 +67,12 @@ namespace Marsion
             UID = uID;
             Name = name;
             Grade = grade;
-            Mana = mana;
+            ManaCost = mana;
             FullArtPath = fullArtPath;
             BoardArtPath = boardArtPath;
             AbilityExplain = abilityExplain;
             Attack = attack;
-            Health = health;
+            HP = health;
             IsDead = isDead;
         }
 
@@ -79,38 +83,43 @@ namespace Marsion
             UID = original.UID; // UID는 고유 식별자로 복사
             Name = original.Name;
             Grade = original.Grade;
-            Mana = original.Mana;
+            ManaCost = original.ManaCost;
             FullArtPath = original.FullArtPath;
             BoardArtPath = original.BoardArtPath;
             AbilityExplain = original.AbilityExplain;
             Attack = original.Attack;
-            Health = original.Health;
+            HP = original.HP;
             IsDead = original.IsDead;
 
             // Abilities를 깊은 복사하려면 Abilities 리스트가 필요함
             // Abilities = original.Abilities.Select(ability => new CardAbility(ability)).ToList(); // CardAbility 클래스에 복사 생성자 필요
         }
 
-        public void AddTrigger(ITrigger trigger)
-        {
-            Triggers.Add(trigger);
-            trigger.Register();
-        }
+        // public void AddTrigger(ITrigger trigger)
+        // {
+        //     Triggers.Add(trigger);
+        //     trigger.Register();
+        // }
 
-        public void RemoveTrigger(ITrigger trigger)
+        // public void RemoveTrigger(ITrigger trigger)
+        // {
+        //     trigger.Unregister();
+        //     Triggers.Remove(trigger);
+        // }
+
+        public void SetMaxHP(int amount)
         {
-            trigger.Unregister();
-            Triggers.Remove(trigger);
+            MaxHP = amount;
         }
 
         public void SetHP(int amount)
         {
-            Health = amount;
+            HP = amount;
         }
 
-        public void Damage(int amount)
+        public void TakeDamage(int amount)
         {
-            Health -= amount;
+            HP -= amount;
         }
 
         public void Die()

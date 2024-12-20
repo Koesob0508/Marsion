@@ -7,13 +7,16 @@ using UnityEngine;
 
 namespace Marsion
 {
+    /// <summary>
+    /// 플레이어 클래스, 플레이어의 상태, 카드 위치 관리리
+    /// </summary>
     [Serializable]
     public class Player
     {
         public ulong PlayerID { get; private set; }
 
         public Card Card;
-        public string Portrait;
+        public string Portrait { get; private set; }
 
         public MyDictionary<string, Card> Cards = new MyDictionary<string, Card>();
         public List<Card> Deck = new List<Card>();
@@ -25,84 +28,26 @@ namespace Marsion
         [JsonProperty]
         public int MaxMana { get; private set; }
 
-        public Player(int clientID)
+        public bool TryGetHandCard(string uid, out Card card)
         {
-            PlayerID = (ulong)clientID;
-            Card = new Card(PlayerID);
+            foreach (Card handCard in Hand)
+            {
+                if (handCard.UID == uid)
+                {
+                    card = handCard;
+                    return true;
+                }
+            }
+
+            card = null;
+            return false;
         }
 
-        [JsonConstructor]
-        public Player(ulong playerID)
+        public bool TryGetFieldCard(string uid, out Card card)
         {
-            PlayerID = playerID;
-        }
-
-        public Player(Player original)
-        {
-            PlayerID = original.PlayerID;
-            Portrait = original.Portrait;
-            Mana = original.Mana;
-            MaxMana = original.MaxMana;
-
-            // Card 복사 (Card 클래스에 복사 생성자 필요)
-            Card = new Card(original.Card);
-
-            // Cards 딕셔너리 깊은 복사
-            Cards = new MyDictionary<string, Card>();
-            foreach (var key in original.Cards.Keys)
+            foreach (Card fieldCard in Field)
             {
-                original.Cards.TryGetValue(key, out var value);
-                Cards.Add(key, new Card(value)); // Card 클래스에 복사 생성자 필요
-            }
-
-            // Deck, Hand, Field 리스트 깊은 복사
-            Deck = new List<Card>(original.Deck.Count);
-            foreach (var card in original.Deck)
-            {
-                Deck.Add(new Card(card)); // Card 클래스에 복사 생성자 필요
-            }
-
-            Hand = new List<Card>(original.Hand.Count);
-            foreach (var card in original.Hand)
-            {
-                Hand.Add(new Card(card)); // Card 클래스에 복사 생성자 필요
-            }
-
-            Field = new List<Card>(original.Field.Count);
-            foreach (var card in original.Field)
-            {
-                Field.Add(new Card(card)); // Card 클래스에 복사 생성자 필요
-            }
-        }
-
-        public Card GetCard(string uid)
-        {
-            Cards.Add(Card.UID, Card);
-            
-            foreach (Card card in Hand)
-            {
-                Cards.Add(card.UID, card);
-            }
-
-            foreach (Card card in Field)
-            {
-                Cards.Add(card.UID, card);
-            }
-
-            Cards.TryGetValue(uid, out var result);
-            Cards.Clear();
-
-            if (result == null)
-                Debug.LogWarning("Get card result is null.");
-
-            return result;
-        }
-
-        public bool GetFieldCard(string uid, out Card card)
-        {
-            foreach(Card fieldCard in Field)
-            {
-                if(fieldCard.UID == uid)
+                if (fieldCard.UID == uid)
                 {
                     card = fieldCard;
                     return true;
@@ -111,6 +56,11 @@ namespace Marsion
 
             card = null;
             return false;
+        }
+
+        public void SetMaxHP(int amount)
+        {
+            Card.SetMaxHP(amount);
         }
 
         public void SetMaxMana(int amount)
@@ -138,15 +88,9 @@ namespace Marsion
             Mana -= amount;
         }
 
-        public override bool Equals(object obj)
+        public void SetPlayerPortrait(string portraitID)
         {
-            return obj is Player player &&
-                   PlayerID == player.PlayerID;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(PlayerID);
+            Portrait = portraitID;
         }
     }
 }

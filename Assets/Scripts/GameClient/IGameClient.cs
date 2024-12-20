@@ -8,7 +8,7 @@ namespace Marsion
 {
     public interface IGameClient
     {
-        GameData Data { get; }
+        DefaultGameData Data { get; }
         ulong PlayerID { get; }
         ulong EnemyID { get; }
         IFieldView PlayerField { get; }

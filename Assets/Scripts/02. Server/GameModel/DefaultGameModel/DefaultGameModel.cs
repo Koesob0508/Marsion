@@ -31,6 +31,8 @@ namespace Marsion
             _dataHandler = gameModelFactory.CreateGameDataHandler(gameData);
             _gameLogic = gameModelFactory.CreateGameLogicEx(_dataHandler);
 
+            _dataHandler.Init();
+
             Upstream.Init();
             Downstream.Init();
 

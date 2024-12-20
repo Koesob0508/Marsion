@@ -39,7 +39,7 @@ namespace Marsion.CardView
 
             Card = card;
             Text_Attack.text = card.Attack.ToString();
-            Text_Health.text = card.Health.ToString();
+            Text_Health.text = card.HP.ToString();
             CardSprite.sprite = Managers.Instance.Resource.Load<Sprite>(card.BoardArtPath);
         }
 

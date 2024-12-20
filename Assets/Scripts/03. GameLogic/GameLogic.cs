@@ -77,22 +77,22 @@ namespace Marsion.Logic
 
         public void Damage(IDamageable attacker, IDamageable defender)
         {
-            attacker.Damage(defender.Attack);
-            defender.Damage(attacker.Attack);
+            attacker.TakeDamage(defender.Attack);
+            defender.TakeDamage(attacker.Attack);
         }
 
         public bool CheckDeadCard(Player[] players)
         {
             foreach (Player player in players)
             {
-                if (player.Card.Health <= 0)
+                if (player.Card.HP <= 0)
                 {
                     player.Card.Die();
                 }
 
                 foreach (Card card in player.Field)
                 {
-                    if (card.Health <= 0)
+                    if (card.HP <= 0)
                     {
                         card.Die();
                     }

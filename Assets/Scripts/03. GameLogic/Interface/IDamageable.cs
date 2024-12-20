@@ -3,6 +3,6 @@
     public interface IDamageable
     {
         public int Attack { get; }
-        void Damage(int amount);
+        void TakeDamage(int amount);
     }
 }

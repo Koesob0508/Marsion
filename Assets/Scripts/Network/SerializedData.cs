@@ -70,7 +70,7 @@ namespace Marsion
                 {
                     byte[] bytes = new byte[size];
                     serializer.SerializeValue(ref bytes);
-                    GameData = NetworkTool.Deserialize<GameData>(bytes);
+                    GameData = NetworkTool.Deserialize<DefaultGameData>(bytes);
                 }
             }
 

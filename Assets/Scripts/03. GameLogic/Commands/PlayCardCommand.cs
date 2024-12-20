@@ -15,12 +15,12 @@
 
         public void Execute()
         {
-            if(player.Mana < card.Mana)
+            if(player.Mana < card.ManaCost)
             {
                 Logger.Log<DefaultGameLogic>($"Not enoufh mana to play {card.Name}", colorName: ColorCodes.Logic);
                 return;
             }
-            player.PayMana(card.Mana);
+            player.PayMana(card.ManaCost);
             player.Hand.Remove(card);
             player.Field.Insert(index, card);
 

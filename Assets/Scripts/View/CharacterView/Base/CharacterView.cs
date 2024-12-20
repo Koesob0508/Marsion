@@ -66,7 +66,7 @@ namespace Marsion.CardView
 
             Card = card;
             Text_Attack.text = card.Attack.ToString();
-            Text_Health.text = card.Health.ToString();
+            Text_Health.text = card.HP.ToString();
         }
 
         public virtual void Clear()
@@ -80,7 +80,7 @@ namespace Marsion.CardView
         public virtual void UpdateStatus()
         {
             Text_Attack.text = Card.Attack.ToString();
-            Text_Health.text = Card.Health.ToString();
+            Text_Health.text = Card.HP.ToString();
         }
 
         public abstract void Spawn();

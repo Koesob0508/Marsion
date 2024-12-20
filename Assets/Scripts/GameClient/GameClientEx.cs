@@ -25,7 +25,7 @@ namespace Marsion
 
         private Dictionary<ushort, Action<SerializedData>> Commands;
 
-        public GameData Data { get; private set; }
+        public DefaultGameData Data { get; private set; }
         public ulong ServerID => Managers.Instance.Network.ServerID;
         public ulong PlayerID => Managers.Instance.Network.LocalID;
         public ulong EnemyID { get; private set; }
@@ -141,7 +141,7 @@ namespace Marsion
             {
                 Logger.Log<GameClientEx>($"Received updated data", colorName: ColorCodes.Client);
 
-                Data = (GameData)sGameData.GameData;
+                Data = (DefaultGameData)sGameData.GameData;
 
                 OnDataUpdated?.Invoke();
             };

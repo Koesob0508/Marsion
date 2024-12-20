@@ -6,10 +6,9 @@ namespace Marsion
 {
     public class DefaultGameLogic : IGameLogicEx
     {
-        private readonly CommandInvoker commandInvoker = new();
+        private readonly IGameDataHandler _dataHandler;
+        private readonly CommandInvoker _commandInvoker;
 
-        public GameData Data;
-        public IGameDataHandler GameDataHandler;
         public event Action OnDataUpdated;
         public event Action OnGameStarted;
         public event Action OnManaChanged;
@@ -22,74 +21,18 @@ namespace Marsion
         public event Action<List<string>> OnCardDied;
         public event Action<ulong> OnGameEnded;
 
-        public DefaultGameLogic(GameData data)
-        {
-            Data = data;
-        }
-
         public DefaultGameLogic(IGameDataHandler gameDataHandler)
         {
-            GameDataHandler = gameDataHandler;
-        }
-
-        public void SetPlayerDeck(ulong clientID, List<string> deck)
-        {
-            Logger.Log<DefaultGameLogic>($"Set player deck", colorName: ColorCodes.Logic);
-            Player player = Data.GetPlayer(clientID);
-            List<Card> resultDeck = new List<Card>();
-
-            foreach(var soID in deck)
-            {
-                if(Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(soID, out var cardSO))
-                {
-                    resultDeck.Add(new Card(clientID, cardSO));
-                }
-                else
-                {
-                    Logger.Log<DefaultGameLogic>($"{soID} CardSO not found", colorName: ColorCodes.Logic);
-                }
-            }
-
-            player.Deck = resultDeck;
-
-            OnDataUpdated?.Invoke();
+            _dataHandler = gameDataHandler;
+            _commandInvoker = new();
         }
 
         public void StartGame()
         {
             Logger.Log<DefaultGameLogic>($"Start Game", colorName: ColorCodes.Logic);
 
-            // 초상화 설정
-            Random random = new Random();
-            int number1 = random.Next(3, 13); // Next의 두 번째 인자는 상한을 포함하지 않으므로 13을 사용
-            // 두 번째 숫자 뽑기 (첫 번째 숫자와 중복되지 않도록)
-            int number2;
-            do
-            {
-                number2 = random.Next(3, 13);
-            } while (number2 == number1);
-
-            Data.Players[0].Portrait = number1.ToString();
-            Data.Players[1].Portrait = number2.ToString();
-
-            // 체력 30
-            // 마나 0
-            // 덱 섞기
-            // 카드 3장 뽑기 
-            foreach (var player in Data.Players)
-            {
-                player.Card.SetHP(30);
-                player.SetMaxMana(0);
-                ShuffleDeck(player);
-                DrawCard(player, out var mulliganTarget, 3);
-            }
-
-            // 선 플레이어 설정
-            ulong number3 = (ulong)random.Next(0, 2);
-            Data.CurrentPlayer = Data.GetPlayer(number3);
-
             // 후 플레이어는 카드 한 장 드로우
-            DrawCard(Data.GetOpponentPlayer(Data.CurrentPlayer), out var _);
+            _dataHandler.DrawCard(_dataHandler.GetOpponentPlayer(_dataHandler.CurrentPlayer.PlayerID), out var _);
 
             // Send Data Update
             OnDataUpdated?.Invoke();
@@ -108,26 +51,28 @@ namespace Marsion
         {
             Logger.Log<DefaultGameLogic>($"Start Turn", colorName: ColorCodes.Logic);
 
-            Data.TurnCount++;
+            _dataHandler.AdvanceTurn();
 
-            if (Data.CurrentPlayer.MaxMana < 10)
-                Data.CurrentPlayer.IncreaseMaxMana(1);
+            if (_dataHandler.CurrentPlayer.MaxMana < 10)
+            {
+                _dataHandler.CurrentPlayer.IncreaseMaxMana(1);
+            }
 
-            Data.CurrentPlayer.RestoreAllMana();
+            _dataHandler.CurrentPlayer.RestoreAllMana();
 
-            DrawCard(Data.CurrentPlayer, out var card);
+            _dataHandler.DrawCard(_dataHandler.CurrentPlayer, out var card);
 
             OnDataUpdated?.Invoke();
             OnManaChanged?.Invoke();
             OnTurnStarted?.Invoke();
-            OnCardDrawn?.Invoke(Data.CurrentPlayer.PlayerID, card.UID);
+            OnCardDrawn?.Invoke(_dataHandler.CurrentPlayer.PlayerID, card.UID);
         }
 
         public void EndTurn()
         {
             Logger.Log<DefaultGameLogic>($"End turn", colorName: ColorCodes.Logic);
 
-            Data.CurrentPlayer = Data.CurrentPlayer == Data.GetPlayer(0) ? Data.GetPlayer(1) : Data.GetPlayer(0);
+            _dataHandler.ChangeCurrentPlayer();
 
             OnDataUpdated?.Invoke();
             OnTurnEnded?.Invoke();
@@ -135,79 +80,27 @@ namespace Marsion
             StartTurn();
         }
 
-        private void ShuffleDeck(Player player)
-        {
-            List<Card> deck = player.Deck;
-
-            Random rng = new Random();
-            int n = deck.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = rng.Next(n + 1);
-                Card value = deck[k];
-                deck[k] = deck[n];
-                deck[n] = value;
-            }
-        }
+        private void ShuffleDeck(Player player) => _dataHandler.ShuffleDeck(player);
 
         public void DrawCard(Player player, out Card drawnCard)
         {
             Logger.Log<GameLogic>("Draw a card", colorName: ColorCodes.Logic);
 
-            Card card = null;
-
-            if (player.Deck.Count > 0 && player.Hand.Count < 10)
-            {
-                card = player.Deck[0];
-                player.Deck.RemoveAt(0);
-                player.Hand.Add(card);
-            }
-            else
-            {
-                Logger.LogWarning<GameLogic>("Can't draw", colorName: ColorCodes.Logic);
-            }
-
-            drawnCard = card;
+            _dataHandler.DrawCard(player, out drawnCard);
         }
 
         public void DrawCard(Player player, out List<Card> drawnCards, int count = 1)
         {
-            Logger.Log<GameLogic>("Draw cards", colorName: ColorCodes.Logic);
+            Logger.Log<DefaultGameLogic>("Draw cards", colorName: ColorCodes.Logic);
 
-            List<Card> outCards = new();
-
-            Card card = null;
-
-            for(int i = 0; i < count; i++)
-            {
-                if (player.Deck.Count > 0 && player.Hand.Count < 10)
-                {
-                    card = player.Deck[0];
-                    player.Deck.RemoveAt(0);
-                    player.Hand.Add(card);
-
-                    outCards.Add(card);
-                }
-                else
-                {
-                    Logger.LogWarning<GameLogic>("Can't draw", colorName: ColorCodes.Logic);
-                }
-            }
-
-            drawnCards = outCards;
-        }
-
-        public void TrySpawnCard(ulong playerID, string cardUID, int index)
-        {
-
+            _dataHandler.DrawCard(player, out drawnCards, count);
         }
 
         public void TrySpawnCard(Player player, Card card, int index)
         {
             Logger.Log<GameLogic>("Try spawn card", colorName: ColorCodes.Logic);
 
-            if (!(player.Mana >= card.Mana))
+            if (!(player.Mana >= card.ManaCost))
             {
                 Logger.Log<DefaultGameLogic>("Spawn try failed", colorName: ColorCodes.Logic);
                 OnCardPlayed?.Invoke(false, player.PlayerID, card.UID);
@@ -217,8 +110,8 @@ namespace Marsion
             }
 
             var playCardCommand = new PlayCardCommand(player, card, index);
-            commandInvoker.AddCommand(playCardCommand);
-            commandInvoker.ExecuteCommands();
+            _commandInvoker.AddCommand(playCardCommand);
+            _commandInvoker.ExecuteCommands();
 
             OnCardPlayed?.Invoke(true, player.PlayerID, card.UID);
             OnCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
@@ -226,16 +119,11 @@ namespace Marsion
             OnManaChanged?.Invoke();
         }
 
-        public void TryAttack(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
-        {
-
-        }
-
         public void TryAttack(Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
         {
             var attackCommand = new AttackCommand(attackPlayer, attacker, defendPlayer, defender);
-            commandInvoker.AddCommand(attackCommand);
-            commandInvoker.ExecuteCommands();
+            _commandInvoker.AddCommand(attackCommand);
+            _commandInvoker.ExecuteCommands();
 
             OnDataUpdated?.Invoke();
             OnCardAttacked?.Invoke(true, attackPlayer.PlayerID, attacker.UID, defendPlayer.PlayerID, defender.UID);
@@ -251,7 +139,7 @@ namespace Marsion
 
             List<ulong> alivePlayerIDs = new();
 
-            foreach(var player in Data.Players)
+            foreach(var player in _dataHandler.Players)
             {
                 if(player.Card.Health > 0)
                 {
@@ -273,11 +161,11 @@ namespace Marsion
         {
             List<string> result = new();
 
-            foreach (var player in Data.Players)
+            foreach (var player in _dataHandler.Players)
             {
                 foreach (Card card in player.Field)
                 {
-                    if(card.Health <= 0)
+                    if(card.HP <= 0)
                     {
                         card.Die();
                         result.Add(card.UID);
@@ -292,7 +180,7 @@ namespace Marsion
         {
             List<Card> deadCards = new();
 
-            foreach (var player in Data.Players)
+            foreach (var player in _dataHandler.Players)
             {
                 foreach (Card card in player.Field)
                 {
@@ -305,7 +193,7 @@ namespace Marsion
 
             foreach(var card in deadCards)
             {
-                foreach(var player in Data.Players)
+                foreach(var player in _dataHandler.Players)
                 {
                     if(player.Field.Contains(card))
                     {

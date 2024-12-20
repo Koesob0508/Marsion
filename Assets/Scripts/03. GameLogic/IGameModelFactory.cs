@@ -18,7 +18,7 @@
         }
 
         public INetworkManagerEx CreateNetworkManager() => _networkManager;
-        public IGameData CreateGameData() => new GameData();
+        public IGameData CreateGameData() => new DefaultGameData();
         public IGameDataHandler CreateGameDataHandler(IGameData gameData) => new DefaultGameDataHandler(gameData);
         public IGameLogicEx CreateGameLogicEx(IGameDataHandler gameDataHandler) => new DefaultGameLogic(gameDataHandler);
     }

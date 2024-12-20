@@ -4,7 +4,11 @@ namespace Marsion
 {
     public interface IGameDataHandler
     {
-        IGameData GameData { get; }
+        public IGameData GameData { get; }
+
+        void Init();
+        
+        Player CurrentPlayer { get; }
 
         Player GetPlayer(ulong playerID);
         Player GetOpponentPlayer(ulong playerID);
@@ -16,5 +20,10 @@ namespace Marsion
         void RemoveCardFromHand(ulong playerID, string cardUID);
         void AddCardToField(ulong playerID, Card card);
         void RemoveCardFromField(ulong playerID, string cardUID);
+        void ShuffleDeck(Player player);
+        void DrawCard(Player player, out Card drawnCard);
+        void DrawCard(Player player, out List<Card> drawnCards, int count = 1);
+        void AdvanceTurn();
+        void ChangeCurrentPlayer();
     }
 }

@@ -161,8 +161,6 @@ namespace Marsion
 
         #endregion
 
-
-
         // Operations
 
         public bool GetDeck(ulong clientID, out List<string> draftedDeck)
