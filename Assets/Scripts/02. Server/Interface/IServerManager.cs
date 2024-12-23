@@ -3,7 +3,7 @@
     public interface IServerManager
     {
         DraftServer DraftServer { get; }
-        IGameSession GameModel { get; }
+        IGameSession GameSession { get; }
         void Init(IServerManagerFactory serverFactory);
     }
 }

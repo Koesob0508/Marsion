@@ -9,9 +9,9 @@ namespace Marsion
     [Serializable]
     public class DefaultGameData : IGameData
     {
-        public Player[] Players { get; private set; }
-        public Player CurrentPlayer { get; set; }
-        public int TurnCount { get; private set; }
+        [JsonProperty] public Player[] Players { get; private set; }
+        [JsonProperty] public Player CurrentPlayer { get; set; }
+        [JsonProperty] public int TurnCount { get; private set; }
 
         public void Init(IGameDataConfig config)
         {

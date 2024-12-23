@@ -7,7 +7,7 @@ namespace Marsion
         private IServerManagerFactory _serverFactory;
         private INetworkManagerEx _networkManager;
 
-        public IGameSession GameModel { get; private set; }
+        public IGameSession GameSession { get; private set; }
         public DraftServer DraftServer { get; private set; }
 
         public void Init(IServerManagerFactory serverFactory)
@@ -37,9 +37,9 @@ namespace Marsion
             DraftServer = _serverFactory.CreateDraftServer();
             DraftServer.Init();
 
-            GameModel = _serverFactory.CreateGameSession();
-            IGameModelFactory gameFactory = _serverFactory.CreateGameFactory(_serverFactory.ProvideManagers()); 
-            GameModel.Init(gameFactory);
+            GameSession = _serverFactory.CreateGameSession();
+            IGameSessionFactory gameFactory = _serverFactory.CreateGameFactory(_serverFactory.ProvideManagers()); 
+            GameSession.Init(gameFactory);
 
             RegisterClient(_networkManager.LocalID);
         }
@@ -63,7 +63,7 @@ namespace Marsion
         {
             Logger.Log<ServerManager>("Server Manager cleared", colorName: ColorCodes.Server);
             DraftServer = null;
-            GameModel = null;
+            GameSession = null;
             _networkManager.OnClientConnected -= OnClientJoin;
             _networkManager.OnConnect -= OnConnect;
         }

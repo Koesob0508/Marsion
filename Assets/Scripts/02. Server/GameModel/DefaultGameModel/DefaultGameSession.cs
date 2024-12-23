@@ -18,17 +18,17 @@ namespace Marsion
         private List<ulong> ConnectedClients;
         private Dictionary<ushort, Action<ulong, SerializedData>> Commands;
 
-        public void Init(IGameModelFactory gameModelFactory)
+        public void Init(IGameSessionFactory gameSessionFactory)
         {
             Logger.Log<DefaultGameSession>($"Game Server initialized", colorName: ColorCodes.Server);
 
             ConnectedClients = new();
             Commands = new();
 
-            _networkManager = gameModelFactory.ProvideNetwork();
-            var gameData = gameModelFactory.CreateGameData();
-            _dataHandler = gameModelFactory.CreateGameDataHandler(gameData);
-            _gameLogic = gameModelFactory.CreateGameLogicEx(_dataHandler);
+            _networkManager = gameSessionFactory.ProvideNetwork();
+            var gameData = gameSessionFactory.CreateGameData();
+            _dataHandler = gameSessionFactory.CreateGameDataHandler(gameData);
+            _gameLogic = gameSessionFactory.CreateGameLogicEx(_dataHandler);
 
             _dataHandler.Init(); // GameData 초기화
 

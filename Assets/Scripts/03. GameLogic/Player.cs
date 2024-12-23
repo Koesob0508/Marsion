@@ -13,10 +13,10 @@ namespace Marsion
     [Serializable]
     public class Player
     {
-        public ulong PlayerID { get; private set; }
+        [JsonProperty] public ulong PlayerID { get; private set; }
 
         public Card Card;
-        public string Portrait { get; private set; }
+        [JsonProperty] public string Portrait { get; private set; }
 
         public List<Card> Deck;
         public List<Card> Hand = new List<Card>();

@@ -20,19 +20,19 @@ namespace Marsion
     /// </summary>
     public class Card : IDamageable
     {
-        public string UID { get; private set; }
-        public ulong PlayerID { get; private set; }
-        public string SOID { get; private set; }
-        public string Name { get; private set; }
-        public GradeType Grade { get; private set; }
-        public int ManaCost { get; private set; }
-        public string FullArtPath { get; private set; }
-        public string BoardArtPath { get; private set; }
-        public string AbilityExplain { get; private set; }
-        public int Attack { get; private set; }
-        public int MaxHP { get; private set; }
-        public int HP { get; private set; }
-        public bool IsDead { get; private set; }
+        [JsonProperty] public string UID { get; private set; }
+        [JsonProperty] public ulong PlayerID { get; private set; }
+        [JsonProperty] public string SOID { get; private set; }
+        [JsonProperty] public string Name { get; private set; }
+        [JsonProperty] public GradeType Grade { get; private set; }
+        [JsonProperty] public int ManaCost { get; private set; }
+        [JsonProperty] public string FullArtPath { get; private set; }
+        [JsonProperty] public string BoardArtPath { get; private set; }
+        [JsonProperty] public string AbilityExplain { get; private set; }
+        [JsonProperty] public int Attack { get; private set; }
+        [JsonProperty] public int MaxHP { get; private set; }
+        [JsonProperty] public int HP { get; private set; }
+        [JsonProperty] public bool IsDead { get; private set; }
 
         public void Init(ulong playerID)
         {

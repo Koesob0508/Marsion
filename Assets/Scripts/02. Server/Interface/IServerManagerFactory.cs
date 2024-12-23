@@ -8,7 +8,7 @@ namespace Marsion
         INetworkManagerEx ProvideNetwork();
         DraftServer CreateDraftServer();
         IGameSession CreateGameSession();
-        IGameModelFactory CreateGameFactory(IManagers managers);
+        IGameSessionFactory CreateGameFactory(IManagers managers);
     }
 
     public class DefaultServerFactory : IServerManagerFactory
@@ -34,6 +34,6 @@ namespace Marsion
 
             return existingGameServer;
         }
-        public IGameModelFactory CreateGameFactory(IManagers managers) => new DefaultGameModelFactory(managers);
+        public IGameSessionFactory CreateGameFactory(IManagers managers) => new DefaultGameSessionFactory(managers);
     }
 }

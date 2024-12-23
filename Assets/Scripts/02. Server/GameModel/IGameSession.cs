@@ -4,7 +4,7 @@ namespace Marsion
 {
     public interface IGameSession
     {
-        void Init(IGameModelFactory gameModelFactory);
+        void Init(IGameSessionFactory gameModelFactory);
         void Ready(ulong clientID, List<string> deck);
     }
 }

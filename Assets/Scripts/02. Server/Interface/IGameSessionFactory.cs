@@ -1,6 +1,6 @@
 ﻿namespace Marsion
 {
-    public interface IGameModelFactory
+    public interface IGameSessionFactory
     {
         INetworkManagerEx ProvideNetwork();
         IDataManager ProvideData();
@@ -9,11 +9,11 @@
         IGameLogicEx CreateGameLogicEx(IGameDataHandler gameDataHandler);
     }
 
-    public class DefaultGameModelFactory : IGameModelFactory
+    public class DefaultGameSessionFactory : IGameSessionFactory
     {
         private IManagers _managers;
 
-        public DefaultGameModelFactory(IManagers managers)
+        public DefaultGameSessionFactory(IManagers managers)
         {
             _managers = managers;
         }

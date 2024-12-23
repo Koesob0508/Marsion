@@ -38,9 +38,12 @@ namespace Marsion.CardView
                 Logger.Log<CreatureView>("Card is null");
 
             Card = card;
-            Text_Attack.text = card.Attack.ToString();
-            Text_Health.text = card.HP.ToString();
-            CardSprite.sprite = Managers.Instance.Resource.Load<Sprite>(card.BoardArtPath);
+
+            Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(Card.SOID, out var cardSO);
+
+            Text_Attack.text = cardSO.Attack.ToString();
+            Text_Health.text = cardSO.Health.ToString();
+            CardSprite.sprite = Managers.Instance.Resource.Load<Sprite>(cardSO.BoardArtPath);
         }
 
         public override void Spawn()
