@@ -53,7 +53,7 @@ namespace Marsion
 
                 Instance._data.Init();
 
-                var serverFactory = factory.CreateServerFactory(Instance.Network);
+                var serverFactory = factory.CreateServerFactory(Instance);
                 Instance._server.Init(serverFactory);
                 
                 Client.Init();

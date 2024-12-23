@@ -9,6 +9,7 @@ namespace Marsion
     public class DefaultGameDataHandler : IGameDataHandler
     {
         public IGameData GameData { get; }
+
         private readonly Dictionary<ulong, List<string>> readyPlayerDeck = new();
 
         public Player CurrentPlayer => GameData.CurrentPlayer;
@@ -27,8 +28,6 @@ namespace Marsion
         /// <summary>
         ///     두 명의 플레이어가 준비되기 전까지 실제 GameData의 덱 등록은 대기시킨다.
         /// </summary>
-        /// <param name="playerID"></param>
-        /// <param name="deck"></param>
         public void RegisterPlayerDeck(ulong playerID, List<string> deck)
         {
             Logger.Log<DefaultGameDataHandler>($"Set player deck", colorName: ColorCodes.Logic);
@@ -41,22 +40,6 @@ namespace Marsion
             {
                 Logger.LogWarning<DefaultGameDataHandler>($"Player ID has ready deck already.", colorName: ColorCodes.Logic);
             }
-            //Player player = GetPlayer(playerID);
-            //List<Card> resultDeck = new List<Card>();
-
-            //foreach (var soID in deck)
-            //{
-            //    if (Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(soID, out var cardSO))
-            //    {
-            //        resultDeck.Add(new Card(playerID, cardSO));
-            //    }
-            //    else
-            //    {
-            //        Logger.Log<DefaultGameDataHandler>($"{soID} CardSO not found", colorName: ColorCodes.Logic);
-            //    }
-            //}
-
-            //player.Deck = resultDeck;
         }
 
         public void SetPlayers()
@@ -84,7 +67,21 @@ namespace Marsion
         // 사전 작업
         private void SetPlayerPortrait(ulong playerID, string portraitID) => GameData.GetPlayer(playerID).SetPlayerPortrait(portraitID);
 
-        private void SetPlayerDeck(ulong playerID) => GameData.GetPlayer(playerID).SetPlayerDeck(readyPlayerDeck[playerID]);
+        // TODO : DataManager 통해서 soID를 Card로 변환해줄 필요가 있음
+        private void SetPlayerDeck(ulong playerID)
+        {
+            var deck = new List<Card>();
+
+            foreach(var soID in readyPlayerDeck[playerID])
+            {
+                var card = new Card();
+                card.Init(playerID, soID);
+
+                deck.Add(card);
+            }
+
+            GameData.GetPlayer(playerID).SetPlayerDeck(deck);
+        }
 
         public Player GetPlayer(ulong playerID) => GameData.GetPlayer(playerID);
 

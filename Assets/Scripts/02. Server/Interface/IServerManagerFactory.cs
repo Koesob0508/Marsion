@@ -4,26 +4,28 @@ namespace Marsion
 {
     public interface IServerManagerFactory
     {
-        INetworkManagerEx CreateNetworkManager();
+        IManagers ProvideManagers();
+        INetworkManagerEx ProvideNetwork();
         DraftServer CreateDraftServer();
-        IGameModel CreateGameModel();
-        IGameModelFactory CreateGameFactory(INetworkManagerEx networkManager);
+        IGameSession CreateGameSession();
+        IGameModelFactory CreateGameFactory(IManagers managers);
     }
 
     public class DefaultServerFactory : IServerManagerFactory
     {
-        private INetworkManagerEx _networkManager;
+        private IManagers _managers;
 
-        public DefaultServerFactory(INetworkManagerEx networkManager)
+        public DefaultServerFactory(IManagers managers)
         {
-            _networkManager = networkManager;
+            _managers = managers;
         }
 
-        public INetworkManagerEx CreateNetworkManager() => _networkManager;
+        public IManagers ProvideManagers() => _managers;
+        public INetworkManagerEx ProvideNetwork() => _managers.Network;
         public DraftServer CreateDraftServer() => new DraftServer();
-        public IGameModel CreateGameModel()
+        public IGameSession CreateGameSession()
         {
-            var existingGameServer = UnityEngine.Object.FindAnyObjectByType<DefaultGameModel>();
+            var existingGameServer = UnityEngine.Object.FindAnyObjectByType<DefaultGameSession>();
             if(existingGameServer == null)
             {
                 throw new InvalidOperationException("GameServer is not found in the scene. " +
@@ -32,6 +34,6 @@ namespace Marsion
 
             return existingGameServer;
         }
-        public IGameModelFactory CreateGameFactory(INetworkManagerEx networkManager) => new DefaultGameModelFactory(networkManager);
+        public IGameModelFactory CreateGameFactory(IManagers managers) => new DefaultGameModelFactory(managers);
     }
 }

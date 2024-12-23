@@ -7,10 +7,9 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class DefaultGameModel : MonoBehaviour, IGameModel
+    public class DefaultGameSession : MonoBehaviour, IGameSession
     {
         [SerializeField] Sequencer Upstream;
-        [SerializeField] Sequencer Downstream;
 
         private INetworkManagerEx _networkManager;
         private IGameLogicEx _gameLogic;
@@ -21,20 +20,19 @@ namespace Marsion
 
         public void Init(IGameModelFactory gameModelFactory)
         {
-            Logger.Log<DefaultGameModel>($"Game Server initialized", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Game Server initialized", colorName: ColorCodes.Server);
 
             ConnectedClients = new();
             Commands = new();
 
-            _networkManager = gameModelFactory.CreateNetworkManager();
-            IGameData gameData = gameModelFactory.CreateGameData();
+            _networkManager = gameModelFactory.ProvideNetwork();
+            var gameData = gameModelFactory.CreateGameData();
             _dataHandler = gameModelFactory.CreateGameDataHandler(gameData);
             _gameLogic = gameModelFactory.CreateGameLogicEx(_dataHandler);
 
             _dataHandler.Init(); // GameData 초기화
 
             Upstream.Init();
-            Downstream.Init();
 
             RegisterDefaultCommands();
             SubscribeToGameLogicEvents();
@@ -114,7 +112,7 @@ namespace Marsion
             }
             else
             {
-                Logger.LogWarning<DefaultGameModel>($"Unknown command received: {type}");
+                Logger.LogWarning<DefaultGameSession>($"Unknown command received: {type}");
             }
         }
 
@@ -168,7 +166,7 @@ namespace Marsion
 
         private void SendUpdateData()
         {
-            Logger.Log<DefaultGameModel>($"Send updated data", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send updated data", colorName: ColorCodes.Server);
 
             var sdata = new SerializedGameData();
             sdata.GameData = _dataHandler.GameData;
@@ -178,14 +176,14 @@ namespace Marsion
 
         private void SendStartGame()
         {
-            Logger.Log<DefaultGameModel>($"Send start game", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send start game", colorName: ColorCodes.Server);
 
             SendToAll(GameCommand.ServerStartGame);
         }
 
         private void SendEndGame(ulong winnerID)
         {
-            Logger.Log<DefaultGameModel>($"Send end game", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send end game", colorName: ColorCodes.Server);
 
             SerializedUlong sdata = new SerializedUlong();
             sdata.value = winnerID;
@@ -195,28 +193,28 @@ namespace Marsion
 
         private void SendChangeMana()
         {
-            Logger.Log<DefaultGameModel>($"Send change mana", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send change mana", colorName: ColorCodes.Server);
 
             SendToAll(GameCommand.ServerChangeMana);
         }
 
         private void SendStartTurn()
         {
-            Logger.Log<DefaultGameModel>($"Send start turn", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send start turn", colorName: ColorCodes.Server);
 
             SendToAll(GameCommand.ServerStartTurn);
         }
 
         private void SendEndTurn()
         {
-            Logger.Log<DefaultGameModel>($"Send end turn", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send end turn", colorName: ColorCodes.Server);
 
             SendToAll(GameCommand.ServerEndTurn);
         }
 
         private void SendDrawCard(ulong playerID, string cardUID)
         {
-            Logger.Log<DefaultGameModel>($"Send draw card", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send draw card", colorName: ColorCodes.Server);
 
             SerializedDrawnCardData sdata = new SerializedDrawnCardData();
             sdata.PlayerID = playerID;
@@ -227,7 +225,7 @@ namespace Marsion
 
         private void SendPlayCardResult(bool succeeded, ulong playerID, string cardUID)
         {
-            Logger.Log<DefaultGameModel>($"Send play card result", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send play card result", colorName: ColorCodes.Server);
 
             SerializedPlayCardResultData sdata = new SerializedPlayCardResultData();
             sdata.Succeeded = succeeded;
@@ -239,7 +237,7 @@ namespace Marsion
 
         private void SendSpawnCardResult(bool succeeded, ulong playerID, string cardUID, int index)
         {
-            Logger.Log<DefaultGameModel>($"Send spawn card result", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send spawn card result", colorName: ColorCodes.Server);
 
             SerializedSpawnCardResultData sdata = new();
             sdata.Succeeded = succeeded;
@@ -252,7 +250,7 @@ namespace Marsion
 
         private void SendAttackCardResult(bool succeeded, ulong attackPlayerID, string attackerUID, ulong defendPlayerID, string defenderUID)
         {
-            Logger.Log<DefaultGameModel>($"Send attack card result", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send attack card result", colorName: ColorCodes.Server);
 
             SerializedAttackCardResultData sdata = new();
             sdata.Succeeded = succeeded;
@@ -266,7 +264,7 @@ namespace Marsion
 
         private void SendDeadCards(List<string> cards)
         {
-            Logger.Log<DefaultGameModel>($"Send dead cards", colorName: ColorCodes.Server);
+            Logger.Log<DefaultGameSession>($"Send dead cards", colorName: ColorCodes.Server);
 
             SerializedDeadCardsData sdata = new();
             sdata.DeadCards = cards;

@@ -18,8 +18,7 @@ namespace Marsion
         public Card Card;
         public string Portrait { get; private set; }
 
-        public MyDictionary<string, Card> Cards = new MyDictionary<string, Card>();
-        public List<Card> Deck = new List<Card>();
+        public List<Card> Deck;
         public List<Card> Hand = new List<Card>();
         public List<Card> Field = new List<Card>();
 
@@ -31,15 +30,16 @@ namespace Marsion
         [JsonProperty]
         public int MaxMana { get; private set; }
 
-        public void SetPlayerPortrait(string portraitID)
+        public void Init(ulong playerID)
         {
-            Portrait = portraitID;
+            PlayerID = playerID;
+            Card = new Card();
+            Card.Init(playerID);
         }
 
-        public void SetPlayerDeck(List<string> deck)
-        {
+        public void SetPlayerPortrait(string portraitID) { Portrait = portraitID; }
 
-        }
+        public void SetPlayerDeck(List<Card> deck) { Deck = deck; }
 
         public bool TryGetHandCard(string uid, out Card card)
         {
@@ -71,24 +71,19 @@ namespace Marsion
             return false;
         }
 
-        public void SetMaxHP(int amount)
-        {
-            Card.SetMaxHP(amount);
-        }
+        public void SetMaxHP(int amount) { Card.SetMaxHP(amount); }
 
-        public void SetMaxMana(int amount)
-        {
-            MaxMana = amount;
-        }
+        public void SetMaxMana(int amount) { MaxMana = amount; }
 
-        public void IncreaseMaxMana(int amount)
-        {
-            MaxMana += amount;
-        }
+        public void IncreaseMaxMana(int amount) { MaxMana += amount; }
 
         public void RestoreMana(int amount)
         {
             Mana += amount;
+            if (Mana > MaxMana)
+            {
+                Mana = MaxMana;
+            }
         }
 
         public void RestoreAllMana()
@@ -99,6 +94,10 @@ namespace Marsion
         public void PayMana(int amount)
         {
             Mana -= amount;
+            if(Mana < 0)
+            {
+                Mana = 0;
+            }
         }
     }
 }

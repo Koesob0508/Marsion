@@ -20,10 +20,8 @@ namespace Marsion
             for (int i = 0; i < config.CountOfPlayer; i++)
             {
                 Players[i] = new Player();
+                Players[i].Init((ulong)i);
             }
-
-            // 아직 PlayerID도 할당 받지 못함
-            // Player 초기화 관련 내용 필요
 
             foreach(var player in Players)
             {
