@@ -126,7 +126,7 @@ namespace Marsion.Tests
         }
 
         [UnityTest]
-        public IEnumerator OnConnected_Callback_Should_Invoke()
+        public IEnumerator OnConnect_Callback_Should_Invoke()
         {
             bool isConnected = false;
 
@@ -143,6 +143,48 @@ namespace Marsion.Tests
         }
 
         [UnityTest]
+        public IEnumerator OnClientConnected_Callback_Should_Not_Invoke()
+        {
+            bool isHostConnected = false;
+            bool isGuestConnected = false;
+            bool isHostReceivedOnClientConnected = false;
+            bool isGuestReceivedOnClientConnected = false;
+
+            HostManagers.Object.Network.OnConnect += () =>
+            {
+                isHostConnected = true;
+            };
+
+
+            HostManagers.Object.Network.OnOtherClientJoin += (clientID) =>
+            {
+                isGuestConnected = true;
+            };
+
+            GuestManagers.Object.Network.OnConnect += () =>
+            {
+                isHostReceivedOnClientConnected = true;
+            };
+
+            GuestManagers.Object.Network.OnOtherClientJoin += (clientID) =>
+            {
+                isGuestReceivedOnClientConnected = true;
+            };
+
+            // Act
+            HostManagers.Object.Network.StartHost();
+            GuestManagers.Object.Network.StartClient();
+
+            yield return wait;
+
+            // Assert
+            Assert.IsTrue(isHostConnected, "Host Network should received OnConnect callback.");
+            Assert.IsTrue(isGuestConnected, "Guest Network should received OnConnect callback.");
+            Assert.IsTrue(isHostReceivedOnClientConnected, "Host should received OnOtherClientJoin callback.");
+            Assert.IsFalse(isGuestReceivedOnClientConnected, "GuestManager should not received OnOtherClientJoin callback.");
+        }
+
+        [UnityTest]
         public IEnumerator OnClientConnected_Callback_Should_Invoke()
         {
             // Arrange
@@ -153,7 +195,7 @@ namespace Marsion.Tests
                 Debug.Log($"Client connected with ID: {clientID}");
             };
 
-            HostManagers.Object.Network.OnClientConnected += (clientID) =>
+            HostManagers.Object.Network.OnOtherClientJoin += (clientID) =>
             {
                 Debug.Log($"Client connected with ID: {clientID}");
                 isClientConnected = true;

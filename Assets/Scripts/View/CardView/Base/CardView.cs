@@ -75,12 +75,14 @@ namespace Marsion.CardView
 
         public void Setup()
         {
-            Text_Name.text = Card.Name;
-            Text_Mana.text = Card.Mana.ToString();
-            Text_AbilityExplain.text = Card.AbilityExplain;
-            Text_Attack.text = Card.Attack.ToString();
-            Text_Health.text = Card.Health.ToString();
-            CardSprite.sprite = Managers.Instance.Resource.Load<Sprite>(Card.FullArtPath);
+            Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(Card.SOID, out var cardSO);
+
+            Text_Name.text = cardSO.Name;
+            Text_Mana.text = cardSO.ManaCost.ToString();
+            Text_AbilityExplain.text = cardSO.AbilityExplain;
+            Text_Attack.text = cardSO.Attack.ToString();
+            Text_Health.text = cardSO.Health.ToString();
+            CardSprite.sprite = Managers.Instance.Resource.Load<Sprite>(cardSO.FullArtPath);
         }
 
         public void Enable() => FSM.PushState<CardViewIdle>();

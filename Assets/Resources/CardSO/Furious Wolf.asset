@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 14
   Name: Furious Wolf
-  Mana: 4
+  ManaCost: 6
   Grade: 2
   FullArtPath: Sprites/Cards/furious_wolf
   BoardArtPath: Sprites/CardsBoard/furious_wolf_board
   AbilityExplain: 
   Attack: 6
   Health: 3
-  Abilities: []

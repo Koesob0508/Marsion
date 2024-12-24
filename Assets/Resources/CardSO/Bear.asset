@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 2
   Name: Bear
-  Mana: 1
+  ManaCost: 1
   Grade: 0
   FullArtPath: Sprites/Cards/bear
   BoardArtPath: Sprites/CardsBoard/bear_board
   AbilityExplain: 
   Attack: 2
   Health: 3
-  Abilities: []

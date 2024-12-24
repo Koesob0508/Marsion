@@ -39,13 +39,13 @@ namespace Marsion.UI
         {
             base.Init();
 
-            Managers.Client.Draft.OnStateUpdate += UpdateState;
-            //Managers.Client.Game.OnGameStarted += ClosePopupUI;
-            Managers.Client.Game.OnGameStarted += ClosePopupUI;
+            Managers.Instance.Client.Draft.OnStateUpdate += UpdateState;
+            //Managers.Instance.Client.Game.OnGameStarted += ClosePopupUI;
+            Managers.Instance.Client.Game.OnGameStarted += ClosePopupUI;
 
             contentsDictionary = new Dictionary<string, GameObject>();
 
-            InitState(Managers.Client.Draft.State);
+            InitState(Managers.Instance.Client.Draft.State);
             InitButtons();
             InitDeck();
             UpdatePanel();
@@ -53,9 +53,9 @@ namespace Marsion.UI
 
         private void Clear()
         {
-            //Managers.Client.Game.OnGameStarted -= ClosePopupUI;
-            Managers.Client.Game.OnGameStarted -= ClosePopupUI;
-            Managers.Client.Draft.OnStateUpdate -= UpdateState;
+            //Managers.Instance.Client.Game.OnGameStarted -= ClosePopupUI;
+            Managers.Instance.Client.Game.OnGameStarted -= ClosePopupUI;
+            Managers.Instance.Client.Draft.OnStateUpdate -= UpdateState;
         }
 
         private void InitState(DraftState state)
@@ -69,21 +69,21 @@ namespace Marsion.UI
             {
                 OnClickButton(0);
                 SortContentByCost();
-                Managers.Client.Draft.Select(0);
+                Managers.Instance.Client.Draft.Select(0);
             });
 
             Button_Center.Button.onClick.AddListener(() =>
             {
                 OnClickButton(1);
                 SortContentByCost();
-                Managers.Client.Draft.Select(1);
+                Managers.Instance.Client.Draft.Select(1);
             });
 
             Button_Right.Button.onClick.AddListener(() =>
             {
                 OnClickButton(2);
                 SortContentByCost();
-                Managers.Client.Draft.Select(2);
+                Managers.Instance.Client.Draft.Select(2);
             });
 
             Button_Ready.onClick.AddListener(Ready);
@@ -101,7 +101,7 @@ namespace Marsion.UI
 
         private void UpdateState()
         {
-            CurrentState = Managers.Client.Draft.State;
+            CurrentState = Managers.Instance.Client.Draft.State;
 
             UpdatePanel();
         }
@@ -241,7 +241,7 @@ namespace Marsion.UI
         {
             Text_State.text = "상대를 기다리는 중!";
             Button_Ready.interactable = false;
-            Managers.Client.Draft.Ready();
+            Managers.Instance.Client.Draft.Ready();
         }
     }
 }
