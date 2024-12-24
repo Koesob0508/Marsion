@@ -6,7 +6,7 @@ namespace Marsion
     {
         public IGameData GameData { get; }
 
-        void Init();
+        void Init(IGameDataHandlerFactory dataHandlerFactory);
         
         Player CurrentPlayer { get; }
 
@@ -15,8 +15,6 @@ namespace Marsion
         Card GetCardFromHand(ulong playerID, string cardUID);
         Card GetCardFromField(ulong playerID, string cardUID);
 
-        void RegisterPlayerDeck(ulong playerID, List<string> deck);
-        void InitPlayers();
         void AddCardToHand(ulong playerID, Card card);
         void RemoveCardFromHand(ulong playerID, string cardUID);
         void AddCardToField(ulong playerID, Card card);

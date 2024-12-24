@@ -11,15 +11,15 @@ namespace Marsion
         private IDataManager _data;
         private INetworkManagerEx _network;
         private IServerManager _server;
-        public IClientManager _client;
+        private IClientManager _client;
 
-        public IResourceManager Resource => _resource;
-        public IUIManager UI => _ui;
+        public IResourceManager Resource => Instance._resource;
+        public IUIManager UI => Instance._ui;
         public static CardManager Card { get; private set; }
-        public IDataManager Data => _data;
-        public INetworkManagerEx Network => _network;
-        public IServerManager Server => _server;
-        public IClientManager Client => _client;
+        public IDataManager Data => Instance._data;
+        public INetworkManagerEx Network => Instance._network;
+        public IServerManager Server => Instance._server;
+        public IClientManager Client => Instance._client;
 
         public static void Init(IManagersFactory factory)
         {

@@ -1,4 +1,6 @@
-﻿namespace Marsion
+﻿using System.Collections.Generic;
+
+namespace Marsion
 {
     public interface IGameData
     {
@@ -6,7 +8,7 @@
         Player CurrentPlayer { get; set; }
         int TurnCount { get; }
         Player GetPlayer(ulong PlayerID);
-        void Init(IGameDataConfig config);
+        void Init(IGameLogicConfig config, List<PlayerInfo> playerInfos);
         void AdvanceTurn();
         void ChangeCurrentPlayer();
     }

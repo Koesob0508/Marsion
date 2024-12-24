@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Marsion
 {
@@ -13,7 +14,7 @@ namespace Marsion
         [JsonProperty] public Player CurrentPlayer { get; set; }
         [JsonProperty] public int TurnCount { get; private set; }
 
-        public void Init(IGameDataConfig config)
+        public void Init(IGameLogicConfig config, List<PlayerInfo> playerInfos)
         {
             Players = new Player[config.CountOfPlayer];
 
@@ -21,12 +22,21 @@ namespace Marsion
             {
                 Players[i] = new Player();
                 Players[i].SetPlayerID((ulong)i);
-            }
+                Players[i].SetPlayerPortrait(playerInfos[i].Portrait);
+                Players[i].SetMaxHealth(config.MaxHealth);
+                Players[i].SetMaxMana(config.MaxMana);
 
-            foreach(var player in Players)
-            {
-                player.SetMaxHealth(config.MaxHealth);
-                player.SetMaxMana(config.MaxMana);
+                var deck = new List<Card>();
+
+                foreach(var soID in playerInfos[i].Deck)
+                {
+                    var card = new Card();
+                    card.Init((ulong)i, soID);
+                    deck.Add(card);
+                }
+
+                Players[i].SetDeck(deck);
+                Players[i].Init();
             }
 
             // Player 외적 설정
@@ -63,6 +73,11 @@ namespace Marsion
 
         public Card GetFieldCard(ulong playerID, string cardUID)
         {
+            if (GetPlayer(playerID).TryGetPlayerCard(cardUID, out var playerCard))
+            {
+                return playerCard;
+            }
+
             if (GetPlayer(playerID).TryGetFieldCard(cardUID, out Card card))
             {
                 return card;

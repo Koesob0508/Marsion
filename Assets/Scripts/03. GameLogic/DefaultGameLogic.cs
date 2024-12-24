@@ -7,8 +7,10 @@ namespace Marsion
 {
     public class DefaultGameLogic : IGameLogicEx
     {
-        private readonly IGameDataHandler _dataHandler;
+        private IGameDataHandler _dataHandler;
         private readonly CommandInvoker _commandInvoker;
+
+        public IGameData GameData => _dataHandler.GameData;
 
         public event Action OnDataUpdated;
         public event Action OnGameStarted;
@@ -22,17 +24,21 @@ namespace Marsion
         public event Action<List<string>> OnCardDied;
         public event Action<ulong> OnGameEnded;
 
-        public DefaultGameLogic(IGameDataHandler gameDataHandler)
+        public DefaultGameLogic()
         {
-            _dataHandler = gameDataHandler;
             _commandInvoker = new();
+        }
+
+        public void Init(IGameLogicFactory logicFactory)
+        {
+            _dataHandler = logicFactory.CreateGameDataHandler();
+            var logicConfig = logicFactory.CreateGameLogicConfig();
+            _dataHandler.Init(logicFactory.CreateGameDataHandlerFactory(logicConfig));
         }
 
         public void StartGame()
         {
             Logger.Log<DefaultGameLogic>($"Start Game", colorName: ColorCodes.Logic);
-
-            _dataHandler.InitPlayers(); // 초상화와 덱 등록
 
             // playerID로 접근하는식으로 바꿀 필요 있다.
             foreach (var player in _dataHandler.GameData.Players)
@@ -106,9 +112,12 @@ namespace Marsion
             _dataHandler.DrawCard(player, out drawnCards, count);
         }
 
-        public void TrySpawnCard(Player player, Card card, int index)
+        public void TrySpawnCard(ulong playerID, string cardUID, int index)
         {
             Logger.Log<GameLogic>("Try spawn card", colorName: ColorCodes.Logic);
+
+            var player = _dataHandler.GetPlayer(playerID);
+            var card = _dataHandler.GetCardFromHand(playerID, cardUID);
 
             if (!(player.Mana >= card.ManaCost))
             {
@@ -129,8 +138,13 @@ namespace Marsion
             OnManaChanged?.Invoke();
         }
 
-        public void TryAttack(Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        public void TryAttack(ulong attackPlayerID, string attackCardUID, ulong defendPlayerID, string defendCardUID)
         {
+            var attackPlayer = _dataHandler.GetPlayer(attackPlayerID);
+            var attacker = _dataHandler.GetCardFromField(attackPlayerID, attackCardUID);
+            var defendPlayer = _dataHandler.GetPlayer(defendPlayerID);
+            var defender = _dataHandler.GetCardFromField(defendPlayerID, defendCardUID);
+
             var attackCommand = new AttackCommand(attackPlayer, attacker, defendPlayer, defender);
             _commandInvoker.AddCommand(attackCommand);
             _commandInvoker.ExecuteCommands();

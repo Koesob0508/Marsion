@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 6
   Name: Eagle
-  Mana: 3
+  ManaCost: 2
   Grade: 3
   FullArtPath: Sprites/Cards/eagle
   BoardArtPath: Sprites/CardsBoard/eagle_board
   AbilityExplain: 
   Attack: 3
   Health: 3
-  Abilities: []

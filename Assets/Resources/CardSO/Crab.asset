@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 5
   Name: Crab
-  Mana: 1
+  ManaCost: 1
   Grade: 0
   FullArtPath: Sprites/Cards/crab
   BoardArtPath: Sprites/CardsBoard/crab_board
   AbilityExplain: Hide
   Attack: 2
   Health: 2
-  Abilities: []

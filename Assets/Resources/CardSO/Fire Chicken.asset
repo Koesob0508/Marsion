@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 8
   Name: Fire Chicken
-  Mana: 6
+  ManaCost: 3
   Grade: 0
   FullArtPath: Sprites/Cards/fire_chicken
   BoardArtPath: Sprites/CardsBoard/fire_chicken_board
   AbilityExplain: 
   Attack: 7
   Health: 6
-  Abilities: []

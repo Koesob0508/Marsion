@@ -78,7 +78,7 @@ namespace Marsion.CardView
             Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(Card.SOID, out var cardSO);
 
             Text_Name.text = cardSO.Name;
-            Text_Mana.text = cardSO.Mana.ToString();
+            Text_Mana.text = cardSO.ManaCost.ToString();
             Text_AbilityExplain.text = cardSO.AbilityExplain;
             Text_Attack.text = cardSO.Attack.ToString();
             Text_Health.text = cardSO.Health.ToString();

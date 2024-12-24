@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 18
   Name: Hell Hound
-  Mana: 6
+  ManaCost: 7
   Grade: 0
   FullArtPath: Sprites/Cards/hell_hound
   BoardArtPath: Sprites/CardsBoard/hell_hound_board
   AbilityExplain: 
   Attack: 8
   Health: 3
-  Abilities: []

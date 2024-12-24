@@ -50,6 +50,8 @@ namespace Marsion
 
         public void Init()
         {
+            Logger.Log<GameClientEx>($"Game Client initialized", colorName: ColorCodes.Client);
+
             Commands = new();
             Upstream.Init();
             Downstream.Init();

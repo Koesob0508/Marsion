@@ -19,7 +19,7 @@ namespace Marsion
         [SerializeField] private string id;
         public string ID => id;
         public string Name;
-        public int Mana;
+        public int ManaCost;
         public GradeType Grade;
         public string FullArtPath;
         public string BoardArtPath;

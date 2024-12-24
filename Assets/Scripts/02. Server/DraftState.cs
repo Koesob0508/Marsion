@@ -7,6 +7,7 @@ namespace Marsion
     {
         public bool IsComplete;
         public int Count;
+        public string Portrait; // 직업을 일단 string, portrait 값으로
         public List<string> CurrentDeck;
         public List<string> CurrentSelections;
         public List<string> CurrentSubSelections;
@@ -39,6 +40,7 @@ namespace Marsion
 
             IsComplete = serialized.isComplete;
             Count = serialized.count;
+            Portrait = serialized.portraitID;
 
             foreach (var cardID in serialized.deck)
             {
@@ -54,6 +56,11 @@ namespace Marsion
             {
                 CurrentSubSelections.Add(cardID);
             }
+        }
+
+        public void SetPortrait(string portraitID)
+        {
+            Portrait = portraitID;
         }
 
         public void Select(int index)

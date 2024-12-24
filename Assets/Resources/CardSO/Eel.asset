@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 7
   Name: Eel
-  Mana: 5
+  ManaCost: 2
   Grade: 3
   FullArtPath: Sprites/Cards/eel
   BoardArtPath: Sprites/CardsBoard/eel_board
   AbilityExplain: 
   Attack: 6
   Health: 7
-  Abilities: []

@@ -23,8 +23,8 @@ namespace Marsion.UI
             if (Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(soID, out var cardSO))
             {
                 Text_Name.text = cardSO.Name;
-                Cost = cardSO.Mana;
-                Text_Cost.text = cardSO.Mana.ToString();
+                Cost = cardSO.ManaCost;
+                Text_Cost.text = cardSO.ManaCost.ToString();
                 Image_Card.sprite = Managers.Instance.Resource.Load<Sprite>(cardSO.BoardArtPath);
             }
             else

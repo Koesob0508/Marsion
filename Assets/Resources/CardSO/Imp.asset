@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 19
   Name: Imp
-  Mana: 1
+  ManaCost: 1
   Grade: 0
   FullArtPath: Sprites/Cards/imp
   BoardArtPath: Sprites/CardsBoard/imp_board
   AbilityExplain: 
   Attack: 1
   Health: 1
-  Abilities: []

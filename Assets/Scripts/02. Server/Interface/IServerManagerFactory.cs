@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Marsion
 {
@@ -8,7 +9,7 @@ namespace Marsion
         INetworkManagerEx ProvideNetwork();
         DraftServer CreateDraftServer();
         IGameSession CreateGameSession();
-        IGameSessionFactory CreateGameFactory(IManagers managers);
+        IGameSessionFactory CreateGameSessionFactory(IManagers managers, List<PlayerInfo> playerInfos);
     }
 
     public class DefaultServerFactory : IServerManagerFactory
@@ -34,6 +35,6 @@ namespace Marsion
 
             return existingGameServer;
         }
-        public IGameSessionFactory CreateGameFactory(IManagers managers) => new DefaultGameSessionFactory(managers);
+        public IGameSessionFactory CreateGameSessionFactory(IManagers managers, List<PlayerInfo> playerInfos) => new DefaultGameSessionFactory(managers, playerInfos);
     }
 }

@@ -31,7 +31,7 @@ namespace Marsion
 
         public event Action OnConnect;
         public event Action OnDisconnect;
-        public event Action<ulong> OnClientConnected;
+        public event Action<ulong> OnOtherClientConnected;
         public event Action<ulong> OnClientDisconnected;
 
         public void StartHost()
@@ -62,7 +62,7 @@ namespace Marsion
             }
             else
             {
-                OnClientConnected?.Invoke(clientID);
+                OnOtherClientConnected?.Invoke(clientID);
             }
         }
 

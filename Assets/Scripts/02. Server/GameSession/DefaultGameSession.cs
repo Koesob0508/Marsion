@@ -13,24 +13,20 @@ namespace Marsion
 
         private INetworkManagerEx _networkManager;
         private IGameLogicEx _gameLogic;
-        private IGameDataHandler _dataHandler;
 
-        private List<ulong> ConnectedClients;
+        private List<ulong> _playersClientIDs;
         private Dictionary<ushort, Action<ulong, SerializedData>> Commands;
 
-        public void Init(IGameSessionFactory gameSessionFactory)
+        public void Init(IGameSessionFactory sessionFactory)
         {
             Logger.Log<DefaultGameSession>($"Game Server initialized", colorName: ColorCodes.Server);
 
-            ConnectedClients = new();
             Commands = new();
 
-            _networkManager = gameSessionFactory.ProvideNetwork();
-            var gameData = gameSessionFactory.CreateGameData();
-            _dataHandler = gameSessionFactory.CreateGameDataHandler(gameData);
-            _gameLogic = gameSessionFactory.CreateGameLogicEx(_dataHandler);
-
-            _dataHandler.Init(); // GameData 초기화
+            _playersClientIDs = sessionFactory.ProvidePlayersClientIDs();
+            _networkManager = sessionFactory.ProvideNetwork();
+            _gameLogic = sessionFactory.CreateGameLogicEx();
+            _gameLogic.Init(sessionFactory.CreateGameLogicFactory());
 
             Upstream.Init();
 
@@ -38,6 +34,8 @@ namespace Marsion
             SubscribeToGameLogicEvents();
 
             _networkManager.SubscribeMessage("GameClient", OnReceivedCommand);
+
+            _gameLogic.StartGame();
         }
 
         private void RegisterDefaultCommands()
@@ -77,23 +75,6 @@ namespace Marsion
             _gameLogic.OnGameEnded -= SendEndGame;
 
             _networkManager.UnsubscribeMessage("GameClient", OnReceivedCommand);
-        }
-
-        public void Ready(ulong clientID, List<string> deck)
-        {
-            Sequencer.Sequence sequence = new("Ready", Upstream);
-            Sequencer.Clip clip = new("SetDeck", sequence);
-
-            clip.OnPlay += () =>
-            {
-                ConnectedClients.Add(clientID);
-                _dataHandler.RegisterPlayerDeck(clientID, deck);
-
-                if (ConnectedClients.Count == 2)
-                {
-                    _gameLogic.StartGame();
-                }
-            };
         }
 
         private void RegisterCommand(ushort type, Action<ulong, SerializedData> callback)
@@ -138,7 +119,7 @@ namespace Marsion
 
             clip.OnPlay += () =>
             {
-                _gameLogic.TrySpawnCard(_dataHandler.GetPlayer(playerID), _dataHandler.GetCardFromHand(playerID, spawnCard.CardUID), spawnCard.Index);
+                _gameLogic.TrySpawnCard(playerID, spawnCard.CardUID, spawnCard.Index);
             };
         }
 
@@ -151,12 +132,7 @@ namespace Marsion
 
             clip.OnPlay += () =>
             {
-                Player attackPlayer = _dataHandler.GetPlayer(attackData.AttackPlayerID);
-                Card attacker = _dataHandler.GetCardFromField(attackPlayer.PlayerID, attackData.AttackerUID);
-                Player defendPlayer = _dataHandler.GetPlayer(attackData.DefendPlayerID);
-                Card defender = _dataHandler.GetCardFromField(defendPlayer.PlayerID, attackData.DefenderUID);
-
-                _gameLogic.TryAttack(attackPlayer, attacker, defendPlayer, defender);
+                _gameLogic.TryAttack(attackData.AttackPlayerID, attackData.AttackerUID, attackData.DefendPlayerID, attackData.DefenderUID);
             };
         }
 
@@ -169,7 +145,7 @@ namespace Marsion
             Logger.Log<DefaultGameSession>($"Send updated data", colorName: ColorCodes.Server);
 
             var sdata = new SerializedGameData();
-            sdata.GameData = _dataHandler.GameData;
+            sdata.GameData = _gameLogic.GameData;
 
             SendToAll(GameCommand.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
         }
@@ -278,7 +254,7 @@ namespace Marsion
 
         private void SendToAll(ushort tag, INetworkSerializable data = null, NetworkDelivery delivery = NetworkDelivery.ReliableSequenced)
         {
-            foreach(ulong clientID in ConnectedClients)
+            foreach(ulong clientID in _playersClientIDs)
             {
                 _networkManager.SendMessage("GameServer", clientID, (writer) =>
                 {

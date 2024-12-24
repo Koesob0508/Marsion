@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 13
   Name: Frog
-  Mana: 2
+  ManaCost: 1
   Grade: 3
   FullArtPath: Sprites/Cards/frog
   BoardArtPath: Sprites/CardsBoard/frog_board
   AbilityExplain: 
   Attack: 1
   Health: 4
-  Abilities: []

@@ -17,6 +17,8 @@
 
         public void Execute()
         {
+            if (attackerCard == null) Logger.LogWarning<AttackCommand>("attack null.");
+            if (defenderCard == null) Logger.LogWarning<AttackCommand>("defend null.");
             attackerCard.TakeDamage(defenderCard.Attack);
             defenderCard.TakeDamage(attackerCard.Attack);
 

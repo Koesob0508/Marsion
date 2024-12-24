@@ -37,12 +37,12 @@ namespace Marsion
             add => networkWrapper.OnDisconnect += value;
             remove => networkWrapper.OnDisconnect -= value;
         }
-        public event Action<ulong> OnClientConnected
+        public event Action<ulong> OnOtherClientJoin
         {
-            add => networkWrapper.OnClientConnected += value;
-            remove => networkWrapper.OnClientConnected -= value;
+            add => networkWrapper.OnOtherClientConnected += value;
+            remove => networkWrapper.OnOtherClientConnected -= value;
         }
-        public event Action<ulong> OnClientDisconnected
+        public event Action<ulong> OnOtherClientQuit
         {
             add => networkWrapper.OnClientDisconnected += value;
             remove => networkWrapper.OnClientDisconnected -= value;

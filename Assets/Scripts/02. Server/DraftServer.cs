@@ -40,6 +40,28 @@ namespace Marsion
             Managers.Instance.Network.SubscribeMessage("DraftClient", OnReceiveCommand);
         }
 
+        public void AddState(ulong clientID)
+        {
+            if (!DraftDictionary.ContainsKey(clientID))
+            {
+                Logger.Log<DraftServer>($"Client(ID : {clientID}) regist", colorName: ColorCodes.Server);
+                var state = new DraftState(InitialTypeSequence);
+
+                // 임의로 직업 초상화 설정.
+                // TODO : 추후에 직업 또한 선택지로 제시할 것
+                System.Random random = new System.Random();
+                int portraitID = random.Next(3, 13);
+                state.SetPortrait(portraitID.ToString());
+
+                state.SetSelection();
+                DraftDictionary.Add(clientID, state);
+            }
+            else
+            {
+                Logger.Log<DraftServer>($"Client(ID : {clientID}) Draft State already exists", colorName: ColorCodes.Server);
+            }
+        }
+
         private void RegisterCommand(ushort type, Action<ulong, SerializedData> callback)
         {
             Commands.Add(type, callback);
@@ -95,7 +117,7 @@ namespace Marsion
 
             DraftDictionary.TryGetValue(clientID, out var state);
 
-            Managers.Instance.Server.GameSession.Ready(clientID, state.CurrentDeck);
+            Managers.Instance.Server.Ready(clientID, state);
         }
 
         #endregion
@@ -109,6 +131,7 @@ namespace Marsion
                 SerializedDraftState sdata = new();
                 sdata.isComplete = state.IsComplete;
                 sdata.count = state.Count;
+                sdata.portraitID = state.Portrait;
                 sdata.deck = state.CurrentDeck.ToArray();
                 sdata.selections = state.CurrentSelections.ToArray();
                 sdata.subSelections = state.CurrentSubSelections.ToArray();
@@ -129,6 +152,7 @@ namespace Marsion
                 SerializedDraftState sdata = new();
                 sdata.isComplete = state.IsComplete;
                 sdata.count = state.Count;
+                sdata.portraitID = state.Portrait;
                 sdata.deck = state.CurrentDeck.ToArray();
                 sdata.selections = state.CurrentSelections.ToArray();
                 sdata.subSelections = state.CurrentSubSelections.ToArray();
@@ -175,25 +199,6 @@ namespace Marsion
                 Logger.Log<DraftServer>($"Client({clientID}) has not state", colorName: ColorCodes.Server);
                 draftedDeck = null;
                 return false;
-            }
-        }
-
-        public void AddState(ulong clientID)
-        {
-            if(!DraftDictionary.ContainsKey(clientID))
-            {
-                var state = new DraftState(InitialTypeSequence);
-                state.SetSelection();
-                DraftDictionary.Add(clientID, state);
-
-                SerializedUlong sdata = new();
-                sdata.value = clientID;
-
-                //OnStartDraft(clientID);
-            }
-            else
-            {
-                Logger.Log<DraftServer>($"Client(ID : {clientID}) Draft State already exists", colorName: ColorCodes.Server);
             }
         }
     }

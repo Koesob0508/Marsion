@@ -224,6 +224,7 @@ namespace Marsion
     {
         public bool isComplete;
         public int count;
+        public string portraitID;
         public string[] deck;
         public string[] selections;
         public string[] subSelections;
@@ -232,6 +233,7 @@ namespace Marsion
         {
             serializer.SerializeValue(ref isComplete);
             serializer.SerializeValue(ref count);
+            serializer.SerializeValue(ref portraitID);
             // Serialize deck array
             SerializeStringArray(ref deck, serializer);
             // Serialize selections array

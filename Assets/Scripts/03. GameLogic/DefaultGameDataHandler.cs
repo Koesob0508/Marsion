@@ -8,90 +8,14 @@ namespace Marsion
     /// </summary>
     public class DefaultGameDataHandler : IGameDataHandler
     {
-        public IGameData GameData { get; }
-
-        private readonly Dictionary<ulong, List<string>> readyPlayerDeck = new();
+        public IGameData GameData { get; private set; }
 
         public Player CurrentPlayer => GameData.CurrentPlayer;
 
-        public DefaultGameDataHandler(IGameData gameData)
+        public void Init(IGameDataHandlerFactory dataHandlerFactory)
         {
-            GameData = gameData;
-        }
-
-        public void Init()
-        {
-            var dataConfig = new DefaultGameDataConfig();
-            GameData.Init(dataConfig);
-        }
-
-        /// <summary>
-        ///     두 명의 플레이어가 준비되기 전까지 실제 GameData의 덱 등록은 대기시킨다.
-        /// </summary>
-        public void RegisterPlayerDeck(ulong playerID, List<string> deck)
-        {
-            Logger.Log<DefaultGameDataHandler>($"Set player deck", colorName: ColorCodes.Logic);
-
-            if(!readyPlayerDeck.ContainsKey(playerID))
-            {
-                readyPlayerDeck[playerID] = deck;
-            }
-            else
-            {
-                Logger.LogWarning<DefaultGameDataHandler>($"Player ID has ready deck already.", colorName: ColorCodes.Logic);
-            }
-        }
-
-        public void InitPlayers()
-        {
-            #region 초상화 설정. 추후 외부에서 등록하도록 바뀔 예정
-            Random random = new Random();
-            int number1 = random.Next(3, 13); // Next의 두 번째 인자는 상한을 포함하지 않으므로 13을 사용
-            // 두 번째 숫자 뽑기 (첫 번째 숫자와 중복되지 않도록)
-            int number2;
-            do
-            {
-                number2 = random.Next(3, 13);
-            } while (number2 == number1);
-
-            #endregion
-
-            /*
-             * TODO
-             * SetPlayerPortrait, SetPlayerDeck 모두 Card에 대한 내용을 숨기는 바람에 읽기 어려움
-             * 
-             */
-
-            SetPlayerPortrait(0, number1.ToString());
-            SetPlayerPortrait(1, number2.ToString());
-
-            // 덱 등록
-            SetPlayerDeck(0);
-            SetPlayerDeck(1);
-
-            foreach(var player in GameData.Players)
-            {
-                player.Init();
-            }
-        }
-
-        // 사전 작업
-        private void SetPlayerPortrait(ulong playerID, string portraitID) => GameData.GetPlayer(playerID).SetPlayerPortrait(portraitID);
-
-        // TODO : DataManager 통해서 soID를 Card로 변환해줄 필요가 있음
-        private void SetPlayerDeck(ulong playerID)
-        {
-            var deck = new List<Card>();
-
-            foreach(var soID in readyPlayerDeck[playerID])
-            {
-                var card = new Card();
-                card.SetSOID(soID);
-
-                deck.Add(card);
-            }
-
-            GameData.GetPlayer(playerID).SetPlayerDeck(deck);
+            GameData = dataHandlerFactory.CreateGameData();
+            GameData.Init(dataHandlerFactory.ProvideGameLogicConfig(), dataHandlerFactory.ProvidePlayerInfos());
         }
 
         public Player GetPlayer(ulong playerID) => GameData.GetPlayer(playerID);
@@ -110,6 +34,11 @@ namespace Marsion
 
         public Card GetCardFromField(ulong playerID, string cardUID)
         {
+            if (GetPlayer(playerID).TryGetPlayerCard(cardUID, out var playerCard))
+            {
+                return playerCard;
+            }
+
             if (GetPlayer(playerID).TryGetFieldCard(cardUID, out var card))
             {
                 return card;

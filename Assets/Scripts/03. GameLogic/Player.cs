@@ -34,23 +34,31 @@ namespace Marsion
             Hand = new();
             Field = new();
 
-            PlayerCard.SetPlayerID(PlayerID);
             PlayerCard.SetMaxHealth(MaxHealth);
-
-            foreach(var card in Deck)
-            {
-                card.SetPlayerID(PlayerID);
-                card.Init();
-            }
-
-            PlayerCard.Init();
+            PlayerCard.Init(PlayerID);
         }
 
         public void SetPlayerID(ulong playerID) { PlayerID = playerID; }
 
         public void SetPlayerPortrait(string portraitID) { Portrait = portraitID; }
 
-        public void SetPlayerDeck(List<Card> deck) { Deck = deck; }
+        public void SetDeck(List<Card> deck) { Deck = deck; }
+
+        public bool TryGetPlayerCard(string uid, out Card card)
+        {
+            if(PlayerCard.UID == uid)
+            {
+                card = PlayerCard;
+
+                return true;
+            }
+            else
+            {
+                card = null;
+
+                return false;
+            }
+        }
 
         public bool TryGetHandCard(string uid, out Card card)
         {

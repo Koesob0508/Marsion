@@ -16,8 +16,8 @@ namespace Marsion
 
         event Action OnConnect;
         event Action OnDisconnect;
-        event Action<ulong> OnClientConnected;
-        event Action<ulong> OnClientDisconnected;
+        event Action<ulong> OnOtherClientJoin;
+        event Action<ulong> OnOtherClientQuit;
 
         void SubscribeMessage(string messageType, Action<ulong, FastBufferReader> handler);
         void UnsubscribeMessage(string messageType, Action<ulong, FastBufferReader> handler);
