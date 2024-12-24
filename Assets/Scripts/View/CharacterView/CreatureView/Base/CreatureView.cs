@@ -41,8 +41,8 @@ namespace Marsion.CardView
 
             Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(Card.SOID, out var cardSO);
 
-            Text_Attack.text = cardSO.Attack.ToString();
-            Text_Health.text = cardSO.Health.ToString();
+            Text_Attack.text = card.Attack.ToString();
+            Text_Health.text = card.Health.ToString();
             CardSprite.sprite = Managers.Instance.Resource.Load<Sprite>(cardSO.BoardArtPath);
         }
 

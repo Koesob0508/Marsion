@@ -15,27 +15,38 @@ namespace Marsion
     {
         [JsonProperty] public ulong PlayerID { get; private set; }
 
-        public Card Card;
+        public Card PlayerCard;
         [JsonProperty] public string Portrait { get; private set; }
 
         public List<Card> Deck;
-        public List<Card> Hand = new List<Card>();
-        public List<Card> Field = new List<Card>();
+        public List<Card> Hand;
+        public List<Card> Field;
 
-        public int Health => Card.HP;
-        public int MaxHealth => Card.MaxHP;
+        public int Health => PlayerCard.Health;
+        [JsonProperty] public int MaxHealth { get; private set; }
 
-        [JsonProperty]
-        public int Mana { get; private set; }
-        [JsonProperty]
-        public int MaxMana { get; private set; }
+        [JsonProperty] public int Mana { get; private set; }
+        [JsonProperty] public int MaxMana { get; private set; }
 
-        public void Init(ulong playerID)
+        public void Init()
         {
-            PlayerID = playerID;
-            Card = new Card();
-            Card.Init(playerID);
+            PlayerCard = new Card();
+            Hand = new();
+            Field = new();
+
+            PlayerCard.SetPlayerID(PlayerID);
+            PlayerCard.SetMaxHealth(MaxHealth);
+
+            foreach(var card in Deck)
+            {
+                card.SetPlayerID(PlayerID);
+                card.Init();
+            }
+
+            PlayerCard.Init();
         }
+
+        public void SetPlayerID(ulong playerID) { PlayerID = playerID; }
 
         public void SetPlayerPortrait(string portraitID) { Portrait = portraitID; }
 
@@ -71,7 +82,7 @@ namespace Marsion
             return false;
         }
 
-        public void SetMaxHP(int amount) { Card.SetMaxHP(amount); }
+        public void SetMaxHealth(int amount) { MaxHealth = amount; }
 
         public void SetMaxMana(int amount) { MaxMana = amount; }
 

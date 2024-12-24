@@ -4,6 +4,15 @@ using UnityEngine;
 
 namespace Marsion
 {
+    public enum GradeType
+    {
+        Basic = 0,
+        Normal = 1,
+        Rare = 2,
+        Epic = 3,
+        Legendary = 4
+    }
+
     [CreateAssetMenu(fileName = "CardSO", menuName = "Marsion/CardSO")]
     public class CardSO : ScriptableObject, IIdentifiable
     {

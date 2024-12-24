@@ -83,7 +83,7 @@ namespace Marsion.Tests
             dataHandler.RegisterPlayerDeck(0, deck1);
             dataHandler.RegisterPlayerDeck(1, deck2);
 
-            dataHandler.SetPlayers();
+            dataHandler.InitPlayers();
 
             // Assert
             // 게임 데이터에 반영이 되었는지?
@@ -114,7 +114,7 @@ namespace Marsion.Tests
                 .Returns(tempPlayer);
 
             var mockPlayer = new Player();
-            mockPlayer.Init(1);
+            mockPlayer.SetPlayerID(1);
             mockDataHandler
                 .Setup(Handler => Handler.CurrentPlayer)
                 .Returns(mockPlayer);
@@ -126,7 +126,7 @@ namespace Marsion.Tests
             tempGameLogic.StartGame();
 
             // Assert
-            mockDataHandler.Verify(handler => handler.SetPlayers(), Times.Once, "SetPlayers should be called exactly once.");
+            mockDataHandler.Verify(handler => handler.InitPlayers(), Times.Once, "SetPlayers should be called exactly once.");
         }
 
         [Test]

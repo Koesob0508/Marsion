@@ -16,7 +16,7 @@ namespace Marsion
         Card GetCardFromField(ulong playerID, string cardUID);
 
         void RegisterPlayerDeck(ulong playerID, List<string> deck);
-        void SetPlayers();
+        void InitPlayers();
         void AddCardToHand(ulong playerID, Card card);
         void RemoveCardFromHand(ulong playerID, string cardUID);
         void AddCardToField(ulong playerID, Card card);

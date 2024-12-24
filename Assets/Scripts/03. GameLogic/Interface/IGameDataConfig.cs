@@ -7,7 +7,7 @@
     public interface IGameDataConfig
     {
         int CountOfPlayer { get; }
-        int MaxHP { get; }
+        int MaxHealth { get; }
         int MaxMana { get; }
         int CountOfStartHand { get; }
     }
@@ -15,7 +15,7 @@
     public class DefaultGameDataConfig : IGameDataConfig
     {
         public int CountOfPlayer => 2;
-        public int MaxHP => 30;
+        public int MaxHealth => 30;
         public int MaxMana => 0;
         public int CountOfStartHand => 3;
     }

@@ -19,7 +19,7 @@ namespace Marsion.Logic
 
         public void SetHP(Player player, int amount)
         {
-            player.Card.SetHP(amount);
+            player.PlayerCard.SetHealth(amount);
         }
 
         public void SetDeck(Player player, List<Card> deck)
@@ -85,14 +85,14 @@ namespace Marsion.Logic
         {
             foreach (Player player in players)
             {
-                if (player.Card.HP <= 0)
+                if (player.PlayerCard.Health <= 0)
                 {
-                    player.Card.Die();
+                    player.PlayerCard.Die();
                 }
 
                 foreach (Card card in player.Field)
                 {
-                    if (card.HP <= 0)
+                    if (card.Health <= 0)
                     {
                         card.Die();
                     }
@@ -103,7 +103,7 @@ namespace Marsion.Logic
 
             foreach (Player player in players)
             {
-                if (!player.Card.IsDead)
+                if (!player.PlayerCard.IsDead)
                     AlivePlayers.Add(player);
             }
 

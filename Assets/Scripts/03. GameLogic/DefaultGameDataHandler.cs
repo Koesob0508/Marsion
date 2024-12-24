@@ -42,7 +42,7 @@ namespace Marsion
             }
         }
 
-        public void SetPlayers()
+        public void InitPlayers()
         {
             #region 초상화 설정. 추후 외부에서 등록하도록 바뀔 예정
             Random random = new Random();
@@ -56,12 +56,23 @@ namespace Marsion
 
             #endregion
 
+            /*
+             * TODO
+             * SetPlayerPortrait, SetPlayerDeck 모두 Card에 대한 내용을 숨기는 바람에 읽기 어려움
+             * 
+             */
+
             SetPlayerPortrait(0, number1.ToString());
             SetPlayerPortrait(1, number2.ToString());
 
             // 덱 등록
             SetPlayerDeck(0);
             SetPlayerDeck(1);
+
+            foreach(var player in GameData.Players)
+            {
+                player.Init();
+            }
         }
 
         // 사전 작업
@@ -75,7 +86,7 @@ namespace Marsion
             foreach(var soID in readyPlayerDeck[playerID])
             {
                 var card = new Card();
-                card.Init(playerID, soID);
+                card.SetSOID(soID);
 
                 deck.Add(card);
             }

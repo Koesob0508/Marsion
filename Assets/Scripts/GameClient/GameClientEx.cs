@@ -162,13 +162,13 @@ namespace Marsion
                 {
                     if (PlayerID == player.PlayerID)
                     {
-                        PlayerHero.Init(player.Card);
+                        PlayerHero.Init(player.PlayerCard);
                         PlayerHero.Spawn();
                     }
                     else
                     {
                         EnemyID = player.PlayerID;
-                        EnemyHero.Init(player.Card);
+                        EnemyHero.Init(player.PlayerCard);
                         EnemyHero.Spawn();
                     }
                 }
@@ -356,7 +356,7 @@ namespace Marsion
             switch (type)
             {
                 case CardType.Hero:
-                    result = Data.GetPlayer(playerID).Card;
+                    result = Data.GetPlayer(playerID).PlayerCard;
                     break;
                 case CardType.Field:
                     result = Data.GetFieldCard(playerID, cardUID);

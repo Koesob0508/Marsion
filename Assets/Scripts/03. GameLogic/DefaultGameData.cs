@@ -20,12 +20,12 @@ namespace Marsion
             for (int i = 0; i < config.CountOfPlayer; i++)
             {
                 Players[i] = new Player();
-                Players[i].Init((ulong)i);
+                Players[i].SetPlayerID((ulong)i);
             }
 
             foreach(var player in Players)
             {
-                player.SetMaxHP(config.MaxHP);
+                player.SetMaxHealth(config.MaxHealth);
                 player.SetMaxMana(config.MaxMana);
             }
 
