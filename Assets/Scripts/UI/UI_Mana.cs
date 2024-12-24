@@ -10,10 +10,10 @@ namespace Marsion.UI
 
         public override void Init()
         {
-            Managers.Client.Game.OnGameStarted -= ShowPanel;
-            Managers.Client.Game.OnGameStarted += ShowPanel;
-            Managers.Client.Game.OnManaChanged -= UpdateMana;
-            Managers.Client.Game.OnManaChanged += UpdateMana;
+            Managers.Instance.Client.Game.OnGameStarted -= ShowPanel;
+            Managers.Instance.Client.Game.OnGameStarted += ShowPanel;
+            Managers.Instance.Client.Game.OnManaChanged -= UpdateMana;
+            Managers.Instance.Client.Game.OnManaChanged += UpdateMana;
         }
 
         private void ShowPanel()
@@ -25,12 +25,12 @@ namespace Marsion.UI
         {
             if (IsPlayer)
             {
-                var player = Managers.Client.Game.Data.GetPlayer(Managers.Client.Game.PlayerID);
+                var player = Managers.Instance.Client.Game.Data.GetPlayer(Managers.Instance.Client.Game.PlayerID);
                 Mana.text = $"{player.Mana}/{player.MaxMana}";
             }
             else
             {
-                var player = Managers.Client.Game.Data.GetPlayer(Managers.Client.Game.EnemyID);
+                var player = Managers.Instance.Client.Game.Data.GetPlayer(Managers.Instance.Client.Game.EnemyID);
                 Mana.text = $"{player.Mana}/{player.MaxMana}";
             }
         }

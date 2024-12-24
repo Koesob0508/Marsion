@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace Marsion
 {
-    public class ClientManager : MonoBehaviour
+    public class ClientManager : MonoBehaviour, IClientManager
     {
         //public GameClient Game;
         [SerializeField] GameClientEx game;
 
         public IGameClient Game => game;
-        public DraftClient Draft;
+        public DraftClient Draft { get; private set; }
 
         public InputManager Input { get; private set; }
 

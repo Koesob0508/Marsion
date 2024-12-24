@@ -37,35 +37,45 @@ namespace Marsion
         public void StartHost()
         {
             networkManager.StartHost();
-            OnConnect?.Invoke();
         }
 
         public void StartServer()
         {
             networkManager.StartServer();
-            OnConnect?.Invoke();
         }
 
         public void StartClient()
         {
             networkManager.StartClient();
-            OnConnect?.Invoke();
         }
 
         public void Shutdown()
         {
             networkManager.Shutdown();
-            OnDisconnect?.Invoke();
         }
 
         private void OnClientConnectedHandler(ulong clientID)
         {
-            OnClientConnected?.Invoke(clientID);
+            if (networkManager.LocalClientId == clientID)
+            {
+                OnConnect?.Invoke();
+            }
+            else
+            {
+                OnClientConnected?.Invoke(clientID);
+            }
         }
 
         private void OnClientDisconnectedHandler(ulong clientID)
         {
-            OnClientDisconnected?.Invoke(clientID);
+            if (networkManager.LocalClientId == clientID)
+            {
+                OnDisconnect?.Invoke();
+            }
+            else
+            {
+                OnClientDisconnected?.Invoke(clientID);
+            }
         }
     }
 }

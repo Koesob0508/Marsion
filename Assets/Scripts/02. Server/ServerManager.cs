@@ -21,6 +21,11 @@ namespace Marsion
             _networkManager.OnClientConnected += OnClientJoin;
         }
 
+        /// <summary>
+        ///     Draft가 진행되지 않았다면 Draft를 매치
+        ///     Draft 완료 후, Ready까지 진행했다면, 따로 관리
+        ///     Ready Player가 두 명이라면 OpenSession
+        /// </summary>
         private void OnConnect()
         {
             if (!_networkManager.IsHost)

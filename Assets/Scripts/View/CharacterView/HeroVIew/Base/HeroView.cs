@@ -16,7 +16,7 @@ namespace Marsion.CardView
 
         protected override void UpdateCard()
         {
-            Card = Managers.Client.Game.GetCard(Type, Card.PlayerID, Card.UID);
+            Card = Managers.Instance.Client.Game.GetCard(Type, Card.PlayerID, Card.UID);
         }
     }
 }

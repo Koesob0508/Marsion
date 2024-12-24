@@ -49,7 +49,7 @@ namespace Marsion.CardView
                 if (Handler.Card.PlayerID != target.Card.PlayerID)
                 {
                     FSM.PopState();
-                    Managers.Client.Game.SendTryAttack(Handler.Card, foundObject.GetComponent<ICharacterView>().Card);
+                    Managers.Instance.Client.Game.SendTryAttack(Handler.Card, foundObject.GetComponent<ICharacterView>().Card);
                 }
                 else
                 {

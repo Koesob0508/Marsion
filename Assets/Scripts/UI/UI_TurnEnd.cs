@@ -9,10 +9,10 @@ namespace Marsion.UI
 
         public override void Init()
         {
-            Managers.Client.Game.OnGameStarted -= ShowPanel;
-            Managers.Client.Game.OnGameStarted += ShowPanel;
-            Managers.Client.Game.OnTurnEnded -= ActivateButton;
-            Managers.Client.Game.OnTurnEnded += ActivateButton;
+            Managers.Instance.Client.Game.OnGameStarted -= ShowPanel;
+            Managers.Instance.Client.Game.OnGameStarted += ShowPanel;
+            Managers.Instance.Client.Game.OnTurnEnded -= ActivateButton;
+            Managers.Instance.Client.Game.OnTurnEnded += ActivateButton;
 
             gameObject.SetActive(false);
         }
@@ -26,7 +26,7 @@ namespace Marsion.UI
 
         private void ActivateButton()
         {
-            if (Managers.Client.Game.IsMyTurn())
+            if (Managers.Instance.Client.Game.IsMyTurn())
             {
                 button.gameObject.SetActive(true);
             }
@@ -38,7 +38,7 @@ namespace Marsion.UI
 
         public void TurnEnd()
         {
-            Managers.Client.Game.SendTurnEnd();
+            Managers.Instance.Client.Game.SendTurnEnd();
         }
     }
 }

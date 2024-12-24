@@ -6,13 +6,12 @@ namespace Marsion
     {
         public static Managers Instance { get; private set; }
 
-        public ClientManager _client;
-
         private IResourceManager _resource;
         private IUIManager _ui;
         private IDataManager _data;
         private INetworkManagerEx _network;
         private IServerManager _server;
+        public IClientManager _client;
 
         public IResourceManager Resource => _resource;
         public IUIManager UI => _ui;
@@ -20,7 +19,7 @@ namespace Marsion
         public IDataManager Data => _data;
         public INetworkManagerEx Network => _network;
         public IServerManager Server => _server;
-        public static ClientManager Client { get { return Instance._client; } }
+        public IClientManager Client => _client;
 
         public static void Init(IManagersFactory factory)
         {
@@ -50,13 +49,13 @@ namespace Marsion
                 Card = new CardManager();
 
                 Instance._server = factory.CreateServer();
+                Instance._client = factory.CreateClient();
 
                 Instance._data.Init();
 
                 var serverFactory = factory.CreateServerFactory(Instance);
                 Instance._server.Init(serverFactory);
-                
-                Client.Init();
+                Instance._client.Init();
             }
         }
 

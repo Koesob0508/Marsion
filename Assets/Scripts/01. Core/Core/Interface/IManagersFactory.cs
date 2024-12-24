@@ -16,6 +16,7 @@ namespace Marsion
         INetworkManagerEx CreateNetworkEx(INetworkManagerWrapper networkManagerWrapper);
         IServerManager CreateServer();
         IServerManagerFactory CreateServerFactory(IManagers managers);
+        IClientManager CreateClient();
     }
 
     public class DefaultManagersFactory : IManagersFactory
@@ -60,5 +61,15 @@ namespace Marsion
             return existingManager;
         }
         public IServerManagerFactory CreateServerFactory(IManagers managers) => new DefaultServerFactory(managers);
+        public IClientManager CreateClient()
+        {
+            var existingManager = UnityEngine.Object.FindAnyObjectByType<ClientManager>();
+            if(existingManager == null)
+            {
+                throw new InvalidOperationException("ClientManager is not found in the scene. " +
+                    "Ensure a ClientManager is pre-placed in the scene or properly configured in environment.");
+            }
+            return existingManager;
+        }
     }
 }

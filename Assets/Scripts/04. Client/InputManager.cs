@@ -1,7 +1,7 @@
 ﻿using Marsion;
 using UnityEngine;
 
-namespace Marsion.Client
+namespace Marsion
 {
     public class InputManager
     {

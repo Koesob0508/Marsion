@@ -9,18 +9,18 @@ namespace Marsion.Client
 
         private void Start()
         {
-            //Managers.Client.Game.OnGameStarted -= SetPortrait;
-            //Managers.Client.Game.OnGameStarted += SetPortrait;
+            //Managers.Instance.Client.Game.OnGameStarted -= SetPortrait;
+            //Managers.Instance.Client.Game.OnGameStarted += SetPortrait;
 
-            Managers.Client.Game.OnGameStarted += SetPortrait;
+            Managers.Instance.Client.Game.OnGameStarted += SetPortrait;
         }
 
         private void SetPortrait()
         {
-            foreach(var player in Managers.Client.Game.Data.Players)
+            foreach(var player in Managers.Instance.Client.Game.Data.Players)
             {
                 // Player
-                if(player.PlayerID == Managers.Client.Game.PlayerID)
+                if(player.PlayerID == Managers.Instance.Client.Game.PlayerID)
                 {
                     Player_Sprite.sprite = Managers.Instance.Data.GetDictionary<PortraitSO>()[player.Portrait].Sprite;
                 }

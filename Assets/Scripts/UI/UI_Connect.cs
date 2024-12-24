@@ -94,7 +94,7 @@ namespace Marsion
             Managers.Instance.UI.ClosePopupUI(this);
 
             Logger.Log<UI_Connect>($"Start Draft", colorName: ColorCodes.CommonUI);
-            Managers.Client.Draft.RequestStartDraft();
+            Managers.Instance.Client.Draft.RequestStartDraft();
         }
 
         private IEnumerator DisplayContentsWithDelay(float delay, bool isHost)
