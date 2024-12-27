@@ -6,9 +6,9 @@ namespace Marsion
     {
         INetworkManagerEx ProvideNetwork();
         IDataManager ProvideData();
-        List<ulong> ProvidePlayersClientIDs();
+        Dictionary<ulong, ushort> ProvidePlayersClientIDs();
         IGameLogicFactory CreateGameLogicFactory();
-        IGameLogicEx CreateGameLogicEx();
+        IGameLogic CreateGameLogicEx();
     }
 
     public class DefaultGameSessionFactory : IGameSessionFactory
@@ -24,18 +24,18 @@ namespace Marsion
 
         public INetworkManagerEx ProvideNetwork() => _managers.Network;
         public IDataManager ProvideData() => _managers.Data; // 함수 네이밍이 좀
-        public List<ulong> ProvidePlayersClientIDs()
+        public Dictionary<ulong, ushort> ProvidePlayersClientIDs()
         {
-            var clientIDs = new List<ulong>();
+            var clientPlayerIdMap = new Dictionary<ulong, ushort>();
 
-            foreach (var playerInfo in _playerInfos)
+            for (ushort index = 0; index < _playerInfos.Count; index++)
             {
-                clientIDs.Add(playerInfo.ClientID);
+                clientPlayerIdMap.Add(_playerInfos[index].ClientID, index);
             }
 
-            return clientIDs;
+            return clientPlayerIdMap;
         }
         public IGameLogicFactory CreateGameLogicFactory() => new DefaultGameLogicFactory(_managers, _playerInfos);
-        public IGameLogicEx CreateGameLogicEx() => new DefaultGameLogic();
+        public IGameLogic CreateGameLogicEx() => new DefaultGameLogic();
     }
 }

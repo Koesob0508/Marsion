@@ -5,7 +5,7 @@ using UnityEngine.Playables;
 
 namespace Marsion
 {
-    public class DefaultGameLogic : IGameLogicEx
+    public class DefaultGameLogic : IGameLogic
     {
         private IGameDataHandler _dataHandler;
         private readonly CommandInvoker _commandInvoker;
@@ -100,7 +100,7 @@ namespace Marsion
 
         public void DrawCard(Player player, out Card drawnCard)
         {
-            Logger.Log<GameLogic>("Draw a card", colorName: ColorCodes.Logic);
+            Logger.Log<IGameLogic>("Draw a card", colorName: ColorCodes.Logic);
 
             _dataHandler.DrawCard(player, out drawnCard);
         }
@@ -114,7 +114,7 @@ namespace Marsion
 
         public void TrySpawnCard(ulong playerID, string cardUID, int index)
         {
-            Logger.Log<GameLogic>("Try spawn card", colorName: ColorCodes.Logic);
+            Logger.Log<IGameLogic>("Try spawn card", colorName: ColorCodes.Logic);
 
             var player = _dataHandler.GetPlayer(playerID);
             var card = _dataHandler.GetCardFromHand(playerID, cardUID);

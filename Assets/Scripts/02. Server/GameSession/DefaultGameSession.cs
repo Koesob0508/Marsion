@@ -12,9 +12,9 @@ namespace Marsion
         [SerializeField] Sequencer Upstream;
 
         private INetworkManagerEx _networkManager;
-        private IGameLogicEx _gameLogic;
+        private IGameLogic _gameLogic;
 
-        private List<ulong> _playersClientIDs;
+        private Dictionary<ulong, ushort> _ClientPlayerIdMap;
         private Dictionary<ushort, Action<ulong, SerializedData>> Commands;
 
         public void Init(IGameSessionFactory sessionFactory)
@@ -23,7 +23,7 @@ namespace Marsion
 
             Commands = new();
 
-            _playersClientIDs = sessionFactory.ProvidePlayersClientIDs();
+            _ClientPlayerIdMap = sessionFactory.ProvidePlayersClientIDs();
             _networkManager = sessionFactory.ProvideNetwork();
             _gameLogic = sessionFactory.CreateGameLogicEx();
             _gameLogic.Init(sessionFactory.CreateGameLogicFactory());
@@ -99,7 +99,7 @@ namespace Marsion
 
         #region OnReceive (Use queue)
 
-        private void OnReceivedTurnEnd(ulong playerID, SerializedData sdata)
+        private void OnReceivedTurnEnd(ulong clientID, SerializedData sdata)
         {
             Sequencer.Sequence sequence = new("Turn end", Upstream);
             Sequencer.Clip clip = new("Turn end", sequence);
@@ -110,7 +110,7 @@ namespace Marsion
             };
         }
 
-        private void OnReceivedTrySpawnCard(ulong playerID, SerializedData sdata)
+        private void OnReceivedTrySpawnCard(ulong clientID, SerializedData sdata)
         {
             SerializedTrySpawnCardData spawnCard = sdata.Get<SerializedTrySpawnCardData>();
 
@@ -119,11 +119,12 @@ namespace Marsion
 
             clip.OnPlay += () =>
             {
+                _ClientPlayerIdMap.TryGetValue(clientID, out var playerID);
                 _gameLogic.TrySpawnCard(playerID, spawnCard.CardUID, spawnCard.Index);
             };
         }
 
-        private void OnReceivedTryAttack(ulong playerID, SerializedData sdata)
+        private void OnReceivedTryAttack(ulong clientID, SerializedData sdata)
         {
             SerializedTryAttackData attackData = sdata.Get<SerializedTryAttackData>();
 
@@ -254,7 +255,7 @@ namespace Marsion
 
         private void SendToAll(ushort tag, INetworkSerializable data = null, NetworkDelivery delivery = NetworkDelivery.ReliableSequenced)
         {
-            foreach(ulong clientID in _playersClientIDs)
+            foreach(ulong clientID in _ClientPlayerIdMap.Keys)
             {
                 _networkManager.SendMessage("GameServer", clientID, (writer) =>
                 {

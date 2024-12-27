@@ -1,28 +1,31 @@
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine.Events;
 
-namespace Marsion.Logic
+namespace Marsion
 {
     public interface IGameLogic
     {
-        #region Game Logic Operations
+        IGameData GameData { get; }
+        event Action OnDataUpdated;
+        event Action OnGameStarted;
+        event Action<ulong> OnGameEnded;
+        event Action OnTurnStarted;
+        event Action OnTurnEnded;
+        event Action OnManaChanged;
+        event Action<ulong, string> OnCardDrawn;
+        event Action<bool, ulong, string> OnCardPlayed;
+        event Action<bool, ulong, string, int> OnCardSpawned;
+        event Action<bool, ulong, string, ulong, string> OnCardAttacked;
+        event Action<List<string>> OnCardDied;
 
-        void SetPortrait(Player player, int index);
+        void Init(IGameLogicFactory gameLogicFactory);
+        void StartGame();
+        void EndGame();
+        void StartTurn();
+        void EndTurn();
 
-        void SetHP(Player player, int amount);
-
-        void SetDeck(Player player, List<Card> deck);
-
-        void ShuffleDeck(Player player);
-
-        Card DrawCard(Player player);
-
-        void Damage(IDamageable attacker, IDamageable defender);
-
-        bool CheckDeadCard(Player[] players);
-
-        int GetAlivePlayer();
-
-        #endregion
+        void TrySpawnCard(ulong playerID, string cardUID, int index);
+        void TryAttack(ulong attackPlayerID, string attackCardUID, ulong defendPlayerID, string defendCardUID);
+        void Clear();
     }
 }
