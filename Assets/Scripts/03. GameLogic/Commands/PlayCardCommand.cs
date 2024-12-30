@@ -20,9 +20,11 @@
                 Logger.Log<DefaultGameLogic>($"Not enoufh mana to play {card.Name}", colorName: ColorCodes.Logic);
                 return;
             }
+
             player.PayMana(card.ManaCost);
             player.Hand.Remove(card);
             player.Field.Insert(index, card);
+            card.ExecutePlayAbility();
 
             Logger.Log<DefaultGameLogic>($"Played card : {card.Name} at position {index}", colorName: ColorCodes.Logic);
         }

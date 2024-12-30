@@ -5,8 +5,9 @@ namespace Marsion
 {
     public interface IGameLogic
     {
+        IDataManager Data { get; }
         IGameData GameData { get; }
-        event Action OnDataUpdated;
+        event Action<IGameData> OnDataUpdated;
         event Action OnGameStarted;
         event Action<ulong> OnGameEnded;
         event Action OnTurnStarted;
@@ -19,13 +20,17 @@ namespace Marsion
         event Action<List<string>> OnCardDied;
 
         void Init(IGameLogicFactory gameLogicFactory);
+        void Clear();
         void StartGame();
         void EndGame();
         void StartTurn();
-        void EndTurn();
 
+        // Player Interaction
+        void EndTurn();
         void TrySpawnCard(ulong playerID, string cardUID, int index);
         void TryAttack(ulong attackPlayerID, string attackCardUID, ulong defendPlayerID, string defendCardUID);
-        void Clear();
+
+        // Card Effect
+        void DrawCard(ulong playerID, int count = 1);
     }
 }

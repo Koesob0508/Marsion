@@ -60,7 +60,7 @@ namespace Marsion
         }
 
         // 특정 타입의 딕셔너리를 가져오는 메서드
-        public Dictionary<string, T> GetDictionary<T>() where T : UnityEngine.Object, IIdentifiable
+        public IDictionary<string, T> GetDictionary<T>() where T : UnityEngine.Object, IIdentifiable
         {
             if (_dataDictionaries.TryGetValue(typeof(T), out var dictionary))
             {

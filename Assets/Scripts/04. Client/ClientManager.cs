@@ -6,7 +6,7 @@ namespace Marsion
     public class ClientManager : MonoBehaviour, IClientManager
     {
         //public GameClient Game;
-        [SerializeField] GameClientEx game;
+        [SerializeField] GameClient game;
 
         public IGameClient Game => game;
         public DraftClient Draft { get; private set; }

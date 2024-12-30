@@ -1,18 +1,14 @@
 ﻿using Marsion.CardView;
-using Marsion.Client;
-using Marsion.Logic;
 using Marsion.Tool;
 using Marsion.UI;
 using System;
 using System.Collections.Generic;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Marsion
 {
-    public class GameClientEx : MonoBehaviour, IGameClient
+    public class GameClient : MonoBehaviour, IGameClient
     {
         [SerializeField] Sequencer Upstream;
         [SerializeField] Sequencer Downstream;
@@ -50,7 +46,7 @@ namespace Marsion
 
         public void Init()
         {
-            Logger.Log<GameClientEx>($"Game Client initialized", colorName: ColorCodes.Client);
+            Logger.Log<GameClient>($"Game Client initialized", colorName: ColorCodes.Client);
 
             Commands = new();
             Upstream.Init();
@@ -99,14 +95,14 @@ namespace Marsion
 
         public void SendTurnEnd()
         {
-            Logger.Log<GameClientEx>("Send turn end", colorName: ColorCodes.Client);
+            Logger.Log<GameClient>("Send turn end", colorName: ColorCodes.Client);
 
             Send(GameCommand.ClientTurnEnd);
         }
 
         public void SendTryAttack(Card attacker, Card defender)
         {
-            Logger.Log<GameClientEx>("Send try attack", colorName: ColorCodes.Client);
+            Logger.Log<GameClient>("Send try attack", colorName: ColorCodes.Client);
 
             SerializedTryAttackData sdata = new();
             sdata.AttackPlayerID = attacker.PlayerID;
@@ -119,7 +115,7 @@ namespace Marsion
 
         public void SendTrySpawnCard(Card card, int index)
         {
-            Logger.Log<GameClientEx>("Try spawn", colorName: ColorCodes.Client);
+            Logger.Log<GameClient>("Try spawn", colorName: ColorCodes.Client);
 
             SerializedTrySpawnCardData sdata = new SerializedTrySpawnCardData();
             sdata.CardUID = card.UID;
@@ -141,7 +137,7 @@ namespace Marsion
 
             clip.OnPlay += () =>
             {
-                Logger.Log<GameClientEx>($"Received updated data", colorName: ColorCodes.Client);
+                Logger.Log<GameClient>($"Received updated data", colorName: ColorCodes.Client);
 
                 Data = (DefaultGameData)sGameData.GameData;
 
@@ -158,7 +154,7 @@ namespace Marsion
 
             initHeroClip.OnPlay += () =>
             {
-                Logger.Log<GameClientEx>($"Received start game", colorName: ColorCodes.Client);
+                Logger.Log<GameClient>($"Received start game", colorName: ColorCodes.Client);
 
                 foreach (var player in Data.Players)
                 {
@@ -202,7 +198,7 @@ namespace Marsion
 
             clip.OnPlay += () =>
             {
-                Logger.Log<GameClientEx>("Game end", colorName: ColorCodes.Client);
+                Logger.Log<GameClient>("Game end", colorName: ColorCodes.Client);
                 UI_EndGame ui = Managers.Instance.UI.ShowPopupUI<UI_EndGame>();
 
                 if(winnerData.value > 10)

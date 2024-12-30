@@ -55,8 +55,6 @@ namespace Marsion.Tests
             yield break;
         }
 
-        // CustomMessaging을 사용하려면 StartHost 하셔야함.
-        // 생각해보니 당연한거네
         [UnityTest]
         public IEnumerator DraftClient_Should_Receives()
         {
@@ -76,10 +74,18 @@ namespace Marsion.Tests
 
             mockManagers.Object.Network.StartHost();
 
+            yield return new WaitForSeconds(0.5f);
+
             // 이제 mockManagers.NetworkEx를 통해서 Send를 해봐야지
             ushort testCommand = DraftCommand.ServerInitState;
             ulong targetID = mockManagers.Object.Network.LocalID;
             SerializedDraftState sdata = new SerializedDraftState();
+            sdata.isComplete = true;
+            sdata.count = 0;
+            sdata.portraitID = "";
+            sdata.deck = new string[0];
+            sdata.selections = new string[0];
+            sdata.subSelections = new string[0];
 
             Action<FastBufferWriter> writeAction = (writer) =>
             {

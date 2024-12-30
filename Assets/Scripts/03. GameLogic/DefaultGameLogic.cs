@@ -10,9 +10,10 @@ namespace Marsion
         private IGameDataHandler _dataHandler;
         private readonly CommandInvoker _commandInvoker;
 
+        public IDataManager Data { get; private set; }
         public IGameData GameData => _dataHandler.GameData;
 
-        public event Action OnDataUpdated;
+        public event Action<IGameData> OnDataUpdated;
         public event Action OnGameStarted;
         public event Action OnManaChanged;
         public event Action OnTurnStarted;
@@ -31,9 +32,12 @@ namespace Marsion
 
         public void Init(IGameLogicFactory logicFactory)
         {
+            // Managers 역할
+            Data = logicFactory.ProvideDataManager();
+
             _dataHandler = logicFactory.CreateGameDataHandler();
             var logicConfig = logicFactory.CreateGameLogicConfig();
-            _dataHandler.Init(logicFactory.CreateGameDataHandlerFactory(logicConfig));
+            _dataHandler.Init(logicFactory.CreateGameDataHandlerFactory(this, logicConfig));
         }
 
         public void StartGame()
@@ -51,7 +55,7 @@ namespace Marsion
             _dataHandler.DrawCard(_dataHandler.GetOpponentPlayer(_dataHandler.CurrentPlayer.PlayerID), out var _);
 
             // Send Data Update
-            OnDataUpdated?.Invoke();
+            OnDataUpdated?.Invoke(GameData);
             // Send Start Game
             OnGameStarted?.Invoke();
 
@@ -78,7 +82,7 @@ namespace Marsion
 
             _dataHandler.DrawCard(_dataHandler.CurrentPlayer, out var card);
 
-            OnDataUpdated?.Invoke();
+            OnDataUpdated?.Invoke(GameData);
             OnManaChanged?.Invoke();
             OnTurnStarted?.Invoke();
             OnCardDrawn?.Invoke(_dataHandler.CurrentPlayer.PlayerID, card.UID);
@@ -90,7 +94,7 @@ namespace Marsion
 
             _dataHandler.ChangeCurrentPlayer();
 
-            OnDataUpdated?.Invoke();
+            OnDataUpdated?.Invoke(GameData);
             OnTurnEnded?.Invoke();
 
             StartTurn();
@@ -134,7 +138,7 @@ namespace Marsion
 
             OnCardPlayed?.Invoke(true, player.PlayerID, card.UID);
             OnCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
-            OnDataUpdated?.Invoke();
+            OnDataUpdated?.Invoke(GameData);
             OnManaChanged?.Invoke();
         }
 
@@ -149,17 +153,17 @@ namespace Marsion
             _commandInvoker.AddCommand(attackCommand);
             _commandInvoker.ExecuteCommands();
 
-            OnDataUpdated?.Invoke();
+            OnDataUpdated?.Invoke(GameData);
             OnCardAttacked?.Invoke(true, attackPlayer.PlayerID, attacker.UID, defendPlayer.PlayerID, defender.UID);
 
             List<string> deadCardUIDs = CheckDeadCard();
 
-            OnDataUpdated?.Invoke();
+            OnDataUpdated?.Invoke(GameData);
             OnCardDied?.Invoke(deadCardUIDs);
 
             RemoveDeadCard();
 
-            OnDataUpdated?.Invoke();
+            OnDataUpdated?.Invoke(GameData);
 
             List<ulong> alivePlayerIDs = new();
 
@@ -230,6 +234,16 @@ namespace Marsion
         public void Clear()
         {
 
+        }
+
+        public void DrawCard(ulong playerID, int count = 1)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                _dataHandler.DrawCard(_dataHandler.GetPlayer(playerID), out var drawnCard);
+                OnDataUpdated?.Invoke(GameData);
+                OnCardDrawn?.Invoke(playerID, drawnCard.UID);
+            }
         }
     }
 }

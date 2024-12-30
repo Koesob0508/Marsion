@@ -8,14 +8,61 @@ namespace Marsion
     /// </summary>
     public class DefaultGameDataHandler : IGameDataHandler
     {
+        public IGameLogic Logic { get; private set; }
         public IGameData GameData { get; private set; }
 
         public Player CurrentPlayer => GameData.CurrentPlayer;
 
         public void Init(IGameDataHandlerFactory dataHandlerFactory)
         {
+            Logic = dataHandlerFactory.ProvideGameLogic();
+
             GameData = dataHandlerFactory.CreateGameData();
-            GameData.Init(dataHandlerFactory.ProvideGameLogicConfig(), dataHandlerFactory.ProvidePlayerInfos());
+            GameData.Init(dataHandlerFactory.ProvideGameLogicConfig());
+
+            var cardSOs = Logic.Data.GetDictionary<CardSO>();
+            var config = dataHandlerFactory.ProvideGameLogicConfig();
+            var playerInfos = dataHandlerFactory.ProvidePlayerInfos();
+
+            foreach(var playerInfo in playerInfos)
+            {
+                var player = new Player();
+
+                player.SetPlayerID(playerInfo.ClientID);
+                player.SetPlayerPortrait(playerInfo.Portrait);
+                player.SetMaxHealth(config.MaxHealth);
+                player.SetMaxMana(config.MaxMana);
+
+                var deck = new List<Card>();
+                foreach(var soID in playerInfo.Deck)
+                {
+                    var card = new Card();
+
+                    if(cardSOs.TryGetValue(soID, out var cardSO))
+                    {
+                        card.Init(Logic, playerInfo.ClientID, cardSO);
+                        deck.Add(card);
+                    }
+                    else
+                    {
+                        Logger.LogWarning<Card>($"The CardSO ID {soID} was not found.", colorName: ColorCodes.Logic);
+                    }
+                }
+
+                player.SetDeck(deck);
+                player.Init();
+
+                GameData.SetPlayer((int)playerInfo.ClientID, player);
+            }
+
+            if(playerInfos.Count == 0)
+            {
+                return;
+            }
+
+            Random random = new Random();
+            ulong firstPlayerID = (ulong)random.Next(0, playerInfos.Count);
+            GameData.SetCurrentPlayer(firstPlayerID);
         }
 
         public Player GetPlayer(ulong playerID) => GameData.GetPlayer(playerID);

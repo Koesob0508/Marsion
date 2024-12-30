@@ -8,7 +8,7 @@ namespace Marsion
         IDataManager ProvideData();
         Dictionary<ulong, ushort> ProvidePlayersClientIDs();
         IGameLogicFactory CreateGameLogicFactory();
-        IGameLogic CreateGameLogicEx();
+        IGameLogic CreateGameLogic();
     }
 
     public class DefaultGameSessionFactory : IGameSessionFactory
@@ -36,6 +36,6 @@ namespace Marsion
             return clientPlayerIdMap;
         }
         public IGameLogicFactory CreateGameLogicFactory() => new DefaultGameLogicFactory(_managers, _playerInfos);
-        public IGameLogic CreateGameLogicEx() => new DefaultGameLogic();
+        public IGameLogic CreateGameLogic() => new DefaultGameLogic();
     }
 }

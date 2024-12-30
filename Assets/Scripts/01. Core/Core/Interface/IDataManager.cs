@@ -13,6 +13,6 @@ namespace Marsion
     {
         void Init();
         IEnumerator LoadFromAddressables<T>(string label) where T : Object, IIdentifiable;
-        Dictionary<string, T> GetDictionary<T>() where T : Object, IIdentifiable;
+        IDictionary<string, T> GetDictionary<T>() where T : Object, IIdentifiable;
     }
 }

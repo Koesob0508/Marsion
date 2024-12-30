@@ -14,36 +14,29 @@ namespace Marsion
         [JsonProperty] public Player CurrentPlayer { get; set; }
         [JsonProperty] public int TurnCount { get; private set; }
 
-        public void Init(IGameLogicConfig config, List<PlayerInfo> playerInfos)
+        public void Init(IGameLogicConfig config)
         {
-            Players = new Player[config.CountOfPlayer];
-
-            for (int i = 0; i < config.CountOfPlayer; i++)
-            {
-                Players[i] = new Player();
-                Players[i].SetPlayerID((ulong)i);
-                Players[i].SetPlayerPortrait(playerInfos[i].Portrait);
-                Players[i].SetMaxHealth(config.MaxHealth);
-                Players[i].SetMaxMana(config.MaxMana);
-
-                var deck = new List<Card>();
-
-                foreach(var soID in playerInfos[i].Deck)
-                {
-                    var card = new Card();
-                    card.Init((ulong)i, soID);
-                    deck.Add(card);
-                }
-
-                Players[i].SetDeck(deck);
-                Players[i].Init();
-            }
-
             // Player 외적 설정
             TurnCount = 0;
-            Random random = new Random();
-            ulong firstPlayerID = (ulong)random.Next(0, 2);
-            CurrentPlayer = GetPlayer(firstPlayerID);
+
+            Players = new Player[config.CountOfPlayer];
+        }
+
+        public void SetPlayer(int index, Player player)
+        {
+            if(index >= Players.Length)
+            {
+                Logger.LogError<IGameData>($"Index out of range. Received index : {index}. Current Players length : {Players.Length}", colorName: ColorCodes.Logic);
+                
+                return;
+            }
+
+            Players[index] = player;
+        }
+
+        public void SetCurrentPlayer(ulong playerID)
+        {
+            CurrentPlayer = GetPlayer(playerID);
         }
 
         public Player GetPlayer(ulong playerID)

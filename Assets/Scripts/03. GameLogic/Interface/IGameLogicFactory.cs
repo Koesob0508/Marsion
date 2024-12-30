@@ -4,9 +4,12 @@ namespace Marsion
 {
     public interface IGameLogicFactory
     {
+        // Managers
+        IDataManager ProvideDataManager();
+
         List<PlayerInfo> ProvidePlayerInfo();
         IGameLogicConfig CreateGameLogicConfig();
-        IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogicConfig logicConfig);
+        IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogic gameLogic, IGameLogicConfig logicConfig);
         IGameDataHandler CreateGameDataHandler();
     }
 
@@ -21,9 +24,11 @@ namespace Marsion
             _playerInfos = playerInfos;
         }
 
+        public IDataManager ProvideDataManager() => _managers.Data;
+
         public List<PlayerInfo> ProvidePlayerInfo() => _playerInfos;
         public IGameLogicConfig CreateGameLogicConfig() => new DefaultGameLogicConfig();
-        public IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogicConfig logicConfig) => new DefaultGameDataHandlerFactory(_managers, logicConfig, _playerInfos);
+        public IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogic gameLogic, IGameLogicConfig logicConfig) => new DefaultGameDataHandlerFactory(gameLogic, logicConfig, _playerInfos);
         public IGameDataHandler CreateGameDataHandler() => new DefaultGameDataHandler();
     }
 }

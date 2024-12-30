@@ -7,8 +7,10 @@ namespace Marsion
         Player[] Players { get; }
         Player CurrentPlayer { get; set; }
         int TurnCount { get; }
+        void Init(IGameLogicConfig config);
+        void SetPlayer(int index, Player player);
+        void SetCurrentPlayer(ulong index);
         Player GetPlayer(ulong PlayerID);
-        void Init(IGameLogicConfig config, List<PlayerInfo> playerInfos);
         void AdvanceTurn();
         void ChangeCurrentPlayer();
     }

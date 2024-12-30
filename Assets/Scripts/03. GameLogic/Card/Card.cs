@@ -21,6 +21,10 @@ namespace Marsion
         [JsonProperty] public int Health { get; private set; }
         [JsonProperty] public bool IsDead { get; private set; }
 
+        private IGameLogic _logic;
+        private List<AbilitySO> _abilities;
+        private List<ITrigger> _triggers;
+
         public void Init(ulong playerID)
         {
             UID = Guid.NewGuid().ToString();
@@ -33,21 +37,16 @@ namespace Marsion
             Health = MaxHealth;
 
             IsDead = false;
+            _triggers = new();
         }
 
         // 생물 카드용 초기화
-        public void Init(ulong playerID, string soID)
+        public void Init(IGameLogic gameLogic, ulong playerID, CardSO cardSO)
         {
-            if (!Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(soID, out var cardSO))
-            {
-                Logger.LogWarning<Card>("The CardSO ID was not found.", colorName: ColorCodes.Logic);
-                return;
-            }
-
             UID = Guid.NewGuid().ToString();
 
             PlayerID = playerID;
-            SOID = soID;
+            SOID = cardSO.ID;
             Name = cardSO.Name;
             ManaCost = cardSO.ManaCost;
             Attack = cardSO.Attack;
@@ -55,19 +54,37 @@ namespace Marsion
 
             Health = MaxHealth;
             IsDead = false;
+
+            _logic = gameLogic;
+            _triggers = new();
+            _abilities = new();
+
+            foreach(var ability in cardSO.Abilities)
+            {
+                _abilities.Add(ability);
+                ability.Init();
+            }
         }
 
-        // public void AddTrigger(ITrigger trigger)
-        // {
-        //     Triggers.Add(trigger);
-        //     trigger.Register();
-        // }
+        public void ExecutePlayAbility()
+        {
+            foreach(var ability in _abilities)
+            {
+                ability.Execute(_logic, this);
+            }
+        }
 
-        // public void RemoveTrigger(ITrigger trigger)
-        // {
-        //     trigger.Unregister();
-        //     Triggers.Remove(trigger);
-        // }
+        public void AddTrigger(ITrigger trigger)
+        {
+            _triggers.Add(trigger);
+            trigger.Register();
+        }
+
+        public void RemoveTrigger(ITrigger trigger)
+        {
+            trigger.Unregister();
+            _triggers.Remove(trigger);
+        }
 
         public void SetPlayerID(ulong playerID) { PlayerID = playerID; }
         public void SetMaxHealth(int amount) { MaxHealth = amount; }

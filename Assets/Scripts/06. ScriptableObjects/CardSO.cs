@@ -1,6 +1,4 @@
-﻿using Marsion.Logic;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Marsion
 {
@@ -26,5 +24,8 @@ namespace Marsion
         public string AbilityExplain;
         public int Attack;
         public int Health;
+        public AbilitySO[] Abilities;
+
+        public void SetID(string value) { id = value; }
     }
 }

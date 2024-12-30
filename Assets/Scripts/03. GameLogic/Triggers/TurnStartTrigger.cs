@@ -17,15 +17,15 @@
 
         private void OnTurnStart(object eventData)
         {
-            //if ((ulong)eventData == _card.OwnerID)
-            //{
-            //    Execute();
-            //}
+            if ((ulong)eventData == _card.PlayerID)
+            {
+                Execute();
+            }
         }
 
         public void Execute()
         {
-            // _effect.Apply(_card, Managers.Instance.Data, Managers.Instance.GameLogic);
+            //_effect.Apply(_card, Managers.Instance.Data, Managers.Instance.GameLogic);
         }
     }
 }

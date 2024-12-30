@@ -25,7 +25,7 @@ namespace Marsion
 
             _ClientPlayerIdMap = sessionFactory.ProvidePlayersClientIDs();
             _networkManager = sessionFactory.ProvideNetwork();
-            _gameLogic = sessionFactory.CreateGameLogicEx();
+            _gameLogic = sessionFactory.CreateGameLogic();
             _gameLogic.Init(sessionFactory.CreateGameLogicFactory());
 
             Upstream.Init();
@@ -141,12 +141,12 @@ namespace Marsion
 
         #region Send Utility (Not use queue, logic process queue already)
 
-        private void SendUpdateData()
+        private void SendUpdateData(IGameData gameData)
         {
             Logger.Log<DefaultGameSession>($"Send updated data", colorName: ColorCodes.Server);
 
             var sdata = new SerializedGameData();
-            sdata.GameData = _gameLogic.GameData;
+            sdata.GameData = gameData;
 
             SendToAll(GameCommand.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
         }
