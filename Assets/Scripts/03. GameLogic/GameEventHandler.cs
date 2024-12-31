@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Marsion
 {
-    public class GameEventManager
+    public class GameEventHandler
     {
-        private static readonly Dictionary<string, List<Action<object>>> _eventListeners = new();
+        private readonly Dictionary<string, List<Action<object>>> _eventListeners = new();
 
-        public static void RegisterEvent(string eventName, Action<object> listener)
+        public void RegisterEvent(string eventName, Action<object> listener)
         {
             if (!_eventListeners.ContainsKey(eventName))
                 _eventListeners[eventName] = new List<Action<object>>();
@@ -15,13 +15,13 @@ namespace Marsion
             _eventListeners[eventName].Add(listener);
         }
 
-        public static void UnregisterEvent(string eventName, Action<object> listener)
+        public void UnregisterEvent(string eventName, Action<object> listener)
         {
             if (_eventListeners.ContainsKey(eventName))
                 _eventListeners[eventName].Remove(listener);
         }
 
-        public static void TriggerEvent(string eventName, object eventData)
+        public void TriggerEvent(string eventName, object eventData)
         {
             if(_eventListeners.ContainsKey(eventName))
             {

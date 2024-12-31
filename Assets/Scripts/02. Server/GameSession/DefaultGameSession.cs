@@ -47,32 +47,32 @@ namespace Marsion
 
         private void SubscribeToGameLogicEvents()
         {
-            _gameLogic.OnDataUpdated += SendUpdateData;
-            _gameLogic.OnGameStarted += SendStartGame;
-            _gameLogic.OnManaChanged += SendChangeMana;
-            _gameLogic.OnTurnStarted += SendStartTurn;
-            _gameLogic.OnTurnEnded += SendEndTurn;
-            _gameLogic.OnCardDrawn += SendDrawCard;
-            _gameLogic.OnCardPlayed += SendPlayCardResult;
-            _gameLogic.OnCardSpawned += SendSpawnCardResult;
-            _gameLogic.OnCardAttacked += SendAttackCardResult;
-            _gameLogic.OnCardDied += SendDeadCards;
-            _gameLogic.OnGameEnded += SendEndGame;
+            _gameLogic.SendDataUpdated += SendUpdateData;
+            _gameLogic.SendGameStarted += SendStartGame;
+            _gameLogic.SendManaChanged += SendChangeMana;
+            _gameLogic.SendTurnStarted += SendStartTurn;
+            _gameLogic.SendTurnEnded += SendEndTurn;
+            _gameLogic.SendCardDrawn += SendDrawCard;
+            _gameLogic.SendCardPlayed += SendPlayCardResult;
+            _gameLogic.SendCardSpawned += SendSpawnCardResult;
+            _gameLogic.SendCardAttacked += SendAttackCardResult;
+            _gameLogic.SendCardDied += SendDeadCards;
+            _gameLogic.SendGameEnded += SendEndGame;
         }
 
         public void Clear()
         {
-            _gameLogic.OnDataUpdated -= SendUpdateData;
-            _gameLogic.OnGameStarted -= SendStartGame;
-            _gameLogic.OnManaChanged -= SendChangeMana;
-            _gameLogic.OnTurnStarted -= SendStartTurn;
-            _gameLogic.OnTurnEnded -= SendEndTurn;
-            _gameLogic.OnCardDrawn -= SendDrawCard;
-            _gameLogic.OnCardPlayed -= SendPlayCardResult;
-            _gameLogic.OnCardSpawned -= SendSpawnCardResult;
-            _gameLogic.OnCardAttacked -= SendAttackCardResult;
-            _gameLogic.OnCardDied -= SendDeadCards;
-            _gameLogic.OnGameEnded -= SendEndGame;
+            _gameLogic.SendDataUpdated -= SendUpdateData;
+            _gameLogic.SendGameStarted -= SendStartGame;
+            _gameLogic.SendManaChanged -= SendChangeMana;
+            _gameLogic.SendTurnStarted -= SendStartTurn;
+            _gameLogic.SendTurnEnded -= SendEndTurn;
+            _gameLogic.SendCardDrawn -= SendDrawCard;
+            _gameLogic.SendCardPlayed -= SendPlayCardResult;
+            _gameLogic.SendCardSpawned -= SendSpawnCardResult;
+            _gameLogic.SendCardAttacked -= SendAttackCardResult;
+            _gameLogic.SendCardDied -= SendDeadCards;
+            _gameLogic.SendGameEnded -= SendEndGame;
 
             _networkManager.UnsubscribeMessage("GameClient", OnReceivedCommand);
         }

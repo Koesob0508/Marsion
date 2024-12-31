@@ -7,27 +7,30 @@ namespace Marsion
 {
     public class DefaultGameLogic : IGameLogic
     {
-        private IGameDataHandler _dataHandler;
-        private readonly CommandInvoker _commandInvoker;
-
         public IDataManager Data { get; private set; }
-        public IGameData GameData => _dataHandler.GameData;
+        public GameEventHandler Event { get; private set; }
 
-        public event Action<IGameData> OnDataUpdated;
-        public event Action OnGameStarted;
-        public event Action OnManaChanged;
-        public event Action OnTurnStarted;
-        public event Action OnTurnEnded;
-        public event Action<ulong, string> OnCardDrawn;
-        public event Action<bool, ulong, string> OnCardPlayed;
-        public event Action<bool, ulong, string, int> OnCardSpawned;
-        public event Action<bool, ulong, string, ulong, string> OnCardAttacked;
-        public event Action<List<string>> OnCardDied;
-        public event Action<ulong> OnGameEnded;
+        public IGameDataHandler DataHandler { get; private set; }
+        private CommandHandler _commanHandler;
+
+        public IGameData GameData => DataHandler.GameData;
+
+        public event Action<IGameData> SendDataUpdated;
+        public event Action SendGameStarted;
+        public event Action SendManaChanged;
+        public event Action SendTurnStarted;
+        public event Action SendTurnEnded;
+        public event Action<ulong, string> SendCardDrawn;
+        public event Action<bool, ulong, string> SendCardPlayed;
+        public event Action<bool, ulong, string, int> SendCardSpawned;
+        public event Action<bool, ulong, string, ulong, string> SendCardAttacked;
+        public event Action<List<string>> SendCardDied;
+        public event Action<ulong> SendGameEnded;
 
         public DefaultGameLogic()
         {
-            _commandInvoker = new();
+            Event = new();
+            _commanHandler = new(this);
         }
 
         public void Init(IGameLogicFactory logicFactory)
@@ -35,9 +38,9 @@ namespace Marsion
             // Managers 역할
             Data = logicFactory.ProvideDataManager();
 
-            _dataHandler = logicFactory.CreateGameDataHandler();
+            DataHandler = logicFactory.CreateGameDataHandler();
             var logicConfig = logicFactory.CreateGameLogicConfig();
-            _dataHandler.Init(logicFactory.CreateGameDataHandlerFactory(this, logicConfig));
+            DataHandler.Init(logicFactory.CreateGameDataHandlerFactory(this, logicConfig));
         }
 
         public void StartGame()
@@ -45,13 +48,11 @@ namespace Marsion
             Logger.Log<DefaultGameLogic>($"Start Game", colorName: ColorCodes.Logic);
 
             // TODO : 멀리건 추가
-            _dataHandler.DrawCard(_dataHandler.CurrentPlayer.PlayerID, out var _, 3);
-            _dataHandler.DrawCard(_dataHandler.GetOpponentPlayer(_dataHandler.CurrentPlayer.PlayerID), out var _, 4);
+            DataHandler.DrawCard(DataHandler.CurrentPlayer.PlayerID, out var _, count : 3);
+            DataHandler.DrawCard(DataHandler.GetOpponentPlayer(DataHandler.CurrentPlayer.PlayerID), out var _, count : 4);
 
-            // Send Data Update
-            OnDataUpdated?.Invoke(GameData);
-            // Send Start Game
-            OnGameStarted?.Invoke();
+            SendDataUpdated?.Invoke(GameData);
+            SendGameStarted?.Invoke();
 
             StartTurn();
         }
@@ -65,31 +66,31 @@ namespace Marsion
         {
             Logger.Log<DefaultGameLogic>($"Start Turn", colorName: ColorCodes.Logic);
 
-            _dataHandler.AdvanceTurn();
+            DataHandler.AdvanceTurn();
 
-            if (_dataHandler.CurrentPlayer.MaxMana < 10)
+            if (DataHandler.CurrentPlayer.MaxMana < 10)
             {
-                _dataHandler.CurrentPlayer.IncreaseMaxMana(1);
+                DataHandler.CurrentPlayer.IncreaseMaxMana(1);
             }
 
-            _dataHandler.CurrentPlayer.RestoreAllMana();
+            DataHandler.CurrentPlayer.RestoreAllMana();
 
-            _dataHandler.DrawCard(_dataHandler.CurrentPlayer.PlayerID, out var card);
+            DataHandler.DrawCard(DataHandler.CurrentPlayer.PlayerID, out var card);
 
-            OnDataUpdated?.Invoke(GameData);
-            OnManaChanged?.Invoke();
-            OnTurnStarted?.Invoke();
-            OnCardDrawn?.Invoke(_dataHandler.CurrentPlayer.PlayerID, card.UID);
+            SendDataUpdated?.Invoke(GameData);
+            SendManaChanged?.Invoke();
+            SendTurnStarted?.Invoke();
+            SendCardDrawn?.Invoke(DataHandler.CurrentPlayer.PlayerID, card.UID);
         }
 
         public void EndTurn()
         {
             Logger.Log<DefaultGameLogic>($"End turn", colorName: ColorCodes.Logic);
 
-            _dataHandler.ChangeCurrentPlayer();
+            DataHandler.ChangeCurrentPlayer();
 
-            OnDataUpdated?.Invoke(GameData);
-            OnTurnEnded?.Invoke();
+            SendDataUpdated?.Invoke(GameData);
+            SendTurnEnded?.Invoke();
 
             StartTurn();
         }
@@ -98,56 +99,54 @@ namespace Marsion
         {
             Logger.Log<IGameLogic>("Try spawn card", colorName: ColorCodes.Logic);
 
-            var player = _dataHandler.GetPlayer(playerID);
-            var card = _dataHandler.GetCardFromHand(playerID, cardUID);
+            var player = DataHandler.GetPlayer(playerID);
+            var card = DataHandler.GetCardFromHand(playerID, cardUID);
 
             if (!(player.Mana >= card.ManaCost))
             {
                 Logger.Log<DefaultGameLogic>("Spawn try failed", colorName: ColorCodes.Logic);
-                OnCardPlayed?.Invoke(false, player.PlayerID, card.UID);
-                OnCardSpawned?.Invoke(false, player.PlayerID, card.UID, index);
+                SendCardPlayed?.Invoke(false, player.PlayerID, card.UID);
+                SendCardSpawned?.Invoke(false, player.PlayerID, card.UID, index);
 
                 return;
             }
 
             var playCardCommand = new PlayCardCommand(player, card, index);
-            _commandInvoker.AddCommand(playCardCommand);
-            _commandInvoker.ExecuteCommands();
+            _commanHandler.AddCommand(playCardCommand);
 
-            OnCardPlayed?.Invoke(true, player.PlayerID, card.UID);
-            OnCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
-            OnDataUpdated?.Invoke(GameData);
-            OnManaChanged?.Invoke();
+            SendCardPlayed?.Invoke(true, player.PlayerID, card.UID);
+            SendCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
+            SendDataUpdated?.Invoke(GameData);
+            SendManaChanged?.Invoke();
         }
 
         public void TryAttack(ulong attackPlayerID, string attackCardUID, ulong defendPlayerID, string defendCardUID)
         {
-            var attackPlayer = _dataHandler.GetPlayer(attackPlayerID);
-            var attacker = _dataHandler.GetCardFromField(attackPlayerID, attackCardUID);
-            var defendPlayer = _dataHandler.GetPlayer(defendPlayerID);
-            var defender = _dataHandler.GetCardFromField(defendPlayerID, defendCardUID);
+            var attackPlayer = DataHandler.GetPlayer(attackPlayerID);
+            var attacker = DataHandler.GetCardFromField(attackPlayerID, attackCardUID);
+            var defendPlayer = DataHandler.GetPlayer(defendPlayerID);
+            var defender = DataHandler.GetCardFromField(defendPlayerID, defendCardUID);
 
             var attackCommand = new AttackCommand(attackPlayer, attacker, defendPlayer, defender);
-            _commandInvoker.AddCommand(attackCommand);
-            _commandInvoker.ExecuteCommands();
+            _commanHandler.AddCommand(attackCommand);
 
-            OnDataUpdated?.Invoke(GameData);
-            OnCardAttacked?.Invoke(true, attackPlayer.PlayerID, attacker.UID, defendPlayer.PlayerID, defender.UID);
+            SendDataUpdated?.Invoke(GameData);
+            SendCardAttacked?.Invoke(true, attackPlayer.PlayerID, attacker.UID, defendPlayer.PlayerID, defender.UID);
 
             List<string> deadCardUIDs = CheckDeadCard();
 
-            OnDataUpdated?.Invoke(GameData);
-            OnCardDied?.Invoke(deadCardUIDs);
+            SendDataUpdated?.Invoke(GameData);
+            SendCardDied?.Invoke(deadCardUIDs);
 
             RemoveDeadCard();
 
-            OnDataUpdated?.Invoke(GameData);
+            SendDataUpdated?.Invoke(GameData);
 
             List<ulong> alivePlayerIDs = new();
 
-            foreach(var playerID in _dataHandler.GameData.Players.Keys)
+            foreach(var playerID in DataHandler.GameData.Players.Keys)
             {
-                if(_dataHandler.GetPlayer(playerID).Health > 0)
+                if(DataHandler.GetPlayer(playerID).Health > 0)
                 {
                     alivePlayerIDs.Add(playerID);
                 }
@@ -155,11 +154,11 @@ namespace Marsion
 
             if(alivePlayerIDs.Count == 1)
             {
-                OnGameEnded?.Invoke(alivePlayerIDs[0]);
+                SendGameEnded?.Invoke(alivePlayerIDs[0]);
             }
             else if(alivePlayerIDs.Count == 0)
             {
-                OnGameEnded?.Invoke(1000);
+                SendGameEnded?.Invoke(1000);
             }
         }
 
@@ -167,9 +166,9 @@ namespace Marsion
         {
             List<string> result = new();
 
-            foreach (var playerID in _dataHandler.GameData.Players.Keys)
+            foreach (var playerID in DataHandler.GameData.Players.Keys)
             {
-                foreach (Card card in _dataHandler.GetPlayer(playerID).Field)
+                foreach (Card card in DataHandler.GetPlayer(playerID).Field)
                 {
                     if(card.Health <= 0)
                     {
@@ -186,9 +185,9 @@ namespace Marsion
         {
             List<Card> deadCards = new();
 
-            foreach (var playerID in _dataHandler.GameData.Players.Keys)
+            foreach (var playerID in DataHandler.GameData.Players.Keys)
             {
-                foreach (Card card in _dataHandler.GetPlayer(playerID).Field)
+                foreach (Card card in DataHandler.GetPlayer(playerID).Field)
                 {
                     if (card.IsDead)
                     {
@@ -199,11 +198,11 @@ namespace Marsion
 
             foreach(var card in deadCards)
             {
-                foreach(var playerID in _dataHandler.GameData.Players.Keys)
+                foreach(var playerID in DataHandler.GameData.Players.Keys)
                 {
-                    if(_dataHandler.GetPlayer(playerID).Field.Contains(card))
+                    if(DataHandler.GetPlayer(playerID).Field.Contains(card))
                     {
-                        _dataHandler.GetPlayer(playerID).Field.Remove(card);
+                        DataHandler.GetPlayer(playerID).Field.Remove(card);
                     }
                 }
             }
@@ -218,9 +217,9 @@ namespace Marsion
         {
             for (int i = 0; i < count; i++)
             {
-                _dataHandler.DrawCard(playerID, out var drawnCard);
-                OnDataUpdated?.Invoke(GameData);
-                OnCardDrawn?.Invoke(playerID, drawnCard.UID);
+                DataHandler.DrawCard(playerID, out var drawnCard);
+                SendDataUpdated?.Invoke(GameData);
+                SendCardDrawn?.Invoke(playerID, drawnCard.UID);
             }
         }
     }

@@ -107,17 +107,17 @@ namespace Marsion.Tests
         [Test]
         public void Logic_StartGame_Should_Send_Action()
         {
-            logic.OnDataUpdated += (gameData) =>
+            logic.SendDataUpdated += (gameData) =>
             {
                 Debug.Log("UpdateData");
             };
 
-            logic.OnGameStarted += () =>
+            logic.SendGameStarted += () =>
             {
                 Debug.Log("StartGame");
             };
 
-            logic.OnTurnStarted += () =>
+            logic.SendTurnStarted += () =>
             {
                 Debug.Log("StartTurn");
             };
@@ -135,13 +135,13 @@ namespace Marsion.Tests
             ulong currentPlayerID = 0;
             string playCardUID = "";
             // OnDataUpdated로 GameData랑 비교해야함.
-            logic.OnDataUpdated += (data) =>
+            logic.SendDataUpdated += (data) =>
             {
                 currentPlayerID = data.CurrentPlayer.PlayerID;
                 playCardUID = data.GetPlayer(data.CurrentPlayer.PlayerID).Hand[0].UID;
             };
 
-            logic.OnCardDrawn += (playerID, cardUID) =>
+            logic.SendCardDrawn += (playerID, cardUID) =>
             {
                 Debug.Log($"Player ID : {playerID}");
                 Debug.Log($"Card UID : {cardUID}");

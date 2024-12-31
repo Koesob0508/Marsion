@@ -6,18 +6,21 @@ namespace Marsion
     public interface IGameLogic
     {
         IDataManager Data { get; }
+        IGameDataHandler DataHandler { get; }
+        GameEventHandler Event { get; }
         IGameData GameData { get; }
-        event Action<IGameData> OnDataUpdated;
-        event Action OnGameStarted;
-        event Action<ulong> OnGameEnded;
-        event Action OnTurnStarted;
-        event Action OnTurnEnded;
-        event Action OnManaChanged;
-        event Action<ulong, string> OnCardDrawn;
-        event Action<bool, ulong, string> OnCardPlayed;
-        event Action<bool, ulong, string, int> OnCardSpawned;
-        event Action<bool, ulong, string, ulong, string> OnCardAttacked;
-        event Action<List<string>> OnCardDied;
+
+        event Action<IGameData> SendDataUpdated;
+        event Action SendGameStarted;
+        event Action<ulong> SendGameEnded;
+        event Action SendTurnStarted;
+        event Action SendTurnEnded;
+        event Action SendManaChanged;
+        event Action<ulong, string> SendCardDrawn;
+        event Action<bool, ulong, string> SendCardPlayed;
+        event Action<bool, ulong, string, int> SendCardSpawned;
+        event Action<bool, ulong, string, ulong, string> SendCardAttacked;
+        event Action<List<string>> SendCardDied;
 
         void Init(IGameLogicFactory gameLogicFactory);
         void Clear();

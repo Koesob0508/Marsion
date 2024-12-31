@@ -13,7 +13,7 @@
             this.index = index;
         }
 
-        public void Execute()
+        public void Execute(IGameDataHandler dataHandler)
         {
             if(player.Mana < card.ManaCost)
             {

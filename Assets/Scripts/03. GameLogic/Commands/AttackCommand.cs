@@ -15,7 +15,7 @@
             this.defenderCard = defenderCard;
         }
 
-        public void Execute()
+        public void Execute(IGameDataHandler datahandler)
         {
             if (attackerCard == null) Logger.LogWarning<AttackCommand>("attack null.");
             if (defenderCard == null) Logger.LogWarning<AttackCommand>("defend null.");

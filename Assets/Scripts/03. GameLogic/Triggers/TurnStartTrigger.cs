@@ -7,12 +7,12 @@
 
         public void Register()
         {
-            GameEventManager.RegisterEvent("TurnStart", OnTurnStart);
+            //GameEventHandler.RegisterEvent("TurnStart", OnTurnStart);
         }
 
         public void Unregister()
         {
-            GameEventManager.UnregisterEvent("TurnStart", OnTurnStart);
+            //GameEventHandler.UnregisterEvent("TurnStart", OnTurnStart);
         }
 
         private void OnTurnStart(object eventData)
