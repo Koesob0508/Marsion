@@ -2,11 +2,19 @@
 
 namespace Marsion
 {
+    public enum AbilityType
+    {
+
+        Play,
+        Exit
+    }
+
     [CreateAssetMenu(fileName = "AbilitySO", menuName = "Marsion/AbilitySO")]
     public class AbilitySO : ScriptableObject, IIdentifiable
     {
         [SerializeField] private string id;
         public string ID => id;
+        public AbilityType Type;
         public int value;
         public EffectSO[] Effects;
 

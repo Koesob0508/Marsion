@@ -44,15 +44,9 @@ namespace Marsion
         {
             Logger.Log<DefaultGameLogic>($"Start Game", colorName: ColorCodes.Logic);
 
-            // playerID로 접근하는식으로 바꿀 필요 있다.
-            foreach (var player in _dataHandler.GameData.Players)
-            {
-                _dataHandler.ShuffleDeck(player);
-                _dataHandler.DrawCard(player, out var mulliganTarget, 3);
-            }
-
-            // 후 플레이어는 카드 한 장 드로우
-            _dataHandler.DrawCard(_dataHandler.GetOpponentPlayer(_dataHandler.CurrentPlayer.PlayerID), out var _);
+            // TODO : 멀리건 추가
+            _dataHandler.DrawCard(_dataHandler.CurrentPlayer.PlayerID, out var _, 3);
+            _dataHandler.DrawCard(_dataHandler.GetOpponentPlayer(_dataHandler.CurrentPlayer.PlayerID), out var _, 4);
 
             // Send Data Update
             OnDataUpdated?.Invoke(GameData);
@@ -80,7 +74,7 @@ namespace Marsion
 
             _dataHandler.CurrentPlayer.RestoreAllMana();
 
-            _dataHandler.DrawCard(_dataHandler.CurrentPlayer, out var card);
+            _dataHandler.DrawCard(_dataHandler.CurrentPlayer.PlayerID, out var card);
 
             OnDataUpdated?.Invoke(GameData);
             OnManaChanged?.Invoke();
@@ -98,22 +92,6 @@ namespace Marsion
             OnTurnEnded?.Invoke();
 
             StartTurn();
-        }
-
-        private void ShuffleDeck(Player player) => _dataHandler.ShuffleDeck(player);
-
-        public void DrawCard(Player player, out Card drawnCard)
-        {
-            Logger.Log<IGameLogic>("Draw a card", colorName: ColorCodes.Logic);
-
-            _dataHandler.DrawCard(player, out drawnCard);
-        }
-
-        public void DrawCard(Player player, out List<Card> drawnCards, int count = 1)
-        {
-            Logger.Log<DefaultGameLogic>("Draw cards", colorName: ColorCodes.Logic);
-
-            _dataHandler.DrawCard(player, out drawnCards, count);
         }
 
         public void TrySpawnCard(ulong playerID, string cardUID, int index)
@@ -167,11 +145,11 @@ namespace Marsion
 
             List<ulong> alivePlayerIDs = new();
 
-            foreach(var player in _dataHandler.GameData.Players)
+            foreach(var playerID in _dataHandler.GameData.Players.Keys)
             {
-                if(player.Health > 0)
+                if(_dataHandler.GetPlayer(playerID).Health > 0)
                 {
-                    alivePlayerIDs.Add(player.PlayerID);
+                    alivePlayerIDs.Add(playerID);
                 }
             }
 
@@ -189,9 +167,9 @@ namespace Marsion
         {
             List<string> result = new();
 
-            foreach (var player in _dataHandler.GameData.Players)
+            foreach (var playerID in _dataHandler.GameData.Players.Keys)
             {
-                foreach (Card card in player.Field)
+                foreach (Card card in _dataHandler.GetPlayer(playerID).Field)
                 {
                     if(card.Health <= 0)
                     {
@@ -208,9 +186,9 @@ namespace Marsion
         {
             List<Card> deadCards = new();
 
-            foreach (var player in _dataHandler.GameData.Players)
+            foreach (var playerID in _dataHandler.GameData.Players.Keys)
             {
-                foreach (Card card in player.Field)
+                foreach (Card card in _dataHandler.GetPlayer(playerID).Field)
                 {
                     if (card.IsDead)
                     {
@@ -221,11 +199,11 @@ namespace Marsion
 
             foreach(var card in deadCards)
             {
-                foreach(var player in _dataHandler.GameData.Players)
+                foreach(var playerID in _dataHandler.GameData.Players.Keys)
                 {
-                    if(player.Field.Contains(card))
+                    if(_dataHandler.GetPlayer(playerID).Field.Contains(card))
                     {
-                        player.Field.Remove(card);
+                        _dataHandler.GetPlayer(playerID).Field.Remove(card);
                     }
                 }
             }
@@ -236,11 +214,11 @@ namespace Marsion
 
         }
 
-        public void DrawCard(ulong playerID, int count = 1)
+        public void DrawCard(ulong playerID, int count)
         {
             for (int i = 0; i < count; i++)
             {
-                _dataHandler.DrawCard(_dataHandler.GetPlayer(playerID), out var drawnCard);
+                _dataHandler.DrawCard(playerID, out var drawnCard);
                 OnDataUpdated?.Invoke(GameData);
                 OnCardDrawn?.Invoke(playerID, drawnCard.UID);
             }

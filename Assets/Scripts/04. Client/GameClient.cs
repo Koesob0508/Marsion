@@ -156,17 +156,17 @@ namespace Marsion
             {
                 Logger.Log<GameClient>($"Received start game", colorName: ColorCodes.Client);
 
-                foreach (var player in Data.Players)
+                foreach (var playerID in Data.Players.Values)
                 {
-                    if (PlayerID == player.PlayerID)
+                    if (PlayerID == playerID.PlayerID)
                     {
-                        PlayerHero.Init(player.PlayerCard);
+                        PlayerHero.Init(playerID.PlayerCard);
                         PlayerHero.Spawn();
                     }
                     else
                     {
-                        EnemyID = player.PlayerID;
-                        EnemyHero.Init(player.PlayerCard);
+                        EnemyID = playerID.PlayerID;
+                        EnemyHero.Init(playerID.PlayerCard);
                         EnemyHero.Spawn();
                     }
                 }
@@ -174,7 +174,7 @@ namespace Marsion
 
             initHandClip.OnPlay += () =>
             {
-                foreach (var player in Data.Players)
+                foreach (var player in Data.Players.Values)
                 {
                     foreach (var card in player.Hand)
                     {

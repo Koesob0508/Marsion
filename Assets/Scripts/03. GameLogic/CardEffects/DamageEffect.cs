@@ -11,9 +11,9 @@
 
         public void Execute(IGameLogic gameLogic, IGameDataHandler dataHandler, Card source)
         {
-            var opponent = dataHandler.GetOpponentPlayer(source.PlayerID);
-            //var target = opponent.Field[0];
-            //target.TakeDamage(damage);
+            //var opponent = dataHandler.GetOpponentPlayer(source.PlayerID);
+            ////var target = opponent.Field[0];
+            ////target.TakeDamage(damage);
         }
     }
 }

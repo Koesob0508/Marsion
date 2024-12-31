@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Marsion.Tests
 {
@@ -9,16 +10,19 @@ namespace Marsion.Tests
     public class GameLogicPlayTests
     {
         Mock<IManagers> mockManagers;
+        ulong firsClientID = 31;
+        ulong secondClientID = 72;
 
+        DefaultGameLogic logic;
+
+        /// <summary>
+        ///     관련 내용은 EditTest에 GameLogicTest 참고
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
             // Arrange
-            // IManager 필요
             mockManagers = new Mock<IManagers>();
-
-            // Load해야하기 때문에 Load Helper들도 필요
-            // IResourceLoader
             var resourceLoader = new DefaultResourceLoader();
 
             // IAddressableLoader
@@ -36,68 +40,118 @@ namespace Marsion.Tests
                 .Returns(dataManager);
 
             mockManagers.Object.Data.Init();
+
+            // IGameLogicFactory
+            // PlayerInfo가 필요함
+            var playerInfos = new List<PlayerInfo>();
+
+            // 각각의 Player 데이터 등록
+            var firstPlayer = new PlayerInfo();
+            firstPlayer.ClientID = firsClientID;
+            firstPlayer.Portrait = "4";
+
+            List<string> firstDeck = new List<string>
+            {
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1"
+            };
+            firstPlayer.Deck = firstDeck;
+
+            var secondPlayer = new PlayerInfo();
+            secondPlayer.ClientID = secondClientID;
+            secondPlayer.Portrait = "7";
+
+            List<string> secondDeck = new List<string>
+            {
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1",
+                "1", "1", "1", "1", "1"
+            };
+            secondPlayer.Deck = secondDeck;
+
+            playerInfos.Add(firstPlayer);
+            playerInfos.Add(secondPlayer);
+
+            var logicFactory = new DefaultGameLogicFactory(mockManagers.Object, playerInfos);
+
+            // Act
+            // GameLogic 만들기
+            logic = new DefaultGameLogic();
+            logic.Init(logicFactory);
         }
 
         [TearDown]
         public void TearDown()
         {
             mockManagers.Reset();
-        }
-
-        // 이거 이미 테스트 있을거 같은데...
-        [Test]
-        public void LogicInit_ShouldMake_GameData()
-        {
-            // Arrange
-            // IGameLogicFactory
-            // PlayerInfo가 필요함
-            var playerInfos = new List<PlayerInfo>();
-            var logicFactory = new DefaultGameLogicFactory(mockManagers.Object, playerInfos);
-
-            // Act
-            // GameLogic 만들기
-            var gameLogic = new DefaultGameLogic();
-            gameLogic.Init(logicFactory);
-
-            // Assert
-            // Init까지 했으면 Data가 있어야겠지?
-            Assert.IsNotNull(gameLogic.GameData);
-            // Config에 따라 Player 두 자리는 생성
-            Assert.IsTrue(gameLogic.GameData.Players.Length == 2);
-            // 그런데 PlayerInfos가 없었기 때문에 Player는 없어야함
-            Assert.IsNull(gameLogic.GameData.Players[0]);
+            logic = null;
         }
 
         [Test]
-        public void LogicInit_ShouldMake_PlayerInfo_Properly()
+        public void LogicInit_ShouldMake_PlayerInfo_Over2_ClientID()
         {
-            // Arrange
-            // IGameLogicFactory
-            // PlayerInfo가 필요함
-            var playerInfos = new List<PlayerInfo>();
-
-            // TODO : 각각의 Player 데이터 등록
-
-            var logicFactory = new DefaultGameLogicFactory(mockManagers.Object, playerInfos);
-
-            // Act
-            // GameLogic 만들기
-            var gameLogic = new DefaultGameLogic();
-            gameLogic.Init(logicFactory);
-
             // Assert
             // Init까지 했으면 Data가 있어야겠지?
-            Assert.IsNotNull(gameLogic.GameData);
-            // Config에 따라 Player 두 자리는 생성
-            Assert.IsTrue(gameLogic.GameData.Players.Length == 2);
+            Assert.IsNotNull(logic.GameData);
             // PlayerInfos가 생겼기 때문에 등록 돼야 함
-            Assert.IsNotNull(gameLogic.GameData.Players[0]);
+            Assert.IsNotNull(logic.GameData.Players[firsClientID]);
         }
 
         [Test]
         public void Logic_StartGame_Should_Send_Action()
         {
+            logic.OnDataUpdated += (gameData) =>
+            {
+                Debug.Log("UpdateData");
+            };
 
+            logic.OnGameStarted += () =>
+            {
+                Debug.Log("StartGame");
+            };
+
+            logic.OnTurnStarted += () =>
+            {
+                Debug.Log("StartTurn");
+            };
+
+            logic.StartGame();
+
+            LogAssert.Expect(LogType.Log, "UpdateData");
+            LogAssert.Expect(LogType.Log, "StartGame");
+            LogAssert.Expect(LogType.Log, "StartTurn");
+        }
+
+        [Test]
+        public void DrawCard_Test()
+        {
+            ulong currentPlayerID = 0;
+            string playCardUID = "";
+            // OnDataUpdated로 GameData랑 비교해야함.
+            logic.OnDataUpdated += (data) =>
+            {
+                currentPlayerID = data.CurrentPlayer.PlayerID;
+                playCardUID = data.GetPlayer(data.CurrentPlayer.PlayerID).Hand[0].UID;
+            };
+
+            logic.OnCardDrawn += (playerID, cardUID) =>
+            {
+                Debug.Log($"Player ID : {playerID}");
+                Debug.Log($"Card UID : {cardUID}");
+            };
+
+            logic.StartGame();
+            // StartTurn까지는 자동으로 이뤄짐.
+            logic.TrySpawnCard(currentPlayerID, playCardUID, 0);
+
+            Assert.Pass();
         }
     }
 }

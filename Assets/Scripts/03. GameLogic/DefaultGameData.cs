@@ -10,28 +10,19 @@ namespace Marsion
     [Serializable]
     public class DefaultGameData : IGameData
     {
-        [JsonProperty] public Player[] Players { get; private set; }
+        [JsonProperty] public Dictionary<ulong, Player> Players { get; private set; }
         [JsonProperty] public Player CurrentPlayer { get; set; }
         [JsonProperty] public int TurnCount { get; private set; }
 
         public void Init(IGameLogicConfig config)
         {
-            // Player 외적 설정
+            Players = new();
             TurnCount = 0;
-
-            Players = new Player[config.CountOfPlayer];
         }
 
-        public void SetPlayer(int index, Player player)
+        public void SetPlayer(Player player)
         {
-            if(index >= Players.Length)
-            {
-                Logger.LogError<IGameData>($"Index out of range. Received index : {index}. Current Players length : {Players.Length}", colorName: ColorCodes.Logic);
-                
-                return;
-            }
-
-            Players[index] = player;
+            Players[player.PlayerID] = player;
         }
 
         public void SetCurrentPlayer(ulong playerID)

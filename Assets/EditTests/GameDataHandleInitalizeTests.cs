@@ -78,7 +78,6 @@ namespace Marsion.Tests
         public void Init_Should_GameData_PlayersCount_Set_ConfigPlayersCount()
         {
             Assert.IsNotNull(dataHandler.GameData);
-            Assert.IsTrue(dataHandler.GameData.Players.Length == 2);
         }
 
         [Test]

@@ -59,7 +59,7 @@ namespace Marsion
             _triggers = new();
             _abilities = new();
 
-            foreach(var ability in cardSO.Abilities)
+            foreach (var ability in cardSO.Abilities)
             {
                 _abilities.Add(ability);
                 ability.Init();
@@ -68,9 +68,12 @@ namespace Marsion
 
         public void ExecutePlayAbility()
         {
-            foreach(var ability in _abilities)
+            foreach (var ability in _abilities)
             {
-                ability.Execute(_logic, this);
+                if (ability.Type == AbilityType.Play)
+                {
+                    ability.Execute(_logic, this);
+                }
             }
         }
 

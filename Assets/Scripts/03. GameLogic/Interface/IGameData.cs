@@ -4,12 +4,12 @@ namespace Marsion
 {
     public interface IGameData
     {
-        Player[] Players { get; }
+        Dictionary<ulong, Player> Players { get; }
         Player CurrentPlayer { get; set; }
         int TurnCount { get; }
         void Init(IGameLogicConfig config);
-        void SetPlayer(int index, Player player);
-        void SetCurrentPlayer(ulong index);
+        void SetPlayer(Player player);
+        void SetCurrentPlayer(ulong playerID);
         Player GetPlayer(ulong PlayerID);
         void AdvanceTurn();
         void ChangeCurrentPlayer();

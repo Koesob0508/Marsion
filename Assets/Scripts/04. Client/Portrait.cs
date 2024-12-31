@@ -17,7 +17,7 @@ namespace Marsion.Client
 
         private void SetPortrait()
         {
-            foreach(var player in Managers.Instance.Client.Game.Data.Players)
+            foreach(var player in Managers.Instance.Client.Game.Data.Players.Values)
             {
                 // Player
                 if(player.PlayerID == Managers.Instance.Client.Game.PlayerID)
