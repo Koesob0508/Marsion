@@ -1,20 +1,31 @@
-﻿namespace Marsion
+﻿using System;
+
+namespace Marsion
 {
     public class PlayCardCommand : ICommand
     {
-        private readonly Player player;
-        private readonly Card card;
+        public event Action<LogicCommandData> OnCompleted;
+
+        private readonly IGameDataHandler _dataHandler;
+        private readonly LogicCommandData _data;
+        private readonly ulong playerID;
+        private readonly string cardUID;
         private readonly int index;
 
-        public PlayCardCommand(Player player, Card card, int index)
+        public PlayCardCommand(IGameDataHandler dataHandler, LogicCommandData data)
         {
-            this.player = player;
-            this.card = card;
-            this.index = index;
+            _dataHandler = dataHandler;
+            _data = data;
+            playerID = data.PlayerID;
+            cardUID = data.CardUID;
+            index = data.Index;
         }
 
-        public void Execute(IGameDataHandler dataHandler)
+        public void Execute()
         {
+            var player = _dataHandler.GetPlayer(playerID);
+            var card = _dataHandler.GetCardFromHand(playerID, cardUID);
+
             if(player.Mana < card.ManaCost)
             {
                 Logger.Log<DefaultGameLogic>($"Not enoufh mana to play {card.Name}", colorName: ColorCodes.Logic);
@@ -27,6 +38,13 @@
             card.ExecutePlayAbility();
 
             Logger.Log<DefaultGameLogic>($"Played card : {card.Name} at position {index}", colorName: ColorCodes.Logic);
+            
+            OnCompleted?.Invoke(_data);
+        }
+
+        public void Clear()
+        {
+            OnCompleted = null;
         }
     }
 }

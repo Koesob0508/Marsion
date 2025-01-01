@@ -1,28 +1,48 @@
-﻿namespace Marsion
+﻿using System;
+
+namespace Marsion
 {
     public class AttackCommand : ICommand
     {
-        private readonly Player attackerPlayer;
-        private readonly Card attackerCard;
-        private readonly Player defenderPlayer;
-        private readonly Card defenderCard;
+        public event Action<LogicCommandData> OnCompleted;
 
-        public AttackCommand(Player attackerPlayer, Card attackerCard, Player defenderPlayer, Card defenderCard)
+        private readonly IGameDataHandler _dataHandler;
+        private readonly LogicCommandData _data;
+        private readonly ulong attackerID;
+        private readonly string attackerUID;
+        private readonly ulong defenderID;
+        private readonly string defenderUID;
+
+        public AttackCommand(IGameDataHandler dataHandler, LogicCommandData data)
         {
-            this.attackerPlayer = attackerPlayer;
-            this.attackerCard = attackerCard;
-            this.defenderPlayer = defenderPlayer;
-            this.defenderCard = defenderCard;
+            _dataHandler = dataHandler;
+            _data = data;
+
+            attackerID = data.PlayerID;
+            attackerUID = data.CardUID;
+            defenderID = data.TargetPlayerID;
+            defenderUID = data.TargetCardUID;
         }
 
-        public void Execute(IGameDataHandler datahandler)
+        public void Execute()
         {
-            if (attackerCard == null) Logger.LogWarning<AttackCommand>("attack null.");
-            if (defenderCard == null) Logger.LogWarning<AttackCommand>("defend null.");
-            attackerCard.TakeDamage(defenderCard.Attack);
-            defenderCard.TakeDamage(attackerCard.Attack);
+            var attackPlayer = _dataHandler.GetPlayer(attackerID);
+            var attacker = _dataHandler.GetCardFromField(attackerID, attackerUID);
+            var defenderPlayer = _dataHandler.GetPlayer(defenderID);
+            var defender = _dataHandler.GetCardFromField(defenderID, defenderUID);
 
-            Logger.Log<DefaultGameLogic>($"{attackerCard.Name} attacked {defenderCard.Name}", colorName: ColorCodes.Logic);
+            if (attackerUID == null) Logger.LogWarning<AttackCommand>("attack null.");
+            if (defenderUID == null) Logger.LogWarning<AttackCommand>("defend null.");
+            attacker.TakeDamage(defender.Attack);
+            defender.TakeDamage(attacker.Attack);
+
+            Logger.Log<DefaultGameLogic>($"{attacker.Name} attacked {defender.Name}", colorName: ColorCodes.Logic);
+
+            OnCompleted?.Invoke(_data);
+        }
+        public void Clear()
+        {
+            OnCompleted = null;
         }
     }
 }

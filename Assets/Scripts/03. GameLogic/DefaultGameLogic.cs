@@ -9,9 +9,10 @@ namespace Marsion
     {
         public IDataManager Data { get; private set; }
         public GameEventHandler Event { get; private set; }
-
         public IGameDataHandler DataHandler { get; private set; }
+
         private CommandHandler _commanHandler;
+        private ILogicCommandFactory _commandFactory;
 
         public IGameData GameData => DataHandler.GameData;
 
@@ -41,6 +42,8 @@ namespace Marsion
             DataHandler = logicFactory.CreateGameDataHandler();
             var logicConfig = logicFactory.CreateGameLogicConfig();
             DataHandler.Init(logicFactory.CreateGameDataHandlerFactory(this, logicConfig));
+
+            _commandFactory = logicFactory.CreateLogicCommandFactory(DataHandler);
         }
 
         public void StartGame()
@@ -111,10 +114,12 @@ namespace Marsion
                 return;
             }
 
-            var playCardCommand = new PlayCardCommand(player, card, index);
-            _commanHandler.AddCommand(playCardCommand);
+            var spawnCommand = _commandFactory.CreatePlayCardCommand(playerID, cardUID, index);
+            spawnCommand.OnCompleted += (data) => SendCardPlayed?.Invoke(data.Success, data.PlayerID, data.CardUID);
 
-            SendCardPlayed?.Invoke(true, player.PlayerID, card.UID);
+            _commanHandler.AddCommand(spawnCommand);
+
+            // SendCardPlayed?.Invoke(true, player.PlayerID, card.UID);
             SendCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
             SendDataUpdated?.Invoke(GameData);
             SendManaChanged?.Invoke();
@@ -122,16 +127,10 @@ namespace Marsion
 
         public void TryAttack(ulong attackPlayerID, string attackCardUID, ulong defendPlayerID, string defendCardUID)
         {
-            var attackPlayer = DataHandler.GetPlayer(attackPlayerID);
-            var attacker = DataHandler.GetCardFromField(attackPlayerID, attackCardUID);
-            var defendPlayer = DataHandler.GetPlayer(defendPlayerID);
-            var defender = DataHandler.GetCardFromField(defendPlayerID, defendCardUID);
-
-            var attackCommand = new AttackCommand(attackPlayer, attacker, defendPlayer, defender);
-            _commanHandler.AddCommand(attackCommand);
+            _commanHandler.AddCommand(_commandFactory.CreateAttackCommand(attackPlayerID, attackCardUID, defendPlayerID, defendCardUID));
 
             SendDataUpdated?.Invoke(GameData);
-            SendCardAttacked?.Invoke(true, attackPlayer.PlayerID, attacker.UID, defendPlayer.PlayerID, defender.UID);
+            SendCardAttacked?.Invoke(true, attackPlayerID, attackCardUID, defendPlayerID, defendCardUID);
 
             List<string> deadCardUIDs = CheckDeadCard();
 

@@ -30,7 +30,8 @@ namespace Marsion
             while(commandQueue.Count > 0)
             {
                 var command = commandQueue.Dequeue();
-                command.Execute(_logic.DataHandler);
+                command.Execute();
+                command.Clear();
             }
 
             _isExecuting = false;

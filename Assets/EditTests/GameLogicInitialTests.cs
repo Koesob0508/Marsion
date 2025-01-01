@@ -68,6 +68,22 @@ namespace Marsion.Tests
         }
 
         [Test]
+        public void CommandFactoryTest()
+        {
+            var playerInfos = new List<PlayerInfo>();
+            var logicFactory = new DefaultGameLogicFactory(mockManagers.Object, playerInfos);
+            var dataHandler = new DefaultGameDataHandler();
+
+            var commandFactory = logicFactory.CreateLogicCommandFactory(dataHandler);
+            var playCommand = commandFactory.CreatePlayCardCommand(13, "asdf", 0);
+            var attackCommand = commandFactory.CreateAttackCommand(13, "asdf", 14, "fdas");
+
+            Assert.IsNotNull(commandFactory);
+            Assert.IsNotNull(playCommand);
+            Assert.IsNotNull(attackCommand);
+        }
+
+        [Test]
         public void LogicInit_ShouldMake_PlayerInfo_Properly()
         {
             // Arrange
@@ -188,12 +204,6 @@ namespace Marsion.Tests
             Assert.IsNotNull(gameLogic.GameData);
             // PlayerInfos가 생겼기 때문에 등록 돼야 함
             Assert.IsNotNull(gameLogic.GameData.Players[firsClientID]);
-        }
-
-        [Test]
-        public void Logic_StartGame_Should_Send_Action()
-        {
-
         }
     }
 }

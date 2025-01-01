@@ -1,7 +1,11 @@
-﻿namespace Marsion
+﻿using System;
+
+namespace Marsion
 {
     public interface ICommand
     {
-        void Execute(IGameDataHandler dataHandler);
+        event Action<LogicCommandData> OnCompleted;
+        void Execute();
+        void Clear();
     }
 }

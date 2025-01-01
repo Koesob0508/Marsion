@@ -3,6 +3,18 @@ using System.Collections.Generic;
 
 namespace Marsion
 {
+    public struct LogicCommandData
+    {
+        public bool Success;
+        public ulong PlayerID;
+        public string CardUID;
+        public ulong TargetPlayerID;
+        public string TargetCardUID;
+        public int Index;
+
+        public List<string> CardUIDs;
+    }
+
     public interface IGameLogic
     {
         IDataManager Data { get; }
@@ -11,6 +23,7 @@ namespace Marsion
         IGameData GameData { get; }
 
         event Action<IGameData> SendDataUpdated;
+
         event Action SendGameStarted;
         event Action<ulong> SendGameEnded;
         event Action SendTurnStarted;
