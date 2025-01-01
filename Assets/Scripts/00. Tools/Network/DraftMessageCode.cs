@@ -1,6 +1,6 @@
 ﻿namespace Marsion
 {
-    public static class DraftCommand
+    public static class DraftMessageCode
     {
         public const ushort None = 0;
 

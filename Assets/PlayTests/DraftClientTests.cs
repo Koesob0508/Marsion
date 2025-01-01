@@ -77,7 +77,7 @@ namespace Marsion.Tests
             yield return new WaitForSeconds(0.5f);
 
             // 이제 mockManagers.NetworkEx를 통해서 Send를 해봐야지
-            ushort testCommand = DraftCommand.ServerInitState;
+            ushort testCommand = DraftMessageCode.ServerInitState;
             ulong targetID = mockManagers.Object.Network.LocalID;
             SerializedDraftState sdata = new SerializedDraftState();
             sdata.isComplete = true;

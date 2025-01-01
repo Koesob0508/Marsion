@@ -11,7 +11,7 @@ namespace Marsion
         IGameLogicConfig CreateGameLogicConfig();
         IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogic gameLogic, IGameLogicConfig logicConfig);
         IGameDataHandler CreateGameDataHandler();
-        ILogicCommandFactory CreateLogicCommandFactory(IGameDataHandler dataHandler);
+        IGameCommandFactory CreateLogicCommandFactory(IGameDataHandler dataHandler);
     }
 
     public class DefaultGameLogicFactory : IGameLogicFactory
@@ -31,6 +31,6 @@ namespace Marsion
         public IGameLogicConfig CreateGameLogicConfig() => new DefaultGameLogicConfig();
         public IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogic gameLogic, IGameLogicConfig logicConfig) => new DefaultGameDataHandlerFactory(gameLogic, logicConfig, _playerInfos);
         public IGameDataHandler CreateGameDataHandler() => new DefaultGameDataHandler();
-        public ILogicCommandFactory CreateLogicCommandFactory(IGameDataHandler dataHandler) => new DefaultLogicCommandFactory(dataHandler);
+        public IGameCommandFactory CreateLogicCommandFactory(IGameDataHandler dataHandler) => new DefaultLogicCommandFactory(dataHandler);
     }
 }

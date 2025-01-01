@@ -4,15 +4,15 @@ namespace Marsion
 {
     public class PlayCardCommand : ICommand
     {
-        public event Action<LogicCommandData> OnCompleted;
+        public event Action<GameCommandData> OnCompleted;
 
         private readonly IGameDataHandler _dataHandler;
-        private readonly LogicCommandData _data;
+        private GameCommandData _data;
         private readonly ulong playerID;
         private readonly string cardUID;
         private readonly int index;
 
-        public PlayCardCommand(IGameDataHandler dataHandler, LogicCommandData data)
+        public PlayCardCommand(IGameDataHandler dataHandler, GameCommandData data)
         {
             _dataHandler = dataHandler;
             _data = data;
@@ -38,7 +38,8 @@ namespace Marsion
             card.ExecutePlayAbility();
 
             Logger.Log<DefaultGameLogic>($"Played card : {card.Name} at position {index}", colorName: ColorCodes.Logic);
-            
+
+            _data.Success = true;
             OnCompleted?.Invoke(_data);
         }
 

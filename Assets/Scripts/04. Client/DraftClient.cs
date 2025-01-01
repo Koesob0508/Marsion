@@ -28,9 +28,9 @@ namespace Marsion
         {
             Logger.Log<DraftClient>($"Draft Client initialized", colorName: ColorCodes.Client);
 
-            RegisterCommand(DraftCommand.ServerInitState, OnReceiveInitState);
-            RegisterCommand(DraftCommand.ServerStartDraft, OnReceiveStartDraft);
-            RegisterCommand(DraftCommand.ServerUpdateState, OnReceiveUpdateState);
+            RegisterCommand(DraftMessageCode.ServerInitState, OnReceiveInitState);
+            RegisterCommand(DraftMessageCode.ServerStartDraft, OnReceiveStartDraft);
+            RegisterCommand(DraftMessageCode.ServerUpdateState, OnReceiveUpdateState);
 
             _managers.Network.SubscribeMessage("DraftServer", OnReceivedCommand);
         }
@@ -94,7 +94,7 @@ namespace Marsion
 
         public void RequestStartDraft()
         {
-            Send(DraftCommand.ClientStartDraft);
+            Send(DraftMessageCode.ClientStartDraft);
         }
 
         public void Select(int index)
@@ -104,14 +104,14 @@ namespace Marsion
 
         public void Ready()
         {
-            Send(DraftCommand.ClientReady);
+            Send(DraftMessageCode.ClientReady);
         }
 
         private void SendSelect(int index)
         {
             Action<FastBufferWriter> writeAction = (writer) =>
             {
-                writer.WriteValueSafe(DraftCommand.ClientSelect);
+                writer.WriteValueSafe(DraftMessageCode.ClientSelect);
                 writer.WriteValueSafe(index);
             };
 

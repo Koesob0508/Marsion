@@ -65,6 +65,7 @@ namespace Marsion.Tests
             Assert.IsNotNull(gameLogic.GameData);
             // 그런데 PlayerInfos가 없었기 때문에 Player는 없어야함
             Assert.IsTrue(gameLogic.GameData.Players.Count == 0);
+            Assert.IsNotNull(gameLogic.Event);
         }
 
         [Test]

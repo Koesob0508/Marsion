@@ -2,13 +2,13 @@
 
 namespace Marsion
 {
-    public class CommandHandler
+    public class GameCommandHandler
     {
         private readonly IGameLogic _logic;
         private readonly Queue<ICommand> commandQueue;
         private bool _isExecuting;
 
-        public CommandHandler(IGameLogic logic)
+        public GameCommandHandler(IGameLogic logic)
         {
             _logic = logic;
             commandQueue = new();

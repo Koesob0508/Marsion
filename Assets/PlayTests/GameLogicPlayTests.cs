@@ -153,5 +153,40 @@ namespace Marsion.Tests
 
             Assert.Pass();
         }
+
+        [Test]
+        public void TrySpawn_Test()
+        {
+            // Arrange
+            ulong targetPlayerID = 0;
+            string targetCardUID = "";
+
+            bool isSuccessed = false;
+            ulong playPlayerID = 0;
+            string playCardUID = "";
+
+            logic.SendDataUpdated += (data) =>
+            {
+                targetPlayerID = data.CurrentPlayer.PlayerID;
+                targetCardUID = data.GetPlayer(targetPlayerID).Hand[0].UID;
+            };
+
+            logic.SendCardPlayed += (success, playerID, cardUID) =>
+            {
+                isSuccessed = success;
+                playPlayerID = playerID;
+                playCardUID = cardUID;
+            };
+
+            logic.StartGame();
+
+            // Act
+            logic.TrySpawnCard(targetPlayerID, targetCardUID, 0);
+
+            // Assert
+            Assert.IsTrue(isSuccessed);
+            Assert.AreEqual(targetPlayerID, playPlayerID);
+            Assert.AreEqual(targetCardUID, playCardUID);
+        }
     }
 }

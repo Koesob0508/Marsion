@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Marsion
 {
-    public struct LogicCommandData
+    public struct GameCommandData
     {
         public bool Success;
         public ulong PlayerID;

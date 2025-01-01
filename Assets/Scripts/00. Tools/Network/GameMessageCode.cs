@@ -1,6 +1,6 @@
 ﻿namespace Marsion
 {
-    public class GameCommand
+    public class GameMessageCode
     {
         public const ushort None = 0;
 

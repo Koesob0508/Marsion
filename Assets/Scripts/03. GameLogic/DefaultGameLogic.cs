@@ -11,8 +11,8 @@ namespace Marsion
         public GameEventHandler Event { get; private set; }
         public IGameDataHandler DataHandler { get; private set; }
 
-        private CommandHandler _commanHandler;
-        private ILogicCommandFactory _commandFactory;
+        private GameCommandHandler _commanHandler;
+        private IGameCommandFactory _commandFactory;
 
         public IGameData GameData => DataHandler.GameData;
 
@@ -119,7 +119,6 @@ namespace Marsion
 
             _commanHandler.AddCommand(spawnCommand);
 
-            // SendCardPlayed?.Invoke(true, player.PlayerID, card.UID);
             SendCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
             SendDataUpdated?.Invoke(GameData);
             SendManaChanged?.Invoke();

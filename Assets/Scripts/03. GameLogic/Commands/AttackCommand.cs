@@ -4,16 +4,16 @@ namespace Marsion
 {
     public class AttackCommand : ICommand
     {
-        public event Action<LogicCommandData> OnCompleted;
+        public event Action<GameCommandData> OnCompleted;
 
         private readonly IGameDataHandler _dataHandler;
-        private readonly LogicCommandData _data;
+        private readonly GameCommandData _data;
         private readonly ulong attackerID;
         private readonly string attackerUID;
         private readonly ulong defenderID;
         private readonly string defenderUID;
 
-        public AttackCommand(IGameDataHandler dataHandler, LogicCommandData data)
+        public AttackCommand(IGameDataHandler dataHandler, GameCommandData data)
         {
             _dataHandler = dataHandler;
             _data = data;

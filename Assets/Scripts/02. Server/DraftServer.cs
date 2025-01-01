@@ -33,9 +33,9 @@ namespace Marsion
                 Enumerable.Repeat(1, 5)
             ));
 
-            RegisterCommand(DraftCommand.ClientStartDraft, OnReceiveStartDraft);
-            RegisterCommand(DraftCommand.ClientSelect, OnReceiveSelect);
-            RegisterCommand(DraftCommand.ClientReady, OnReceiveReady);
+            RegisterCommand(DraftMessageCode.ClientStartDraft, OnReceiveStartDraft);
+            RegisterCommand(DraftMessageCode.ClientSelect, OnReceiveSelect);
+            RegisterCommand(DraftMessageCode.ClientReady, OnReceiveReady);
 
             Managers.Instance.Network.SubscribeMessage("DraftClient", OnReceiveCommand);
         }
@@ -136,13 +136,13 @@ namespace Marsion
                 sdata.selections = state.CurrentSelections.ToArray();
                 sdata.subSelections = state.CurrentSubSelections.ToArray();
 
-                Send(clientID, DraftCommand.ServerInitState, sdata, NetworkDelivery.ReliableSequenced);
+                Send(clientID, DraftMessageCode.ServerInitState, sdata, NetworkDelivery.ReliableSequenced);
             }
         }
 
         private void SendStartDraft(ulong clientID)
         {
-            Send(clientID, DraftCommand.ServerStartDraft);
+            Send(clientID, DraftMessageCode.ServerStartDraft);
         }
 
         private void SendUdpateState(ulong clientID)
@@ -157,7 +157,7 @@ namespace Marsion
                 sdata.selections = state.CurrentSelections.ToArray();
                 sdata.subSelections = state.CurrentSubSelections.ToArray();
 
-                Send(clientID, DraftCommand.ServerUpdateState, sdata, NetworkDelivery.ReliableSequenced);
+                Send(clientID, DraftMessageCode.ServerUpdateState, sdata, NetworkDelivery.ReliableSequenced);
             }
             else
             {

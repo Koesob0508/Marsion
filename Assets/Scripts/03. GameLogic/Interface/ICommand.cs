@@ -4,7 +4,7 @@ namespace Marsion
 {
     public interface ICommand
     {
-        event Action<LogicCommandData> OnCompleted;
+        event Action<GameCommandData> OnCompleted;
         void Execute();
         void Clear();
     }

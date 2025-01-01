@@ -40,9 +40,9 @@ namespace Marsion
 
         private void RegisterDefaultCommands()
         {
-            RegisterCommand(GameCommand.ClientTurnEnd, OnReceivedTurnEnd);
-            RegisterCommand(GameCommand.ClientTrySpawnCard, OnReceivedTrySpawnCard);
-            RegisterCommand(GameCommand.ClientTryAttack, OnReceivedTryAttack);
+            RegisterCommand(GameMessageCode.ClientTurnEnd, OnReceivedTurnEnd);
+            RegisterCommand(GameMessageCode.ClientTrySpawnCard, OnReceivedTrySpawnCard);
+            RegisterCommand(GameMessageCode.ClientTryAttack, OnReceivedTryAttack);
         }
 
         private void SubscribeToGameLogicEvents()
@@ -148,14 +148,14 @@ namespace Marsion
             var sdata = new SerializedGameData();
             sdata.GameData = gameData;
 
-            SendToAll(GameCommand.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
+            SendToAll(GameMessageCode.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
         }
 
         private void SendStartGame()
         {
             Logger.Log<DefaultGameSession>($"Send start game", colorName: ColorCodes.Server);
 
-            SendToAll(GameCommand.ServerStartGame);
+            SendToAll(GameMessageCode.ServerStartGame);
         }
 
         private void SendEndGame(ulong winnerID)
@@ -165,28 +165,28 @@ namespace Marsion
             SerializedUlong sdata = new SerializedUlong();
             sdata.value = winnerID;
 
-            SendToAll(GameCommand.ServerEndGame, sdata);
+            SendToAll(GameMessageCode.ServerEndGame, sdata);
         }
 
         private void SendChangeMana()
         {
             Logger.Log<DefaultGameSession>($"Send change mana", colorName: ColorCodes.Server);
 
-            SendToAll(GameCommand.ServerChangeMana);
+            SendToAll(GameMessageCode.ServerChangeMana);
         }
 
         private void SendStartTurn()
         {
             Logger.Log<DefaultGameSession>($"Send start turn", colorName: ColorCodes.Server);
 
-            SendToAll(GameCommand.ServerStartTurn);
+            SendToAll(GameMessageCode.ServerStartTurn);
         }
 
         private void SendEndTurn()
         {
             Logger.Log<DefaultGameSession>($"Send end turn", colorName: ColorCodes.Server);
 
-            SendToAll(GameCommand.ServerEndTurn);
+            SendToAll(GameMessageCode.ServerEndTurn);
         }
 
         private void SendDrawCard(ulong playerID, string cardUID)
@@ -197,7 +197,7 @@ namespace Marsion
             sdata.PlayerID = playerID;
             sdata.CardUID = cardUID;
 
-            SendToAll(GameCommand.ServerDrawCard, sdata, NetworkDelivery.Reliable);
+            SendToAll(GameMessageCode.ServerDrawCard, sdata, NetworkDelivery.Reliable);
         }
 
         private void SendPlayCardResult(bool succeeded, ulong playerID, string cardUID)
@@ -209,7 +209,7 @@ namespace Marsion
             sdata.PlayerID = playerID;
             sdata.CardUID = cardUID;
 
-            SendToAll(GameCommand.ServerPlayCardResult, sdata, NetworkDelivery.Reliable);
+            SendToAll(GameMessageCode.ServerPlayCardResult, sdata, NetworkDelivery.Reliable);
         }
 
         private void SendSpawnCardResult(bool succeeded, ulong playerID, string cardUID, int index)
@@ -222,7 +222,7 @@ namespace Marsion
             sdata.CardUID = cardUID;
             sdata.Index = index;
 
-            SendToAll(GameCommand.ServerSpawnCardResult, sdata, NetworkDelivery.Reliable);
+            SendToAll(GameMessageCode.ServerSpawnCardResult, sdata, NetworkDelivery.Reliable);
         }
 
         private void SendAttackCardResult(bool succeeded, ulong attackPlayerID, string attackerUID, ulong defendPlayerID, string defenderUID)
@@ -236,7 +236,7 @@ namespace Marsion
             sdata.DefendPlayerID = defendPlayerID;
             sdata.DefenderUID = defenderUID;
 
-            SendToAll(GameCommand.ServerAttackCardResult, sdata, NetworkDelivery.Reliable);
+            SendToAll(GameMessageCode.ServerAttackCardResult, sdata, NetworkDelivery.Reliable);
         }
 
         private void SendDeadCards(List<string> cards)
@@ -246,7 +246,7 @@ namespace Marsion
             SerializedDeadCardsData sdata = new();
             sdata.DeadCards = cards;
 
-            SendToAll(GameCommand.ServerDeadCards, sdata, NetworkDelivery.Reliable);
+            SendToAll(GameMessageCode.ServerDeadCards, sdata, NetworkDelivery.Reliable);
         }
 
         #endregion

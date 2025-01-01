@@ -52,17 +52,17 @@ namespace Marsion
             Upstream.Init();
             Downstream.Init();
 
-            RegisterCommand(GameCommand.ServerUpdateData, OnReceivedUpdatData);
-            RegisterCommand(GameCommand.ServerStartGame, OnReceivedStartGame);
-            RegisterCommand(GameCommand.ServerEndGame, OnReceivedEndGame);
-            RegisterCommand(GameCommand.ServerChangeMana, OnReceivedChangeMana);
-            RegisterCommand(GameCommand.ServerStartTurn, OnReceivedStartTurn);
-            RegisterCommand(GameCommand.ServerEndTurn, OnReceivedEndTurn);
-            RegisterCommand(GameCommand.ServerDrawCard, OnReceivedDrawCard);
-            RegisterCommand(GameCommand.ServerPlayCardResult, OnReceivedPlayCardResult);
-            RegisterCommand(GameCommand.ServerSpawnCardResult, OnReceivedSpawnCardResult);
-            RegisterCommand(GameCommand.ServerAttackCardResult, OnReceivedAttackCardResult);
-            RegisterCommand(GameCommand.ServerDeadCards, OnReceivedDeadCards);
+            RegisterCommand(GameMessageCode.ServerUpdateData, OnReceivedUpdatData);
+            RegisterCommand(GameMessageCode.ServerStartGame, OnReceivedStartGame);
+            RegisterCommand(GameMessageCode.ServerEndGame, OnReceivedEndGame);
+            RegisterCommand(GameMessageCode.ServerChangeMana, OnReceivedChangeMana);
+            RegisterCommand(GameMessageCode.ServerStartTurn, OnReceivedStartTurn);
+            RegisterCommand(GameMessageCode.ServerEndTurn, OnReceivedEndTurn);
+            RegisterCommand(GameMessageCode.ServerDrawCard, OnReceivedDrawCard);
+            RegisterCommand(GameMessageCode.ServerPlayCardResult, OnReceivedPlayCardResult);
+            RegisterCommand(GameMessageCode.ServerSpawnCardResult, OnReceivedSpawnCardResult);
+            RegisterCommand(GameMessageCode.ServerAttackCardResult, OnReceivedAttackCardResult);
+            RegisterCommand(GameMessageCode.ServerDeadCards, OnReceivedDeadCards);
 
             Managers.Instance.Network.SubscribeMessage("GameServer", OnReceivedCommand);
         }
@@ -97,7 +97,7 @@ namespace Marsion
         {
             Logger.Log<GameClient>("Send turn end", colorName: ColorCodes.Client);
 
-            Send(GameCommand.ClientTurnEnd);
+            Send(GameMessageCode.ClientTurnEnd);
         }
 
         public void SendTryAttack(Card attacker, Card defender)
@@ -110,7 +110,7 @@ namespace Marsion
             sdata.DefendPlayerID = defender.PlayerID;
             sdata.DefenderUID = defender.UID;
 
-            Send(GameCommand.ClientTryAttack, sdata, NetworkDelivery.Reliable);
+            Send(GameMessageCode.ClientTryAttack, sdata, NetworkDelivery.Reliable);
         }
 
         public void SendTrySpawnCard(Card card, int index)
@@ -121,7 +121,7 @@ namespace Marsion
             sdata.CardUID = card.UID;
             sdata.Index = index;
 
-            Send(GameCommand.ClientTrySpawnCard, sdata, NetworkDelivery.Reliable);
+            Send(GameMessageCode.ClientTrySpawnCard, sdata, NetworkDelivery.Reliable);
         }
 
         #endregion
