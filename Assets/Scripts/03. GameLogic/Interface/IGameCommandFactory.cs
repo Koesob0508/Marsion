@@ -6,12 +6,12 @@
         ICommand CreateAttackCommand(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID);
     }
 
-    public class DefaultLogicCommandFactory : IGameCommandFactory
+    public class DefaultGameCommandFactory : IGameCommandFactory
     {
-        private IGameDataHandler _dataHandler;
-        public DefaultLogicCommandFactory(IGameDataHandler dataHandler)
+        private IGameLogic _gameLogic;
+        public DefaultGameCommandFactory(IGameLogic gameLogic)
         {
-            _dataHandler = dataHandler;
+            _gameLogic = gameLogic;
         }
 
         public ICommand CreatePlayCardCommand(ulong playerID, string cardUID, int index)
@@ -21,7 +21,7 @@
             _data.CardUID = cardUID;
             _data.Index = index;
 
-            return new PlayCardCommand(_dataHandler, _data);
+            return new PlayCardCommand(_gameLogic, _data);
         }
 
         public ICommand CreateAttackCommand(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
@@ -32,7 +32,7 @@
             _data.TargetPlayerID = defenderID;
             _data.TargetCardUID = defenderUID;
 
-            return new AttackCommand(_dataHandler, _data);
+            return new AttackCommand(_gameLogic, _data);
         }
     }
 }

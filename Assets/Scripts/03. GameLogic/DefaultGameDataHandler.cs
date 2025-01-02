@@ -107,24 +107,26 @@ namespace Marsion
             return null;
         }
 
-        public void AddCardToField(ulong playerID, Card card)
+        public void AddCardToField(ulong playerID, Card card, int index)
         {
-            throw new NotImplementedException();
+            GetPlayer(playerID).Field.Insert(index, card);
         }
 
         public void AddCardToHand(ulong playerID, Card card)
         {
-            throw new NotImplementedException();
+            GetPlayer(playerID).Hand.Add(card);
         }
 
         public void RemoveCardFromField(ulong playerID, string cardUID)
         {
-            throw new NotImplementedException();
+            var card = GetCardFromField(playerID, cardUID);
+            GetPlayer(playerID).Field.Remove(card);
         }
 
         public void RemoveCardFromHand(ulong playerID, string cardUID)
         {
-            throw new NotImplementedException();
+            var card = GetCardFromHand(playerID, cardUID);
+            GetPlayer(playerID).Hand.Remove(card);
         }
 
         public void ShuffleDeck(ulong playerID)

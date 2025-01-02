@@ -4,17 +4,15 @@ namespace Marsion
 {
     public class PlayCardCommand : ICommand
     {
-        public event Action<GameCommandData> OnCompleted;
-
-        private readonly IGameDataHandler _dataHandler;
+        private readonly IGameLogic _gameLogic;
         private GameCommandData _data;
         private readonly ulong playerID;
         private readonly string cardUID;
         private readonly int index;
 
-        public PlayCardCommand(IGameDataHandler dataHandler, GameCommandData data)
+        public PlayCardCommand(IGameLogic gameLogic, GameCommandData data)
         {
-            _dataHandler = dataHandler;
+            _gameLogic = gameLogic;
             _data = data;
             playerID = data.PlayerID;
             cardUID = data.CardUID;
@@ -23,8 +21,8 @@ namespace Marsion
 
         public void Execute()
         {
-            var player = _dataHandler.GetPlayer(playerID);
-            var card = _dataHandler.GetCardFromHand(playerID, cardUID);
+            var player = _gameLogic.DataHandler.GetPlayer(playerID);
+            var card = _gameLogic.DataHandler.GetCardFromHand(playerID, cardUID);
 
             if(player.Mana < card.ManaCost)
             {
@@ -39,13 +37,9 @@ namespace Marsion
 
             Logger.Log<DefaultGameLogic>($"Played card : {card.Name} at position {index}", colorName: ColorCodes.Logic);
 
-            _data.Success = true;
-            OnCompleted?.Invoke(_data);
-        }
+            _data.Succeeded = true;
 
-        public void Clear()
-        {
-            OnCompleted = null;
+            _gameLogic.EventHandler.TriggerEvent("CardPlayed", _data);
         }
     }
 }

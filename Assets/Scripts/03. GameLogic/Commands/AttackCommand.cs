@@ -4,18 +4,16 @@ namespace Marsion
 {
     public class AttackCommand : ICommand
     {
-        public event Action<GameCommandData> OnCompleted;
-
-        private readonly IGameDataHandler _dataHandler;
+        private readonly IGameLogic _gameLogic;
         private readonly GameCommandData _data;
         private readonly ulong attackerID;
         private readonly string attackerUID;
         private readonly ulong defenderID;
         private readonly string defenderUID;
 
-        public AttackCommand(IGameDataHandler dataHandler, GameCommandData data)
+        public AttackCommand(IGameLogic gameLogic, GameCommandData data)
         {
-            _dataHandler = dataHandler;
+            _gameLogic = gameLogic;
             _data = data;
 
             attackerID = data.PlayerID;
@@ -26,10 +24,10 @@ namespace Marsion
 
         public void Execute()
         {
-            var attackPlayer = _dataHandler.GetPlayer(attackerID);
-            var attacker = _dataHandler.GetCardFromField(attackerID, attackerUID);
-            var defenderPlayer = _dataHandler.GetPlayer(defenderID);
-            var defender = _dataHandler.GetCardFromField(defenderID, defenderUID);
+            var attackPlayer = _gameLogic.DataHandler.GetPlayer(attackerID);
+            var attacker = _gameLogic.DataHandler.GetCardFromField(attackerID, attackerUID);
+            var defenderPlayer = _gameLogic.DataHandler.GetPlayer(defenderID);
+            var defender = _gameLogic.DataHandler.GetCardFromField(defenderID, defenderUID);
 
             if (attackerUID == null) Logger.LogWarning<AttackCommand>("attack null.");
             if (defenderUID == null) Logger.LogWarning<AttackCommand>("defend null.");
@@ -37,12 +35,6 @@ namespace Marsion
             defender.TakeDamage(attacker.Attack);
 
             Logger.Log<DefaultGameLogic>($"{attacker.Name} attacked {defender.Name}", colorName: ColorCodes.Logic);
-
-            OnCompleted?.Invoke(_data);
-        }
-        public void Clear()
-        {
-            OnCompleted = null;
         }
     }
 }

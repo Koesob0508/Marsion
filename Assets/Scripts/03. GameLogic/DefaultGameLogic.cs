@@ -8,7 +8,7 @@ namespace Marsion
     public class DefaultGameLogic : IGameLogic
     {
         public IDataManager Data { get; private set; }
-        public GameEventHandler Event { get; private set; }
+        public GameEventHandler EventHandler { get; private set; }
         public IGameDataHandler DataHandler { get; private set; }
 
         private GameCommandHandler _commanHandler;
@@ -30,7 +30,7 @@ namespace Marsion
 
         public DefaultGameLogic()
         {
-            Event = new();
+            EventHandler = new();
             _commanHandler = new(this);
         }
 
@@ -43,7 +43,14 @@ namespace Marsion
             var logicConfig = logicFactory.CreateGameLogicConfig();
             DataHandler.Init(logicFactory.CreateGameDataHandlerFactory(this, logicConfig));
 
-            _commandFactory = logicFactory.CreateLogicCommandFactory(DataHandler);
+            _commandFactory = logicFactory.CreateGameCommandFactory(this);
+
+            InitSendCardPlayed();
+        }
+
+        public void SubscribeEvent(Action<string, GameCommandData> observerAlert)
+        {
+            EventHandler.SubscribeEvent(observerAlert);
         }
 
         public void StartGame()
@@ -115,8 +122,6 @@ namespace Marsion
             }
 
             var spawnCommand = _commandFactory.CreatePlayCardCommand(playerID, cardUID, index);
-            spawnCommand.OnCompleted += (data) => SendCardPlayed?.Invoke(data.Success, data.PlayerID, data.CardUID);
-
             _commanHandler.AddCommand(spawnCommand);
 
             SendCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
@@ -219,6 +224,14 @@ namespace Marsion
                 SendDataUpdated?.Invoke(GameData);
                 SendCardDrawn?.Invoke(playerID, drawnCard.UID);
             }
+        }
+
+        public void InitSendCardPlayed()
+        {
+            EventHandler.RegisterEvent("CardPlayed", (eventName, commandData) =>
+            {
+                SendCardPlayed?.Invoke(commandData.Succeeded, commandData.PlayerID, commandData.CardUID);
+            });
         }
     }
 }

@@ -15,13 +15,14 @@ namespace Marsion
         private IGameLogic _gameLogic;
 
         private Dictionary<ulong, ushort> _ClientPlayerIdMap;
-        private Dictionary<ushort, Action<ulong, SerializedData>> Commands;
+        private Dictionary<ushort, Action<ulong, SerializedData>> Messages;
+        private Dictionary<string, Action<GameCommandData>> Events;
 
         public void Init(IGameSessionFactory sessionFactory)
         {
             Logger.Log<DefaultGameSession>($"Game Server initialized", colorName: ColorCodes.Server);
 
-            Commands = new();
+            Messages = new();
 
             _ClientPlayerIdMap = sessionFactory.ProvidePlayersClientIDs();
             _networkManager = sessionFactory.ProvideNetwork();
@@ -30,30 +31,33 @@ namespace Marsion
 
             Upstream.Init();
 
-            RegisterDefaultCommands();
-            SubscribeToGameLogicEvents();
+            RegisterMessages();
+            RegisterEvents();
 
-            _networkManager.SubscribeMessage("GameClient", OnReceivedCommand);
+            _networkManager.SubscribeMessage("GameClient", OnReceivedClientMessage);
+            _gameLogic.SubscribeEvent(OnReceivedSendRequest);
 
             _gameLogic.StartGame();
         }
 
-        private void RegisterDefaultCommands()
+        private void RegisterMessages()
         {
-            RegisterCommand(GameMessageCode.ClientTurnEnd, OnReceivedTurnEnd);
-            RegisterCommand(GameMessageCode.ClientTrySpawnCard, OnReceivedTrySpawnCard);
-            RegisterCommand(GameMessageCode.ClientTryAttack, OnReceivedTryAttack);
+            RegisterMessage(GameMessageCode.ClientTurnEnd, OnReceivedTurnEnd);
+            RegisterMessage(GameMessageCode.ClientTrySpawnCard, OnReceivedTrySpawnCard);
+            RegisterMessage(GameMessageCode.ClientTryAttack, OnReceivedTryAttack);
         }
 
-        private void SubscribeToGameLogicEvents()
+        private void RegisterEvents()
         {
+            RegisterEvent("PlayCard", SendPlayCardResult);
+
             _gameLogic.SendDataUpdated += SendUpdateData;
             _gameLogic.SendGameStarted += SendStartGame;
             _gameLogic.SendManaChanged += SendChangeMana;
             _gameLogic.SendTurnStarted += SendStartTurn;
             _gameLogic.SendTurnEnded += SendEndTurn;
             _gameLogic.SendCardDrawn += SendDrawCard;
-            _gameLogic.SendCardPlayed += SendPlayCardResult;
+            //_gameLogic.SendCardPlayed += SendPlayCardResult;
             _gameLogic.SendCardSpawned += SendSpawnCardResult;
             _gameLogic.SendCardAttacked += SendAttackCardResult;
             _gameLogic.SendCardDied += SendDeadCards;
@@ -68,28 +72,27 @@ namespace Marsion
             _gameLogic.SendTurnStarted -= SendStartTurn;
             _gameLogic.SendTurnEnded -= SendEndTurn;
             _gameLogic.SendCardDrawn -= SendDrawCard;
-            _gameLogic.SendCardPlayed -= SendPlayCardResult;
             _gameLogic.SendCardSpawned -= SendSpawnCardResult;
             _gameLogic.SendCardAttacked -= SendAttackCardResult;
             _gameLogic.SendCardDied -= SendDeadCards;
             _gameLogic.SendGameEnded -= SendEndGame;
 
-            _networkManager.UnsubscribeMessage("GameClient", OnReceivedCommand);
+            _networkManager.UnsubscribeMessage("GameClient", OnReceivedClientMessage);
         }
 
-        private void RegisterCommand(ushort type, Action<ulong, SerializedData> callback)
+        private void RegisterMessage(ushort type, Action<ulong, SerializedData> callback)
         {
-            Commands.Add(type, callback);
+            Messages.Add(type, callback);
         }
 
-        private void OnReceivedCommand(ulong clientID, FastBufferReader reader)
+        private void OnReceivedClientMessage(ulong clientID, FastBufferReader reader)
         {
             reader.ReadValueSafe(out ushort type);
             SerializedData sdata = new SerializedData(reader);
 
-            if(Commands.TryGetValue(type, out var command))
+            if(Messages.TryGetValue(type, out var onReceivedMessage))
             {
-                command(clientID, sdata);
+                onReceivedMessage(clientID, sdata);
             }
             else
             {
@@ -97,7 +100,24 @@ namespace Marsion
             }
         }
 
-        #region OnReceive (Use queue)
+        private void RegisterEvent(string eventName, Action<GameCommandData> listener)
+        {
+            Events.Add(eventName, listener);
+        }
+
+        private void OnReceivedSendRequest(string eventName, GameCommandData cdata)
+        {
+            if(Events.TryGetValue(eventName, out var sendRequest))
+            {
+                sendRequest(cdata);
+            }
+            else
+            {
+                Logger.LogWarning<DefaultGameSession>($"Unknown event name received: {eventName}");
+            }
+        }
+
+        #region OnReceiveClientMessage (Use queue)
 
         private void OnReceivedTurnEnd(ulong clientID, SerializedData sdata)
         {
@@ -140,6 +160,8 @@ namespace Marsion
         #endregion
 
         #region Send Utility (Not use queue, logic process queue already)
+
+        
 
         private void SendUpdateData(IGameData gameData)
         {
@@ -200,16 +222,16 @@ namespace Marsion
             SendToAll(GameMessageCode.ServerDrawCard, sdata, NetworkDelivery.Reliable);
         }
 
-        private void SendPlayCardResult(bool succeeded, ulong playerID, string cardUID)
+        private void SendPlayCardResult(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send play card result", colorName: ColorCodes.Server);
 
-            SerializedPlayCardResultData sdata = new SerializedPlayCardResultData();
-            sdata.Succeeded = succeeded;
-            sdata.PlayerID = playerID;
-            sdata.CardUID = cardUID;
+            SerializedPlayCardResultData sdata = new();
+            sdata.Succeeded = cdata.Succeeded;
+            sdata.PlayerID = cdata.PlayerID;
+            sdata.CardUID = cdata.CardUID;
 
-            SendToAll(GameMessageCode.ServerPlayCardResult, sdata, NetworkDelivery.Reliable);
+            SendToAll(GameMessageCode.ServerPlayCardResult, sdata, NetworkDelivery.ReliableSequenced);
         }
 
         private void SendSpawnCardResult(bool succeeded, ulong playerID, string cardUID, int index)

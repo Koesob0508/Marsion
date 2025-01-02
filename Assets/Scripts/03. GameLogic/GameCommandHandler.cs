@@ -31,7 +31,6 @@ namespace Marsion
             {
                 var command = commandQueue.Dequeue();
                 command.Execute();
-                command.Clear();
             }
 
             _isExecuting = false;

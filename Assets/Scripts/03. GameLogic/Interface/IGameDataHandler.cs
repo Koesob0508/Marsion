@@ -17,7 +17,7 @@ namespace Marsion
 
         void AddCardToHand(ulong playerID, Card card);
         void RemoveCardFromHand(ulong playerID, string cardUID);
-        void AddCardToField(ulong playerID, Card card);
+        void AddCardToField(ulong playerID, Card card, int index);
         void RemoveCardFromField(ulong playerID, string cardUID);
         void ShuffleDeck(ulong playerID);
         void DrawCard(ulong playerID, out Card drawnCard);

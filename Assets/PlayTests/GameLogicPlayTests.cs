@@ -165,10 +165,19 @@ namespace Marsion.Tests
             ulong playPlayerID = 0;
             string playCardUID = "";
 
+            bool isFirstUpdate = true;
+
             logic.SendDataUpdated += (data) =>
             {
-                targetPlayerID = data.CurrentPlayer.PlayerID;
-                targetCardUID = data.GetPlayer(targetPlayerID).Hand[0].UID;
+                if(isFirstUpdate)
+                {
+                    targetPlayerID = data.CurrentPlayer.PlayerID;
+                    targetCardUID = data.GetPlayer(targetPlayerID).Hand[0].UID;
+                    Debug.Log($"target player ID : {targetPlayerID}");
+                    Debug.Log($"targetCardUID : {targetCardUID}");
+
+                    isFirstUpdate = false;
+                }
             };
 
             logic.SendCardPlayed += (success, playerID, cardUID) =>
@@ -176,6 +185,7 @@ namespace Marsion.Tests
                 isSuccessed = success;
                 playPlayerID = playerID;
                 playCardUID = cardUID;
+                Debug.Log($"playCardUID : {playCardUID}");
             };
 
             logic.StartGame();

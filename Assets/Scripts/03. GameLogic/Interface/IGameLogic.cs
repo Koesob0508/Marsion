@@ -5,7 +5,7 @@ namespace Marsion
 {
     public struct GameCommandData
     {
-        public bool Success;
+        public bool Succeeded;
         public ulong PlayerID;
         public string CardUID;
         public ulong TargetPlayerID;
@@ -19,7 +19,7 @@ namespace Marsion
     {
         IDataManager Data { get; }
         IGameDataHandler DataHandler { get; }
-        GameEventHandler Event { get; }
+        GameEventHandler EventHandler { get; }
         IGameData GameData { get; }
 
         event Action<IGameData> SendDataUpdated;
@@ -36,6 +36,7 @@ namespace Marsion
         event Action<List<string>> SendCardDied;
 
         void Init(IGameLogicFactory gameLogicFactory);
+        void SubscribeEvent(Action<string, GameCommandData> listener);
         void Clear();
         void StartGame();
         void EndGame();

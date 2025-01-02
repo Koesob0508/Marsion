@@ -65,7 +65,7 @@ namespace Marsion.Tests
             Assert.IsNotNull(gameLogic.GameData);
             // 그런데 PlayerInfos가 없었기 때문에 Player는 없어야함
             Assert.IsTrue(gameLogic.GameData.Players.Count == 0);
-            Assert.IsNotNull(gameLogic.Event);
+            Assert.IsNotNull(gameLogic.EventHandler);
         }
 
         [Test]
@@ -75,7 +75,10 @@ namespace Marsion.Tests
             var logicFactory = new DefaultGameLogicFactory(mockManagers.Object, playerInfos);
             var dataHandler = new DefaultGameDataHandler();
 
-            var commandFactory = logicFactory.CreateLogicCommandFactory(dataHandler);
+            var gameLogic = new DefaultGameLogic();
+            gameLogic.Init(logicFactory);
+
+            var commandFactory = logicFactory.CreateGameCommandFactory(gameLogic);
             var playCommand = commandFactory.CreatePlayCardCommand(13, "asdf", 0);
             var attackCommand = commandFactory.CreateAttackCommand(13, "asdf", 14, "fdas");
 
