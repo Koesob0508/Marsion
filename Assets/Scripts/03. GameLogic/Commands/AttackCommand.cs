@@ -18,8 +18,8 @@ namespace Marsion
 
             attackerID = data.PlayerID;
             attackerUID = data.CardUID;
-            defenderID = data.TargetPlayerID;
-            defenderUID = data.TargetCardUID;
+            defenderID = data.TargetPlayerID_2;
+            defenderUID = data.TargetCardUID_2;
         }
 
         public void Execute()

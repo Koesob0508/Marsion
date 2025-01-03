@@ -49,35 +49,24 @@ namespace Marsion
 
         private void RegisterEvents()
         {
-            RegisterEvent("PlayCard", SendPlayCardResult);
-
-            _gameLogic.SendDataUpdated += SendUpdateData;
-            _gameLogic.SendGameStarted += SendStartGame;
-            _gameLogic.SendManaChanged += SendChangeMana;
-            _gameLogic.SendTurnStarted += SendStartTurn;
-            _gameLogic.SendTurnEnded += SendEndTurn;
-            _gameLogic.SendCardDrawn += SendDrawCard;
-            //_gameLogic.SendCardPlayed += SendPlayCardResult;
-            _gameLogic.SendCardSpawned += SendSpawnCardResult;
-            _gameLogic.SendCardAttacked += SendAttackCardResult;
-            _gameLogic.SendCardDied += SendDeadCards;
-            _gameLogic.SendGameEnded += SendEndGame;
+            RegisterEvent("UpdateData", SendUpdateData);
+            RegisterEvent("StartGame", SendStartGame);
+            RegisterEvent("EndGame", SendEndGame);
+            RegisterEvent("StartTurn", SendStartTurn);
+            RegisterEvent("EndTurn", SendEndTurn);
+            RegisterEvent("DrawCard", SendDrawCard);
+            RegisterEvent("ChangeMana", SendChangeMana);
+            RegisterEvent("FailedPlayCard", SendFailedPlay);
+            RegisterEvent("PlayCard", SendPlayCard);
+            RegisterEvent("SpawnCard", SendSpawnCard);
+            RegisterEvent("AttackCard", SendAttackCard);
+            RegisterEvent("DieCards", SendDieCards);
         }
 
         public void Clear()
         {
-            _gameLogic.SendDataUpdated -= SendUpdateData;
-            _gameLogic.SendGameStarted -= SendStartGame;
-            _gameLogic.SendManaChanged -= SendChangeMana;
-            _gameLogic.SendTurnStarted -= SendStartTurn;
-            _gameLogic.SendTurnEnded -= SendEndTurn;
-            _gameLogic.SendCardDrawn -= SendDrawCard;
-            _gameLogic.SendCardSpawned -= SendSpawnCardResult;
-            _gameLogic.SendCardAttacked -= SendAttackCardResult;
-            _gameLogic.SendCardDied -= SendDeadCards;
-            _gameLogic.SendGameEnded -= SendEndGame;
-
             _networkManager.UnsubscribeMessage("GameClient", OnReceivedClientMessage);
+            _gameLogic.UnsubscribeEvent(OnReceivedSendRequest);
         }
 
         private void RegisterMessage(ushort type, Action<ulong, SerializedData> callback)
@@ -161,68 +150,66 @@ namespace Marsion
 
         #region Send Utility (Not use queue, logic process queue already)
 
-        
-
-        private void SendUpdateData(IGameData gameData)
+        private void SendUpdateData(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send updated data", colorName: ColorCodes.Server);
 
             var sdata = new SerializedGameData();
-            sdata.GameData = gameData;
+            sdata.GameData = _gameLogic.GameData;
 
             SendToAll(GameMessageCode.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
         }
 
-        private void SendStartGame()
+        private void SendStartGame(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send start game", colorName: ColorCodes.Server);
 
             SendToAll(GameMessageCode.ServerStartGame);
         }
 
-        private void SendEndGame(ulong winnerID)
+        private void SendEndGame(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send end game", colorName: ColorCodes.Server);
 
             SerializedUlong sdata = new SerializedUlong();
-            sdata.value = winnerID;
+            sdata.value = cdata.PlayerID;
 
             SendToAll(GameMessageCode.ServerEndGame, sdata);
         }
 
-        private void SendChangeMana()
+        private void SendChangeMana(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send change mana", colorName: ColorCodes.Server);
 
             SendToAll(GameMessageCode.ServerChangeMana);
         }
 
-        private void SendStartTurn()
+        private void SendStartTurn(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send start turn", colorName: ColorCodes.Server);
 
             SendToAll(GameMessageCode.ServerStartTurn);
         }
 
-        private void SendEndTurn()
+        private void SendEndTurn(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send end turn", colorName: ColorCodes.Server);
 
             SendToAll(GameMessageCode.ServerEndTurn);
         }
 
-        private void SendDrawCard(ulong playerID, string cardUID)
+        private void SendDrawCard(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send draw card", colorName: ColorCodes.Server);
 
             SerializedDrawnCardData sdata = new SerializedDrawnCardData();
-            sdata.PlayerID = playerID;
-            sdata.CardUID = cardUID;
+            sdata.PlayerID = cdata.PlayerID;
+            sdata.CardUID = cdata.CardUID;
 
             SendToAll(GameMessageCode.ServerDrawCard, sdata, NetworkDelivery.Reliable);
         }
 
-        private void SendPlayCardResult(GameCommandData cdata)
+        private void SendPlayCard(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send play card result", colorName: ColorCodes.Server);
 
@@ -234,39 +221,53 @@ namespace Marsion
             SendToAll(GameMessageCode.ServerPlayCardResult, sdata, NetworkDelivery.ReliableSequenced);
         }
 
-        private void SendSpawnCardResult(bool succeeded, ulong playerID, string cardUID, int index)
+        private void SendFailedPlay(GameCommandData cdata)
+        {
+            Logger.Log<DefaultGameSession>($"Send failed play card", colorName: ColorCodes.Server);
+
+            SerializedSpawnCardResultData sdata = new();
+            sdata.Succeeded = false;
+            sdata.PlayerID = cdata.PlayerID;
+            sdata.CardUID = cdata.CardUID;
+            sdata.Index = cdata.IntValue;
+
+            SendToAll(GameMessageCode.ServerSpawnCardResult, sdata, NetworkDelivery.ReliableSequenced);
+        }
+
+        private void SendSpawnCard(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send spawn card result", colorName: ColorCodes.Server);
 
             SerializedSpawnCardResultData sdata = new();
-            sdata.Succeeded = succeeded;
-            sdata.PlayerID = playerID;
-            sdata.CardUID = cardUID;
-            sdata.Index = index;
+            sdata.Succeeded = true;
+            sdata.PlayerID = cdata.PlayerID;
+            sdata.CardUID = cdata.CardUID;
+            sdata.Index = cdata.IntValue;
 
-            SendToAll(GameMessageCode.ServerSpawnCardResult, sdata, NetworkDelivery.Reliable);
+            SendToAll(GameMessageCode.ServerSpawnCardResult, sdata, NetworkDelivery.ReliableSequenced);
         }
 
-        private void SendAttackCardResult(bool succeeded, ulong attackPlayerID, string attackerUID, ulong defendPlayerID, string defenderUID)
+        private void SendAttackCard(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send attack card result", colorName: ColorCodes.Server);
 
             SerializedAttackCardResultData sdata = new();
-            sdata.Succeeded = succeeded;
-            sdata.AttackPlayerID = attackPlayerID;
-            sdata.AttackerUID = attackerUID;
-            sdata.DefendPlayerID = defendPlayerID;
-            sdata.DefenderUID = defenderUID;
+            sdata.Succeeded = cdata.Succeeded;
+            sdata.AttackPlayerID = cdata.PlayerID;
+            sdata.AttackerUID = cdata.CardUID;
+            sdata.DefendPlayerID = cdata.TargetPlayerID_2;
+            sdata.DefenderUID = cdata.TargetCardUID_2;
 
             SendToAll(GameMessageCode.ServerAttackCardResult, sdata, NetworkDelivery.Reliable);
+
         }
 
-        private void SendDeadCards(List<string> cards)
+        private void SendDieCards(GameCommandData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send dead cards", colorName: ColorCodes.Server);
 
             SerializedDeadCardsData sdata = new();
-            sdata.DeadCards = cards;
+            sdata.DeadCards = cdata.CardUIDs;
 
             SendToAll(GameMessageCode.ServerDeadCards, sdata, NetworkDelivery.Reliable);
         }

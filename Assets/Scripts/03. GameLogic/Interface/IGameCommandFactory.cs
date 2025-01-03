@@ -2,8 +2,9 @@
 {
     public interface IGameCommandFactory
     {
-        ICommand CreatePlayCardCommand(ulong playerID, string cardUID, int index);
-        ICommand CreateAttackCommand(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID);
+        ICommand CreatePayMana(ulong playerID, int amount);
+        ICommand CreatePlayCard(ulong playerID, string cardUID, int index);
+        ICommand CreateAttack(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID);
     }
 
     public class DefaultGameCommandFactory : IGameCommandFactory
@@ -14,25 +15,34 @@
             _gameLogic = gameLogic;
         }
 
-        public ICommand CreatePlayCardCommand(ulong playerID, string cardUID, int index)
+        public ICommand CreatePayMana(ulong playerID, int amount)
         {
-            var _data = new GameCommandData();
-            _data.PlayerID = playerID;
-            _data.CardUID = cardUID;
-            _data.Index = index;
+            var data = new GameCommandData();
+            data.PlayerID = playerID;
+            data.IntValue = amount;
 
-            return new PlayCardCommand(_gameLogic, _data);
+            return new PayManaCommand(_gameLogic, data);
         }
 
-        public ICommand CreateAttackCommand(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
+        public ICommand CreatePlayCard(ulong playerID, string cardUID, int index)
         {
-            var _data = new GameCommandData();
-            _data.PlayerID = attackerID;
-            _data.CardUID = attackerUID;
-            _data.TargetPlayerID = defenderID;
-            _data.TargetCardUID = defenderUID;
+            var data = new GameCommandData();
+            data.PlayerID = playerID;
+            data.CardUID = cardUID;
+            data.IntValue = index;
 
-            return new AttackCommand(_gameLogic, _data);
+            return new PlayCardCommand(_gameLogic, data);
+        }
+
+        public ICommand CreateAttack(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
+        {
+            var data = new GameCommandData();
+            data.PlayerID = attackerID;
+            data.CardUID = attackerUID;
+            data.TargetPlayerID_2 = defenderID;
+            data.TargetCardUID_2 = defenderUID;
+
+            return new AttackCommand(_gameLogic, data);
         }
     }
 }

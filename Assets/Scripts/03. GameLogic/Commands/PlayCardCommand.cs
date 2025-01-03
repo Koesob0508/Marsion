@@ -6,40 +6,27 @@ namespace Marsion
     {
         private readonly IGameLogic _gameLogic;
         private GameCommandData _data;
-        private readonly ulong playerID;
-        private readonly string cardUID;
-        private readonly int index;
 
         public PlayCardCommand(IGameLogic gameLogic, GameCommandData data)
         {
             _gameLogic = gameLogic;
             _data = data;
-            playerID = data.PlayerID;
-            cardUID = data.CardUID;
-            index = data.Index;
         }
 
         public void Execute()
         {
-            var player = _gameLogic.DataHandler.GetPlayer(playerID);
-            var card = _gameLogic.DataHandler.GetCardFromHand(playerID, cardUID);
+            var player = _gameLogic.DataHandler.GetPlayer(_data.PlayerID);
+            var card = _gameLogic.DataHandler.GetCardFromHand(_data.PlayerID, _data.CardUID);
+            
+            Logger.Log<DefaultGameLogic>($"Played card : {card.Name} at position {_data.IntValue}", colorName: ColorCodes.Logic);
 
-            if(player.Mana < card.ManaCost)
-            {
-                Logger.Log<DefaultGameLogic>($"Not enoufh mana to play {card.Name}", colorName: ColorCodes.Logic);
-                return;
-            }
-
-            player.PayMana(card.ManaCost);
-            player.Hand.Remove(card);
-            player.Field.Insert(index, card);
+            _gameLogic.DataHandler.RemoveCardFromHand(_data.PlayerID, _data.CardUID);
+            _gameLogic.DataHandler.AddCardToField(_data.PlayerID, card, _data.IntValue);
             card.ExecutePlayAbility();
-
-            Logger.Log<DefaultGameLogic>($"Played card : {card.Name} at position {index}", colorName: ColorCodes.Logic);
-
             _data.Succeeded = true;
 
-            _gameLogic.EventHandler.TriggerEvent("CardPlayed", _data);
+            _gameLogic.EventHandler.TriggerEvent("UpdateData", _data);
+            _gameLogic.EventHandler.TriggerEvent("PlayCard", _data);
         }
     }
 }

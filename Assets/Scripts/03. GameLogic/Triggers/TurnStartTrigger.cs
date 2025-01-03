@@ -15,9 +15,9 @@
             //GameEventHandler.UnregisterEvent("TurnStart", OnTurnStart);
         }
 
-        private void OnTurnStart(object eventData)
+        private void OnTurnStart(GameCommandData eventData)
         {
-            if ((ulong)eventData == _card.PlayerID)
+            if (eventData.PlayerID == _card.PlayerID)
             {
                 Execute();
             }

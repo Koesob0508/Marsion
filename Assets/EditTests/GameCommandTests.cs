@@ -21,8 +21,8 @@ namespace Marsion.Tests
 
             var commandFactory = new DefaultGameCommandFactory(mockLogic.Object);
 
-            var playCommand = commandFactory.CreatePlayCardCommand(32, "asdf", 0);
-            var attackCommand = commandFactory.CreateAttackCommand(32, "addd", 21, "fdsa");
+            var playCommand = commandFactory.CreatePlayCard(32, "asdf", 0);
+            var attackCommand = commandFactory.CreateAttack(32, "addd", 21, "fdsa");
 
             Assert.IsNotNull(playCommand);
             Assert.IsNotNull(attackCommand);

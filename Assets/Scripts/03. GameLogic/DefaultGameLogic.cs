@@ -11,18 +11,16 @@ namespace Marsion
         public GameEventHandler EventHandler { get; private set; }
         public IGameDataHandler DataHandler { get; private set; }
 
-        private GameCommandHandler _commanHandler;
+        private GameCommandHandler _commandHandler;
         private IGameCommandFactory _commandFactory;
 
         public IGameData GameData => DataHandler.GameData;
 
         public event Action<IGameData> SendDataUpdated;
         public event Action SendGameStarted;
-        public event Action SendManaChanged;
         public event Action SendTurnStarted;
         public event Action SendTurnEnded;
         public event Action<ulong, string> SendCardDrawn;
-        public event Action<bool, ulong, string> SendCardPlayed;
         public event Action<bool, ulong, string, int> SendCardSpawned;
         public event Action<bool, ulong, string, ulong, string> SendCardAttacked;
         public event Action<List<string>> SendCardDied;
@@ -31,7 +29,7 @@ namespace Marsion
         public DefaultGameLogic()
         {
             EventHandler = new();
-            _commanHandler = new(this);
+            _commandHandler = new(this);
         }
 
         public void Init(IGameLogicFactory logicFactory)
@@ -44,13 +42,16 @@ namespace Marsion
             DataHandler.Init(logicFactory.CreateGameDataHandlerFactory(this, logicConfig));
 
             _commandFactory = logicFactory.CreateGameCommandFactory(this);
-
-            InitSendCardPlayed();
         }
 
         public void SubscribeEvent(Action<string, GameCommandData> observerAlert)
         {
             EventHandler.SubscribeEvent(observerAlert);
+        }
+
+        public void UnsubscribeEvent(Action<string, GameCommandData> observerAlert)
+        {
+            EventHandler.UnsubscribeEvent(observerAlert);
         }
 
         public void StartGame()
@@ -87,8 +88,8 @@ namespace Marsion
 
             DataHandler.DrawCard(DataHandler.CurrentPlayer.PlayerID, out var card);
 
-            SendDataUpdated?.Invoke(GameData);
-            SendManaChanged?.Invoke();
+            EventHandler.TriggerEvent("UpdateData");
+            EventHandler.TriggerEvent("ChangeMana");
             SendTurnStarted?.Invoke();
             SendCardDrawn?.Invoke(DataHandler.CurrentPlayer.PlayerID, card.UID);
         }
@@ -112,26 +113,28 @@ namespace Marsion
             var player = DataHandler.GetPlayer(playerID);
             var card = DataHandler.GetCardFromHand(playerID, cardUID);
 
-            if (!(player.Mana >= card.ManaCost))
+            if (player.Mana < card.ManaCost)
             {
-                Logger.Log<DefaultGameLogic>("Spawn try failed", colorName: ColorCodes.Logic);
-                SendCardPlayed?.Invoke(false, player.PlayerID, card.UID);
-                SendCardSpawned?.Invoke(false, player.PlayerID, card.UID, index);
+                var cdata = new GameCommandData();
+                cdata.PlayerID = player.PlayerID;
+                cdata.CardUID = card.UID;
 
+                EventHandler.TriggerEvent("FailedPlayCard", cdata);
                 return;
             }
 
-            var spawnCommand = _commandFactory.CreatePlayCardCommand(playerID, cardUID, index);
-            _commanHandler.AddCommand(spawnCommand);
+            var payManaCommand = _commandFactory.CreatePayMana(playerID, card.ManaCost);
+            var spawnCommand = _commandFactory.CreatePlayCard(playerID, cardUID, index);
+            _commandHandler.AddCommand(payManaCommand);
+            _commandHandler.AddCommand(spawnCommand);
 
             SendCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
             SendDataUpdated?.Invoke(GameData);
-            SendManaChanged?.Invoke();
         }
 
         public void TryAttack(ulong attackPlayerID, string attackCardUID, ulong defendPlayerID, string defendCardUID)
         {
-            _commanHandler.AddCommand(_commandFactory.CreateAttackCommand(attackPlayerID, attackCardUID, defendPlayerID, defendCardUID));
+            _commandHandler.AddCommand(_commandFactory.CreateAttack(attackPlayerID, attackCardUID, defendPlayerID, defendCardUID));
 
             SendDataUpdated?.Invoke(GameData);
             SendCardAttacked?.Invoke(true, attackPlayerID, attackCardUID, defendPlayerID, defendCardUID);
@@ -228,10 +231,10 @@ namespace Marsion
 
         public void InitSendCardPlayed()
         {
-            EventHandler.RegisterEvent("CardPlayed", (eventName, commandData) =>
-            {
-                SendCardPlayed?.Invoke(commandData.Succeeded, commandData.PlayerID, commandData.CardUID);
-            });
+            //EventHandler.RegisterEvent("CardPlayed", (commandData) =>
+            //{
+            //    SendCardPlayed?.Invoke(commandData.Succeeded, commandData.PlayerID, commandData.CardUID);
+            //});
         }
     }
 }

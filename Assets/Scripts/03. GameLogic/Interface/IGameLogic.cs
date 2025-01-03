@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace Marsion
 {
-    public struct GameCommandData
+    public class GameCommandData
     {
         public bool Succeeded;
         public ulong PlayerID;
         public string CardUID;
-        public ulong TargetPlayerID;
-        public string TargetCardUID;
-        public int Index;
+        public ulong TargetPlayerID_2;
+        public string TargetCardUID_2;
+        public int IntValue;
 
         public List<string> CardUIDs;
     }
@@ -28,15 +28,14 @@ namespace Marsion
         event Action<ulong> SendGameEnded;
         event Action SendTurnStarted;
         event Action SendTurnEnded;
-        event Action SendManaChanged;
         event Action<ulong, string> SendCardDrawn;
-        event Action<bool, ulong, string> SendCardPlayed;
         event Action<bool, ulong, string, int> SendCardSpawned;
         event Action<bool, ulong, string, ulong, string> SendCardAttacked;
         event Action<List<string>> SendCardDied;
 
         void Init(IGameLogicFactory gameLogicFactory);
-        void SubscribeEvent(Action<string, GameCommandData> listener);
+        void SubscribeEvent(Action<string, GameCommandData> observerAlert);
+        void UnsubscribeEvent(Action<string, GameCommandData> observerAlert);
         void Clear();
         void StartGame();
         void EndGame();
@@ -44,6 +43,8 @@ namespace Marsion
 
         // Player Interaction
         void EndTurn();
+
+        // TODO : 이후 마법 카드가 나올 수도 있음
         void TrySpawnCard(ulong playerID, string cardUID, int index);
         void TryAttack(ulong attackPlayerID, string attackCardUID, ulong defendPlayerID, string defendCardUID);
 

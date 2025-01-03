@@ -107,6 +107,11 @@ namespace Marsion
             return null;
         }
 
+        public void PayMana(ulong playerID, int amount)
+        {
+            GetPlayer(playerID).PayMana(amount);
+        }
+
         public void AddCardToField(ulong playerID, Card card, int index)
         {
             GetPlayer(playerID).Field.Insert(index, card);
