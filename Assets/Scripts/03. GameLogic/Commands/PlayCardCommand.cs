@@ -5,9 +5,9 @@ namespace Marsion
     public class PlayCardCommand : ICommand
     {
         private readonly IGameLogic _gameLogic;
-        private GameCommandData _data;
+        private CommandData _data;
 
-        public PlayCardCommand(IGameLogic gameLogic, GameCommandData data)
+        public PlayCardCommand(IGameLogic gameLogic, CommandData data)
         {
             _gameLogic = gameLogic;
             _data = data;
@@ -25,8 +25,8 @@ namespace Marsion
             card.ExecutePlayAbility();
             _data.Succeeded = true;
 
-            _gameLogic.EventHandler.TriggerEvent("UpdateData", _data);
-            _gameLogic.EventHandler.TriggerEvent("PlayCard", _data);
+            _gameLogic.Trigger.TriggerEvent("UpdateData", _data);
+            _gameLogic.Trigger.TriggerEvent("PlayCard", _data);
         }
     }
 }

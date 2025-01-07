@@ -3,9 +3,9 @@
     public class PayManaCommand : ICommand
     {
         private readonly IGameLogic _gameLogic;
-        private GameCommandData _data;
+        private CommandData _data;
 
-        public PayManaCommand(IGameLogic gameLogic, GameCommandData data)
+        public PayManaCommand(IGameLogic gameLogic, CommandData data)
         {
             _gameLogic = gameLogic;
             _data = data;
@@ -16,8 +16,8 @@
             Logger.Log<PayManaCommand>($"Player {_data.PlayerID} pay mana {_data.IntValue}", colorName: ColorCodes.Logic);
 
             _gameLogic.DataHandler.PayMana(_data.PlayerID, _data.IntValue);
-            _gameLogic.EventHandler.TriggerEvent("UpdateData", _data);
-            _gameLogic.EventHandler.TriggerEvent("ChangeMana", _data);
+            _gameLogic.Trigger.TriggerEvent("UpdateData", _data);
+            _gameLogic.Trigger.TriggerEvent("ChangeMana", _data);
         }
     }
 }

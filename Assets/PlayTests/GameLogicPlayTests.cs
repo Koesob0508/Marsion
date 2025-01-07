@@ -167,7 +167,7 @@ namespace Marsion.Tests
 
             bool isFirstUpdate = true;
 
-            logic.EventHandler.RegisterEvent("UpdateData", (data) =>
+            logic.Trigger.RegisterEvent("UpdateData", (data) =>
             {
                 if (isFirstUpdate)
                 {
@@ -178,7 +178,7 @@ namespace Marsion.Tests
                 }
             });
 
-            logic.EventHandler.RegisterEvent("PlayCard", (data) =>
+            logic.Trigger.RegisterEvent("PlayCard", (data) =>
             {
                 isSuccessed = data.Succeeded;
                 playPlayerID = data.PlayerID;

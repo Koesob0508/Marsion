@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Marsion
 {
-    public class GameCommandData
+    public class CommandData
     {
         public bool Succeeded;
         public ulong PlayerID;
@@ -19,7 +19,7 @@ namespace Marsion
     {
         IDataManager Data { get; }
         IGameDataHandler DataHandler { get; }
-        GameEventHandler EventHandler { get; }
+        ITriggerHandler Trigger { get; }
         IGameData GameData { get; }
 
         event Action<IGameData> SendDataUpdated;
@@ -34,8 +34,8 @@ namespace Marsion
         event Action<List<string>> SendCardDied;
 
         void Init(IGameLogicFactory gameLogicFactory);
-        void SubscribeEvent(Action<string, GameCommandData> observerAlert);
-        void UnsubscribeEvent(Action<string, GameCommandData> observerAlert);
+        void SubscribeEvent(Action<string, CommandData> observerAlert);
+        void UnsubscribeEvent(Action<string, CommandData> observerAlert);
         void Clear();
         void StartGame();
         void EndGame();

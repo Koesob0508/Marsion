@@ -8,10 +8,12 @@ namespace Marsion
         IDataManager ProvideDataManager();
 
         List<PlayerInfo> ProvidePlayerInfo();
+        ITriggerHandler CreateTriggerhandler();
         IGameLogicConfig CreateGameLogicConfig();
         IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogic gameLogic, IGameLogicConfig logicConfig);
         IGameDataHandler CreateGameDataHandler();
-        IGameCommandFactory CreateGameCommandFactory(IGameLogic gameLogic);
+        ICommandHandler CreateCommandHandler(IGameLogic gameLogic);
+        ICommandFactory CreateCommandFactory(IGameLogic gameLogic);
     }
 
     public class DefaultGameLogicFactory : IGameLogicFactory
@@ -26,11 +28,12 @@ namespace Marsion
         }
 
         public IDataManager ProvideDataManager() => _managers.Data;
-
+        public ITriggerHandler CreateTriggerhandler() => new TriggerHandler();
         public List<PlayerInfo> ProvidePlayerInfo() => _playerInfos;
         public IGameLogicConfig CreateGameLogicConfig() => new DefaultGameLogicConfig();
         public IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogic gameLogic, IGameLogicConfig logicConfig) => new DefaultGameDataHandlerFactory(gameLogic, logicConfig, _playerInfos);
         public IGameDataHandler CreateGameDataHandler() => new DefaultGameDataHandler();
-        public IGameCommandFactory CreateGameCommandFactory(IGameLogic gameLogic) => new DefaultGameCommandFactory(gameLogic);
+        public ICommandHandler CreateCommandHandler(IGameLogic gameLogic) => new CommandHandler(gameLogic);
+        public ICommandFactory CreateCommandFactory(IGameLogic gameLogic) => new DefaultCommandFactory(gameLogic);
     }
 }

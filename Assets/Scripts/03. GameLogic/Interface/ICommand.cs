@@ -1,9 +1,16 @@
-﻿using System;
+﻿using Codice.CM.Common;
+using System;
 
 namespace Marsion
 {
     public interface ICommand
     {
-        void Execute();
+        IGameLogic GameLogic { get; }
+        ICondition Condition { get; }
+        TriggerType Trigger { get; }
+        void Register();
+        void Unregister();
+        void Execute(CommandData data);
+        void CheckTrigger();
     }
 }

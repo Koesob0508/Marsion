@@ -2,23 +2,28 @@
 
 namespace Marsion
 {
-    public class GameCommandHandler
+    public class CommandHandler : ICommandHandler
     {
         private readonly IGameLogic _logic;
-        private readonly Queue<ICommand> commandQueue;
+        private readonly Queue<ICommand> _stack;
         private bool _isExecuting;
 
-        public GameCommandHandler(IGameLogic logic)
+        public CommandHandler(IGameLogic logic)
         {
             _logic = logic;
-            commandQueue = new();
+            _stack = new();
             _isExecuting = false;
         }
 
-        public void AddCommand(ICommand command)
+        public void Add(ICommand command)
         {
-            commandQueue.Enqueue(command);
+            _stack.Enqueue(command);
             ExecuteCommands();
+        }
+
+        public void Remove(ICommand command)
+        {
+
         }
 
         private void ExecuteCommands()
@@ -27,18 +32,18 @@ namespace Marsion
 
             _isExecuting = true;
 
-            while(commandQueue.Count > 0)
+            while(_stack.Count > 0)
             {
-                var command = commandQueue.Dequeue();
+                var command = _stack.Dequeue();
                 command.Execute();
             }
 
             _isExecuting = false;
         }
 
-        public void ClearCommands()
+        public void Clear()
         {
-            commandQueue.Clear();
+            _stack.Clear();
         }
     }
 }

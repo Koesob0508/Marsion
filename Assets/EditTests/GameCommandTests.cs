@@ -11,15 +11,15 @@ namespace Marsion.Tests
         {
             var mockLogic = new Mock<IGameLogic>();
             var mockDataHandler = new Mock<IGameDataHandler>();
-            var gameEventHandler = new GameEventHandler();
+            var gameEventHandler = new TriggerHandler();
             mockLogic
                 .Setup(l => l.DataHandler)
                 .Returns(mockDataHandler.Object);
             mockLogic
-                .Setup(l => l.EventHandler)
+                .Setup(l => l.Trigger)
                 .Returns(gameEventHandler);
 
-            var commandFactory = new DefaultGameCommandFactory(mockLogic.Object);
+            var commandFactory = new DefaultCommandFactory(mockLogic.Object);
 
             var playCommand = commandFactory.CreatePlayCard(32, "asdf", 0);
             var attackCommand = commandFactory.CreateAttack(32, "addd", 21, "fdsa");

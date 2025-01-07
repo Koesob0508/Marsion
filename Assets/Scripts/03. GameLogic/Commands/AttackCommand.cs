@@ -2,16 +2,16 @@
 
 namespace Marsion
 {
-    public class AttackCommand : ICommand
+    public class AttackCommand : BaseCommand
     {
         private readonly IGameLogic _gameLogic;
-        private readonly GameCommandData _data;
+        private readonly CommandData _data;
         private readonly ulong attackerID;
         private readonly string attackerUID;
         private readonly ulong defenderID;
         private readonly string defenderUID;
 
-        public AttackCommand(IGameLogic gameLogic, GameCommandData data)
+        public AttackCommand(IGameLogic gameLogic, CommandData data)
         {
             _gameLogic = gameLogic;
             _data = data;
