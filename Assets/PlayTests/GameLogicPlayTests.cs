@@ -167,23 +167,23 @@ namespace Marsion.Tests
 
             bool isFirstUpdate = true;
 
-            logic.Trigger.RegisterEvent("UpdateData", (data) =>
-            {
-                if (isFirstUpdate)
-                {
-                    targetPlayerID = logic.DataHandler.CurrentPlayer.PlayerID;
-                    targetCardUID = logic.DataHandler.GetPlayer(targetPlayerID).Hand[0].UID;
+            //logic.Trigger.RegisterEvent("UpdateData", (data) =>
+            //{
+            //    if (isFirstUpdate)
+            //    {
+            //        targetPlayerID = logic.DataHandler.CurrentPlayer.PlayerID;
+            //        targetCardUID = logic.DataHandler.GetPlayer(targetPlayerID).Hand[0].UID;
 
-                    isFirstUpdate = false;
-                }
-            });
+            //        isFirstUpdate = false;
+            //    }
+            //});
 
-            logic.Trigger.RegisterEvent("PlayCard", (data) =>
-            {
-                isSuccessed = data.Succeeded;
-                playPlayerID = data.PlayerID;
-                playCardUID = data.CardUID;
-            });
+            //logic.Trigger.RegisterEvent("PlayCard", (data) =>
+            //{
+            //    isSuccessed = data.Succeeded;
+            //    playPlayerID = data.PlayerID;
+            //    playCardUID = data.CardUID;
+            //});
 
             logic.StartGame();
 

@@ -8,8 +8,8 @@ namespace Marsion
         public bool Succeeded;
         public ulong PlayerID;
         public string CardUID;
-        public ulong TargetPlayerID_2;
-        public string TargetCardUID_2;
+        public ulong TargetPlayerID;
+        public string TargetCardUID;
         public int IntValue;
 
         public List<string> CardUIDs;
@@ -21,6 +21,8 @@ namespace Marsion
         IGameDataHandler DataHandler { get; }
         ITriggerHandler Trigger { get; }
         IGameData GameData { get; }
+        ICommandHandler CommandHandler { get; }
+        ICommandFactory CommandFactory { get; }
 
         event Action<IGameData> SendDataUpdated;
 

@@ -24,7 +24,7 @@ namespace Marsion
             var config = dataHandlerFactory.ProvideGameLogicConfig();
             var playerInfos = dataHandlerFactory.ProvidePlayerInfos();
 
-            foreach(var playerInfo in playerInfos)
+            foreach (var playerInfo in playerInfos)
             {
                 var player = new Player();
 
@@ -34,11 +34,11 @@ namespace Marsion
                 player.SetMaxMana(config.MaxMana);
 
                 var deck = new List<Card>();
-                foreach(var soID in playerInfo.Deck)
+                foreach (var soID in playerInfo.Deck)
                 {
                     var card = new Card();
 
-                    if(cardSOs.TryGetValue(soID, out var cardSO))
+                    if (cardSOs.TryGetValue(soID, out var cardSO))
                     {
                         card.Init(Logic, playerInfo.ClientID, cardSO);
                         deck.Add(card);
@@ -55,7 +55,7 @@ namespace Marsion
                 GameData.SetPlayer(player);
             }
 
-            if(playerInfos.Count == 0)
+            if (playerInfos.Count == 0)
             {
                 return;
             }
@@ -67,15 +67,25 @@ namespace Marsion
             GameData.SetCurrentPlayer(firstPlayerID);
         }
 
-        public Player GetPlayer(ulong playerID) => GameData.GetPlayer(playerID);
-
-        public ulong GetOpponentPlayer(ulong playerID)
+        public bool TryGetPlayer(ulong playerID, out Player player)
         {
-            foreach(var opponentID in GameData.Players.Keys)
+            player = GameData.GetPlayer(playerID);
+
+            if (player == null)
             {
-                if(opponentID != playerID)
+                Logger.Log<IGameDataHandler>("Player ID not found.", colorName: ColorCodes.Logic);
+                return false;
+            }
+            return true;
+        }
+
+        public ulong GetOpponentPlayerID(ulong playerID)
+        {
+            foreach (var opponentID in GameData.Players.Keys)
+            {
+                if (opponentID != playerID)
                 {
-                    return GetPlayer(opponentID).PlayerID;
+                    return opponentID;
                 }
             }
 
@@ -84,60 +94,72 @@ namespace Marsion
 
         public Card GetCardFromHand(ulong playerID, string cardUID)
         {
-            if (GetPlayer(playerID).TryGetHandCard(cardUID, out var card))
+            if (!TryGetPlayer(playerID, out var player)) return null;
+
+            if (!player.TryGetHandCard(cardUID, out var card))
             {
-                return card;
+                Logger.Log<IGameDataHandler>("Card UID not found.", colorName: ColorCodes.Logic);
+                return null;
             }
 
-            return null;
+            return card;
         }
 
         public Card GetCardFromField(ulong playerID, string cardUID)
         {
-            if (GetPlayer(playerID).TryGetPlayerCard(cardUID, out var playerCard))
+            if (!TryGetPlayer(playerID, out var player)) return null;
+
+            if (player.TryGetPlayerCard(cardUID, out var playerCard))
             {
                 return playerCard;
             }
 
-            if (GetPlayer(playerID).TryGetFieldCard(cardUID, out var card))
+            if (player.TryGetFieldCard(cardUID, out var card))
             {
                 return card;
             }
 
+            Logger.Log<IGameDataHandler>("Card UID not found.", colorName: ColorCodes.Logic);
             return null;
         }
 
         public void PayMana(ulong playerID, int amount)
         {
-            GetPlayer(playerID).PayMana(amount);
+            if (!TryGetPlayer(playerID, out var player)) return;
+            player.PayMana(amount);
         }
 
         public void AddCardToField(ulong playerID, Card card, int index)
         {
-            GetPlayer(playerID).Field.Insert(index, card);
+            if (!TryGetPlayer(playerID, out var player)) return;
+            player.Field.Insert(index, card);
         }
 
         public void AddCardToHand(ulong playerID, Card card)
         {
-            GetPlayer(playerID).Hand.Add(card);
+            if (!TryGetPlayer(playerID, out var player)) return;
+            player.Hand.Add(card);
         }
 
         public void RemoveCardFromField(ulong playerID, string cardUID)
         {
+            if (!TryGetPlayer(playerID, out var player)) return;
             var card = GetCardFromField(playerID, cardUID);
-            GetPlayer(playerID).Field.Remove(card);
+            player.Field.Remove(card);
         }
 
         public void RemoveCardFromHand(ulong playerID, string cardUID)
         {
+            if (!TryGetPlayer(playerID, out var player)) return;
             var card = GetCardFromHand(playerID, cardUID);
-            GetPlayer(playerID).Hand.Remove(card);
+            player.Hand.Remove(card);
         }
 
         public void ShuffleDeck(ulong playerID)
         {
             Logger.Log<DefaultGameDataHandler>("Shuffle deck", colorName: ColorCodes.Logic);
-            List<Card> deck = GetPlayer(playerID).Deck;
+            if (!TryGetPlayer(playerID, out var player)) return;
+            List<Card> deck = player.Deck;
 
             Random rng = new Random();
             int n = deck.Count;
@@ -154,14 +176,19 @@ namespace Marsion
         public void DrawCard(ulong playerID, out Card drawnCard)
         {
             Logger.Log<DefaultGameDataHandler>("Draw a card", colorName: ColorCodes.Logic);
+            if (!TryGetPlayer(playerID, out var player))
+            {
+                drawnCard = null;
+                return;
+            }
 
             Card card = null;
 
-            if (GetPlayer(playerID).Deck.Count > 0 && GetPlayer(playerID).Hand.Count < 10)
+            if (player.Deck.Count > 0 && player.Hand.Count < 10)
             {
-                card = GetPlayer(playerID).Deck[0];
-                GetPlayer(playerID).Deck.RemoveAt(0);
-                GetPlayer(playerID).Hand.Add(card);
+                card = player.Deck[0];
+                player.Deck.RemoveAt(0);
+                player.Hand.Add(card);
             }
             else
             {
@@ -174,18 +201,22 @@ namespace Marsion
         public void DrawCard(ulong playerID, out List<Card> drawnCards, int count = 1)
         {
             Logger.Log<DefaultGameDataHandler>("Draw cards", colorName: ColorCodes.Logic);
+            if (!TryGetPlayer(playerID, out var player))
+            {
+                drawnCards = null;
+                return;
+            }
 
             List<Card> outCards = new();
-
             Card card = null;
 
             for (int i = 0; i < count; i++)
             {
-                if (GetPlayer(playerID).Deck.Count > 0 && GetPlayer(playerID).Hand.Count < 10)
+                if (player.Deck.Count > 0 && player.Hand.Count < 10)
                 {
-                    card = GetPlayer(playerID).Deck[0];
-                    GetPlayer(playerID).Deck.RemoveAt(0);
-                    GetPlayer(playerID).Hand.Add(card);
+                    card = player.Deck[0];
+                    player.Deck.RemoveAt(0);
+                    player.Hand.Add(card);
 
                     outCards.Add(card);
                 }

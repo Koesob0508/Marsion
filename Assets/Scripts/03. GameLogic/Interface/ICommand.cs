@@ -5,12 +5,9 @@ namespace Marsion
 {
     public interface ICommand
     {
+        CommandData CommandData { get; }
         IGameLogic GameLogic { get; }
-        ICondition Condition { get; }
-        TriggerType Trigger { get; }
-        void Register();
-        void Unregister();
-        void Execute(CommandData data);
-        void CheckTrigger();
+        TriggerType TriggerType { get; }
+        void Execute();
     }
 }

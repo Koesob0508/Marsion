@@ -22,9 +22,8 @@ namespace Marsion
         [JsonProperty] public bool IsDead { get; private set; }
 
         private IGameLogic _logic;
-        private List<AbilitySO> _abilities;
-        private List<ITrigger> _triggers;
-
+        private List<AbilitySO> SpellAbilities;
+        private List<AbilitySO> Abilities;
         public void Init(ulong playerID)
         {
             UID = Guid.NewGuid().ToString();
@@ -37,7 +36,6 @@ namespace Marsion
             Health = MaxHealth;
 
             IsDead = false;
-            _triggers = new();
         }
 
         // 생물 카드용 초기화
@@ -56,37 +54,27 @@ namespace Marsion
             IsDead = false;
 
             _logic = gameLogic;
-            _triggers = new();
-            _abilities = new();
+            SpellAbilities = new();
+            Abilities = new();
 
             foreach (var ability in cardSO.Abilities)
             {
-                _abilities.Add(ability);
+                if(ability.Type == AbilityType.Spell)
+                {
+                    SpellAbilities.Add(ability);
+                }
+                else
+                {
+                    Abilities.Add(ability);
+                }
+
                 ability.Init();
             }
         }
 
-        public void ExecutePlayAbility()
+        public List<AbilitySO> GetCreatureSpell()
         {
-            foreach (var ability in _abilities)
-            {
-                if (ability.Type == AbilityType.Play)
-                {
-                    ability.Execute(_logic, this);
-                }
-            }
-        }
-
-        public void AddTrigger(ITrigger trigger)
-        {
-            _triggers.Add(trigger);
-            trigger.Register();
-        }
-
-        public void RemoveTrigger(ITrigger trigger)
-        {
-            trigger.Unregister();
-            _triggers.Remove(trigger);
+            return SpellAbilities;
         }
 
         public void SetPlayerID(ulong playerID) { PlayerID = playerID; }

@@ -2,8 +2,8 @@
 
 namespace Marsion
 {
-    [CreateAssetMenu(fileName = "DrawEffect", menuName = "Marsion/Effect/DrawEffect")]
-    public class DrawEffect : EffectSO
+    [CreateAssetMenu(fileName = "BuffAttack", menuName = "Marsion/Effect/BuffAttack")]
+    public class BuffAttack : EffectSO
     {
         private int _value;
 
@@ -11,9 +11,10 @@ namespace Marsion
         {
             _value = value;
         }
+
         public override void Execute(IGameLogic logic, Card card)
         {
-            logic.DrawCard(card.PlayerID, _value);
+            Debug.Log($"{card.Name} 공격력 {_value} 증가!");
         }
     }
 }

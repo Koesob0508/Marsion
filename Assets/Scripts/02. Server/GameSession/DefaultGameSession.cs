@@ -255,8 +255,8 @@ namespace Marsion
             sdata.Succeeded = cdata.Succeeded;
             sdata.AttackPlayerID = cdata.PlayerID;
             sdata.AttackerUID = cdata.CardUID;
-            sdata.DefendPlayerID = cdata.TargetPlayerID_2;
-            sdata.DefenderUID = cdata.TargetCardUID_2;
+            sdata.DefendPlayerID = cdata.TargetPlayerID;
+            sdata.DefenderUID = cdata.TargetCardUID;
 
             SendToAll(GameMessageCode.ServerAttackCardResult, sdata, NetworkDelivery.Reliable);
 

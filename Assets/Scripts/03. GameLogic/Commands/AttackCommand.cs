@@ -4,30 +4,23 @@ namespace Marsion
 {
     public class AttackCommand : BaseCommand
     {
-        private readonly IGameLogic _gameLogic;
-        private readonly CommandData _data;
         private readonly ulong attackerID;
         private readonly string attackerUID;
         private readonly ulong defenderID;
         private readonly string defenderUID;
 
-        public AttackCommand(IGameLogic gameLogic, CommandData data)
+        public AttackCommand(IGameLogic logic, CommandData data, TriggerType trigger) : base(logic, data, trigger)
         {
-            _gameLogic = gameLogic;
-            _data = data;
-
             attackerID = data.PlayerID;
             attackerUID = data.CardUID;
-            defenderID = data.TargetPlayerID_2;
-            defenderUID = data.TargetCardUID_2;
+            defenderID = data.TargetPlayerID;
+            defenderUID = data.TargetCardUID;
         }
 
-        public void Execute()
+        protected override void Implement()
         {
-            var attackPlayer = _gameLogic.DataHandler.GetPlayer(attackerID);
-            var attacker = _gameLogic.DataHandler.GetCardFromField(attackerID, attackerUID);
-            var defenderPlayer = _gameLogic.DataHandler.GetPlayer(defenderID);
-            var defender = _gameLogic.DataHandler.GetCardFromField(defenderID, defenderUID);
+            var attacker = GameLogic.DataHandler.GetCardFromField(attackerID, attackerUID);
+            var defender = GameLogic.DataHandler.GetCardFromField(defenderID, defenderUID);
 
             if (attackerUID == null) Logger.LogWarning<AttackCommand>("attack null.");
             if (defenderUID == null) Logger.LogWarning<AttackCommand>("defend null.");

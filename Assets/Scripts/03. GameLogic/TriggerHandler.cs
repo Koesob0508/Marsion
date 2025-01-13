@@ -7,7 +7,7 @@ namespace Marsion
     {
         private readonly Dictionary<TriggerType, List<Action<CommandData>>> _triggerListeners = new();
 
-        public void RegisterTrigger(TriggerType type, Action<CommandData> listener)
+        public void Register(TriggerType type, Action<CommandData> listener)
         {
             if (!_triggerListeners.ContainsKey(type))
                 _triggerListeners[type] = new List<Action<CommandData>>();
@@ -15,13 +15,13 @@ namespace Marsion
             _triggerListeners[type].Add(listener);
         }
 
-        public void UnregisterTrigger(TriggerType type, Action<CommandData> listener)
+        public void Unregister(TriggerType type, Action<CommandData> listener)
         {
             if (_triggerListeners.ContainsKey(type))
                 _triggerListeners[type].Remove(listener);
         }
 
-        public void TriggerEvent(TriggerType type, CommandData eventData = null)
+        public void Trigger(TriggerType type, CommandData eventData = null)
         {
             if (_triggerListeners.ContainsKey(type))
             {

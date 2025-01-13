@@ -26,8 +26,8 @@ namespace Marsion
 
         public T Get<T>() where T : INetworkSerializable, new()
         {
-            reader.ReadNetworkSerializable(out T val);
-            return val;
+            reader.ReadNetworkSerializable(out T value);
+            return value;
         }
     }
 

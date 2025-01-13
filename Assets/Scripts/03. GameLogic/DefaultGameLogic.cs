@@ -10,9 +10,8 @@ namespace Marsion
         public IDataManager Data { get; private set; }
         public ITriggerHandler Trigger { get; private set; }
         public IGameDataHandler DataHandler { get; private set; }
-
-        private ICommandHandler _commandHandler;
-        private ICommandFactory _commandFactory;
+        public ICommandHandler CommandHandler { get; private set; }
+        public ICommandFactory CommandFactory { get; private set; }
 
         public IGameData GameData => DataHandler.GameData;
 
@@ -33,8 +32,8 @@ namespace Marsion
             Trigger = logicFactory.CreateTriggerhandler();
             DataHandler = logicFactory.CreateGameDataHandler();
             var logicConfig = logicFactory.CreateGameLogicConfig();
-            _commandHandler = logicFactory.CreateCommandHandler(this);
-            _commandFactory = logicFactory.CreateCommandFactory(this);
+            CommandHandler = logicFactory.CreateCommandHandler(this);
+            CommandFactory = logicFactory.CreateCommandFactory(this);
 
             DataHandler.Init(logicFactory.CreateGameDataHandlerFactory(this, logicConfig));
         }
@@ -55,7 +54,7 @@ namespace Marsion
 
             // TODO : 멀리건 추가
             DataHandler.DrawCard(DataHandler.CurrentPlayer.PlayerID, out var _, count : 3);
-            DataHandler.DrawCard(DataHandler.GetOpponentPlayer(DataHandler.CurrentPlayer.PlayerID), out var _, count : 4);
+            DataHandler.DrawCard(DataHandler.GetOpponentPlayerID(DataHandler.CurrentPlayer.PlayerID), out var _, count : 4);
 
             SendDataUpdated?.Invoke(GameData);
             SendGameStarted?.Invoke();
@@ -85,82 +84,82 @@ namespace Marsion
 
             //TriggerHandler.TriggerEvent("UpdateData");
             //TriggerHandler.TriggerEvent("ChangeMana");
-            SendTurnStarted?.Invoke();
-            SendCardDrawn?.Invoke(DataHandler.CurrentPlayer.PlayerID, card.UID);
+            //SendTurnStarted?.Invoke();
+            //SendCardDrawn?.Invoke(DataHandler.CurrentPlayer.PlayerID, card.UID);
         }
 
         public void EndTurn()
         {
-            Logger.Log<DefaultGameLogic>($"End turn", colorName: ColorCodes.Logic);
+            //Logger.Log<DefaultGameLogic>($"End turn", colorName: ColorCodes.Logic);
 
-            DataHandler.ChangeCurrentPlayer();
+            //DataHandler.ChangeCurrentPlayer();
 
-            SendDataUpdated?.Invoke(GameData);
-            SendTurnEnded?.Invoke();
+            //SendDataUpdated?.Invoke(GameData);
+            //SendTurnEnded?.Invoke();
 
-            StartTurn();
+            //StartTurn();
         }
 
         public void TrySpawnCard(ulong playerID, string cardUID, int index)
         {
-            Logger.Log<IGameLogic>("Try spawn card", colorName: ColorCodes.Logic);
+            //Logger.Log<IGameLogic>("Try spawn card", colorName: ColorCodes.Logic);
 
-            var player = DataHandler.GetPlayer(playerID);
-            var card = DataHandler.GetCardFromHand(playerID, cardUID);
+            //var player = DataHandler.GetPlayer(playerID);
+            //var card = DataHandler.GetCardFromHand(playerID, cardUID);
 
-            if (player.Mana < card.ManaCost)
-            {
-                var cdata = new CommandData();
-                cdata.PlayerID = player.PlayerID;
-                cdata.CardUID = card.UID;
+            //if (player.Mana < card.ManaCost)
+            //{
+            //    var cdata = new CommandData();
+            //    cdata.PlayerID = player.PlayerID;
+            //    cdata.CardUID = card.UID;
 
-                //TriggerHandler.TriggerEvent("FailedPlayCard", cdata);
-                return;
-            }
+            //    //TriggerHandler.TriggerEvent("FailedPlayCard", cdata);
+            //    return;
+            //}
 
-            var payManaCommand = _commandFactory.CreatePayMana(playerID, card.ManaCost);
-            var spawnCommand = _commandFactory.CreatePlayCard(playerID, cardUID, index);
-            _commandHandler.Add(payManaCommand);
-            _commandHandler.Add(spawnCommand);
+            //var payManaCommand = _commandFactory.CreatePayMana(playerID, card.ManaCost);
+            //var spawnCommand = _commandFactory.CreateSpawnCard(playerID, cardUID, index);
+            //_commandHandler.Add(payManaCommand);
+            //_commandHandler.Add(spawnCommand);
 
-            SendCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
-            SendDataUpdated?.Invoke(GameData);
+            //SendCardSpawned?.Invoke(true, player.PlayerID, card.UID, index);
+            //SendDataUpdated?.Invoke(GameData);
         }
 
         public void TryAttack(ulong attackPlayerID, string attackCardUID, ulong defendPlayerID, string defendCardUID)
         {
-            _commandHandler.Add(_commandFactory.CreateAttack(attackPlayerID, attackCardUID, defendPlayerID, defendCardUID));
+            //_commandHandler.Add(_commandFactory.CreateAttack(attackPlayerID, attackCardUID, defendPlayerID, defendCardUID));
 
-            SendDataUpdated?.Invoke(GameData);
-            SendCardAttacked?.Invoke(true, attackPlayerID, attackCardUID, defendPlayerID, defendCardUID);
+            //SendDataUpdated?.Invoke(GameData);
+            //SendCardAttacked?.Invoke(true, attackPlayerID, attackCardUID, defendPlayerID, defendCardUID);
 
-            List<string> deadCardUIDs = CheckDeadCard();
+            //List<string> deadCardUIDs = CheckDeadCard();
 
-            SendDataUpdated?.Invoke(GameData);
-            SendCardDied?.Invoke(deadCardUIDs);
+            //SendDataUpdated?.Invoke(GameData);
+            //SendCardDied?.Invoke(deadCardUIDs);
 
-            RemoveDeadCard();
+            //RemoveDeadCard();
 
-            SendDataUpdated?.Invoke(GameData);
+            //SendDataUpdated?.Invoke(GameData);
 
-            List<ulong> alivePlayerIDs = new();
+            //List<ulong> alivePlayerIDs = new();
 
-            foreach(var playerID in DataHandler.GameData.Players.Keys)
-            {
-                if(DataHandler.GetPlayer(playerID).Health > 0)
-                {
-                    alivePlayerIDs.Add(playerID);
-                }
-            }
+            //foreach(var playerID in DataHandler.GameData.Players.Keys)
+            //{
+            //    if(DataHandler.GetPlayer(playerID).Health > 0)
+            //    {
+            //        alivePlayerIDs.Add(playerID);
+            //    }
+            //}
 
-            if(alivePlayerIDs.Count == 1)
-            {
-                SendGameEnded?.Invoke(alivePlayerIDs[0]);
-            }
-            else if(alivePlayerIDs.Count == 0)
-            {
-                SendGameEnded?.Invoke(1000);
-            }
+            //if(alivePlayerIDs.Count == 1)
+            //{
+            //    SendGameEnded?.Invoke(alivePlayerIDs[0]);
+            //}
+            //else if(alivePlayerIDs.Count == 0)
+            //{
+            //    SendGameEnded?.Invoke(1000);
+            //}
         }
 
         private List<string> CheckDeadCard()
@@ -169,7 +168,9 @@ namespace Marsion
 
             foreach (var playerID in DataHandler.GameData.Players.Keys)
             {
-                foreach (Card card in DataHandler.GetPlayer(playerID).Field)
+                if (!DataHandler.TryGetPlayer(playerID, out var player)) return null;
+
+                foreach (Card card in player.Field)
                 {
                     if(card.Health <= 0)
                     {
@@ -188,7 +189,9 @@ namespace Marsion
 
             foreach (var playerID in DataHandler.GameData.Players.Keys)
             {
-                foreach (Card card in DataHandler.GetPlayer(playerID).Field)
+                if (!DataHandler.TryGetPlayer(playerID, out var player)) return;
+
+                foreach (Card card in player.Field)
                 {
                     if (card.IsDead)
                     {
@@ -201,9 +204,11 @@ namespace Marsion
             {
                 foreach(var playerID in DataHandler.GameData.Players.Keys)
                 {
-                    if(DataHandler.GetPlayer(playerID).Field.Contains(card))
+                    if (!DataHandler.TryGetPlayer(playerID, out var player)) return;
+
+                    if (player.Field.Contains(card))
                     {
-                        DataHandler.GetPlayer(playerID).Field.Remove(card);
+                        player.Field.Remove(card);
                     }
                 }
             }
@@ -222,14 +227,6 @@ namespace Marsion
                 SendDataUpdated?.Invoke(GameData);
                 SendCardDrawn?.Invoke(playerID, drawnCard.UID);
             }
-        }
-
-        public void InitSendCardPlayed()
-        {
-            //EventHandler.RegisterEvent("CardPlayed", (commandData) =>
-            //{
-            //    SendCardPlayed?.Invoke(commandData.Succeeded, commandData.PlayerID, commandData.CardUID);
-            //});
         }
     }
 }

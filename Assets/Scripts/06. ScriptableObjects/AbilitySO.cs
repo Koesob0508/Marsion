@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Marsion
 {
     public enum AbilityType
     {
-
-        Play,
+        Ongoing,
+        Spell,
         Exit
     }
 
@@ -16,21 +17,17 @@ namespace Marsion
         public string ID => id;
         public AbilityType Type;
         public int value;
-        public EffectSO[] Effects;
+        public EffectSO Effect;
 
         public virtual void Init()
         {
-            foreach(var effect in Effects)
+            try
             {
-                effect.Init(value);
+                Effect.Init(value);
             }
-        }
-
-        public virtual void Execute(IGameLogic gameLogic, Card card)
-        {
-            foreach(var effect in Effects)
+            catch (Exception ex)
             {
-                effect.Execute(gameLogic, card);
+                throw new Exception($"Error initializing Effect: {ex.Message}");
             }
         }
     }

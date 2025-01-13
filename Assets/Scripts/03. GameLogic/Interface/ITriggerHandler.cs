@@ -4,13 +4,20 @@ namespace Marsion
 {
     public enum TriggerType
     {
+        None,
         Spawn,
+        PayMana,
+        PlayCreature,
+        CreatureSpell,
+        Attack,
+        DrawCard,
+        BuffAttack,
     }
 
     public interface ITriggerHandler
     {
-        void RegisterTrigger(TriggerType type, Action<CommandData> listener);
-        void UnregisterTrigger(TriggerType type, Action<CommandData> listener);
-        void TriggerEvent(TriggerType type, CommandData triggerData = null);
+        void Register(TriggerType type, Action<CommandData> listener);
+        void Unregister(TriggerType type, Action<CommandData> listener);
+        void Trigger(TriggerType type, CommandData triggerData = null);
     }
 }

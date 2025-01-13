@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: GreenDragonAbility
   m_EditorClassIdentifier: 
   id: 16
+  Type: 1
   value: 2
-  Effects:
-  - {fileID: 11400000, guid: 6e8c3ed042a20e54fbeec0d9620b880d, type: 2}
+  Effect: {fileID: 11400000, guid: 6e8c3ed042a20e54fbeec0d9620b880d, type: 2}

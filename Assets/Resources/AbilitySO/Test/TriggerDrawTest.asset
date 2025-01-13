@@ -9,7 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f881e4fd30e5b504d9505120af6d6a05, type: 3}
-  m_Name: DrawEffect
+  m_Script: {fileID: 11500000, guid: 32d872ddfebb5c54b9faa178947fade2, type: 3}
+  m_Name: TriggerDrawTest
   m_EditorClassIdentifier: 
-  TriggerType: 5
+  id: 998
+  Type: 0
+  value: 1
+  Effect: {fileID: 11400000, guid: 0be44fe6200301e4e96e1624e9cc01d5, type: 2}

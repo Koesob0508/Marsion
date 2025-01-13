@@ -3,16 +3,11 @@
 namespace Marsion
 {
     [CreateAssetMenu(fileName = "EffectSO", menuName = "Marsion/EffectSO")]
-    public class EffectSO : ScriptableObject
+    public abstract class EffectSO : ScriptableObject
     {
-        public virtual void Init(int value)
-        {
+        public TriggerType TriggerType;
 
-        }
-
-        public virtual void Execute(IGameLogic logic, Card card)
-        {
-
-        }
+        public abstract void Init(int value);
+        public abstract void Execute(IGameLogic logic, Card card);
     }
 }

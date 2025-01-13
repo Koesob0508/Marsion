@@ -8,8 +8,8 @@ namespace Marsion.Tests
     public class GameLogicInitialTests
     {
         Mock<IManagers> mockManagers;
-        ulong firsClientID = 31;
-        ulong secondClientID = 72;
+        readonly ulong firsClientID = 31;
+        readonly ulong secondClientID = 72;
 
         [SetUp]
         public void SetUp()
@@ -79,7 +79,7 @@ namespace Marsion.Tests
             gameLogic.Init(logicFactory);
 
             var commandFactory = logicFactory.CreateCommandFactory(gameLogic);
-            var playCommand = commandFactory.CreatePlayCard(13, "asdf", 0);
+            var playCommand = commandFactory.CreatePlayCreature(13, "asdf", 0);
             var attackCommand = commandFactory.CreateAttack(13, "asdf", 14, "fdas");
 
             Assert.IsNotNull(commandFactory);

@@ -2,6 +2,6 @@
 root = true
 
 [*.cs]
-dotnet_diagnostic.IDE0051.severity = error   # 사용되지 않는 코드 경고를 오류로 변경
+dotnet_diagnostic.IDE0051.severity = warning   # 사용되지 않는 코드 경고를 오류로 변경
 dotnet_diagnostic.IDE0044.severity = warning # 불변 필드 권장 메시지를 경고로 표시
 csharp_prefer_braces = true                  # if/else 문에 중괄호를 강제

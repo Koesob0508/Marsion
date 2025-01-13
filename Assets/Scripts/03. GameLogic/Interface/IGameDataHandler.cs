@@ -10,8 +10,8 @@ namespace Marsion
         
         Player CurrentPlayer { get; }
 
-        Player GetPlayer(ulong playerID);
-        ulong GetOpponentPlayer(ulong playerID);
+        bool TryGetPlayer(ulong playerID, out Player player);
+        ulong GetOpponentPlayerID(ulong playerID);
         Card GetCardFromHand(ulong playerID, string cardUID);
         Card GetCardFromField(ulong playerID, string cardUID);
 
