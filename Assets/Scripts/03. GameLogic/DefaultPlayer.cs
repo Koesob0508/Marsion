@@ -8,16 +8,18 @@ namespace Marsion
     /// 플레이어 클래스, 플레이어의 상태, 카드 위치 관리리
     /// </summary>
     [Serializable]
-    public class Player
+    public class DefaultPlayer : IPlayer
     {
         [JsonProperty] public ulong PlayerID { get; private set; }
+        public string HeroID { get; }
 
         public Card PlayerCard;
         [JsonProperty] public string Portrait { get; private set; }
 
-        public List<Card> Deck;
-        public List<Card> Hand;
-        public List<Card> Field;
+        public List<ICard> Deck { get; private set; }
+        public List<ICard> Hand { get; private set; }
+        public List<ICard> Field { get; private set; }
+        public List<ICard> Grave { get; private set; }
 
         public int Health => PlayerCard.Health;
         [JsonProperty] public int MaxHealth { get; private set; }
@@ -39,7 +41,7 @@ namespace Marsion
 
         public void SetPlayerPortrait(string portraitID) { Portrait = portraitID; }
 
-        public void SetDeck(List<Card> deck) { Deck = deck; }
+        public void SetDeck(List<ICard> deck) { Deck = deck; }
 
         public bool TryGetPlayerCard(string uid, out Card card)
         {

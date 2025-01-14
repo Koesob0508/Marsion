@@ -2,7 +2,7 @@
 {
     public class CreatureEffectCommand : BaseCommand
     {
-        private readonly Card card;
+        private readonly ICard card;
         private EffectSO _effect;
 
         public CreatureEffectCommand(IGameLogic logic, CommandData data, TriggerType trigger) : base(logic, data, trigger)

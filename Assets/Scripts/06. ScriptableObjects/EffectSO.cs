@@ -8,6 +8,6 @@ namespace Marsion
         public TriggerType TriggerType;
 
         public abstract void Init(int value);
-        public abstract void Execute(IGameLogic logic, Card card);
+        public abstract void Execute(IGameLogic logic, ICard card);
     }
 }

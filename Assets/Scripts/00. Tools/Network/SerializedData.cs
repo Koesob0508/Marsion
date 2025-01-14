@@ -50,6 +50,13 @@ namespace Marsion
             serializer.SerializeValue(ref value);
         }
     }
+    public class SerializedCard : INetworkSerializable
+    {
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            throw new System.NotImplementedException();
+        }
+    }
 
     public class SerializedGameData : INetworkSerializable
     {

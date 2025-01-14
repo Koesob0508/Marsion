@@ -10,8 +10,8 @@ namespace Marsion
     [Serializable]
     public class DefaultGameData : IGameData
     {
-        [JsonProperty] public Dictionary<ulong, Player> Players { get; private set; }
-        [JsonProperty] public Player CurrentPlayer { get; set; }
+        [JsonProperty] public Dictionary<ulong, DefaultPlayer> Players { get; private set; }
+        [JsonProperty] public DefaultPlayer CurrentPlayer { get; set; }
         [JsonProperty] public int TurnCount { get; private set; }
 
         public void Init(IGameLogicConfig config)
@@ -20,7 +20,7 @@ namespace Marsion
             TurnCount = 0;
         }
 
-        public void SetPlayer(Player player)
+        public void SetPlayer(DefaultPlayer player)
         {
             Players[player.PlayerID] = player;
         }
@@ -30,7 +30,7 @@ namespace Marsion
             CurrentPlayer = GetPlayer(playerID);
         }
 
-        public Player GetPlayer(ulong playerID)
+        public DefaultPlayer GetPlayer(ulong playerID)
         {
             if (Players[playerID] == null)
             {

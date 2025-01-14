@@ -19,10 +19,10 @@ namespace Marsion
         event Action OnTurnStarted;
         event Action OnTurnEnded;
         event Action OnManaChanged;
-        event Action<Player, Card> OnCardDrawn;
-        event Action<bool, Player, Card> OnCardPlayed;
-        event Action<bool, Player, Card, int> OnCardSpawned;
-        event Action<Sequencer.Sequence, Player, Card, Player, Card> OnAttackStarted;
+        event Action<DefaultPlayer, ICard> OnCardDrawn;
+        event Action<bool, DefaultPlayer, Card> OnCardPlayed;
+        event Action<bool, DefaultPlayer, Card, int> OnCardSpawned;
+        event Action<Sequencer.Sequence, DefaultPlayer, Card, DefaultPlayer, Card> OnAttackStarted;
         event Action<List<string>> OnCardDied;
 
         void Init();
@@ -30,10 +30,10 @@ namespace Marsion
         void SendTurnEnd();
 
         void SendTryAttack(Card attacker, Card defender);
-        void SendTrySpawnCard(Card card, int index);
+        void SendTrySpawnCard(ICard card, int index);
 
         bool IsMine(ulong id);
-        bool IsMine(Player player);
+        bool IsMine(DefaultPlayer player);
         bool IsMine(Card card);
         bool IsMyTurn();
         Card GetCard(CardType type, ulong playerID, string cardUID);

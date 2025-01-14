@@ -12,7 +12,7 @@ namespace Marsion
             _value = value;
         }
 
-        public override void Execute(IGameLogic logic, Card card)
+        public override void Execute(IGameLogic logic, ICard card)
         {
             Debug.Log($"{card.Name} 공격력 {_value} 증가!");
         }

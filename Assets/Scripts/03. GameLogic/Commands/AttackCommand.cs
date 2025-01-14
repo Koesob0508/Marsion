@@ -19,15 +19,15 @@ namespace Marsion
 
         protected override void Implement()
         {
-            var attacker = GameLogic.DataHandler.GetCardFromField(attackerID, attackerUID);
-            var defender = GameLogic.DataHandler.GetCardFromField(defenderID, defenderUID);
+            //var attacker = GameLogic.DataHandler.GetCardFromField(attackerID, attackerUID);
+            //var defender = GameLogic.DataHandler.GetCardFromField(defenderID, defenderUID);
 
-            if (attackerUID == null) Logger.LogWarning<AttackCommand>("attack null.");
-            if (defenderUID == null) Logger.LogWarning<AttackCommand>("defend null.");
-            attacker.TakeDamage(defender.Attack);
-            defender.TakeDamage(attacker.Attack);
+            //if (attackerUID == null) Logger.LogWarning<AttackCommand>("attack null.");
+            //if (defenderUID == null) Logger.LogWarning<AttackCommand>("defend null.");
+            //attacker.TakeDamage(defender.Power);
+            //defender.TakeDamage(attacker.Power);
 
-            Logger.Log<DefaultGameLogic>($"{attacker.Name} attacked {defender.Name}", colorName: ColorCodes.Logic);
+            //Logger.Log<DefaultGameLogic>($"{attacker.Name} attacked {defender.Name}", colorName: ColorCodes.Logic);
         }
     }
 }

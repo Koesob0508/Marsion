@@ -25,7 +25,7 @@ namespace Marsion.CardView
 
         [SerializeField] public CardViewParameters Parameters;
 
-        public Card Card { get; set; }
+        public ICard Card { get; set; }
         public string Name => gameObject.name;
         public MonoBehaviour MonoBehaviour => this;
         public CardViewFsm FSM { get; private set; }

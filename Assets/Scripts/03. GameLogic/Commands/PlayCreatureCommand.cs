@@ -9,19 +9,19 @@ namespace Marsion
 
         protected override void Implement()
         {
-            var card = GameLogic.DataHandler.GetCardFromHand(CommandData.PlayerID, CommandData.CardUID);
+            //var card = GameLogic.DataHandler.GetCardFromHand(CommandData.PlayerID, CommandData.CardUID);
 
-            Logger.Log<PlayCreatureCommand>($"Play Creature : {card.Name} at position {CommandData.IntValue}", colorName: ColorCodes.Logic);
+            //Logger.Log<PlayCreatureCommand>($"Play Creature : {card.Name} at position {CommandData.IntValue}", colorName: ColorCodes.Logic);
 
-            GameLogic.DataHandler.RemoveCardFromHand(CommandData.PlayerID, CommandData.CardUID);
-            GameLogic.DataHandler.AddCardToField(CommandData.PlayerID, card, CommandData.IntValue);
+            //GameLogic.DataHandler.RemoveCardFromHand(CommandData.PlayerID, CommandData.CardUID);
+            //GameLogic.DataHandler.AddCardToField(CommandData.PlayerID, card, CommandData.IntValue);
 
-            var creatureSpell = card.GetCreatureSpell();
+            //var creatureSpell = card.GetCreatureSpell();
 
-            if (creatureSpell.Count == 0) return;
+            //if (creatureSpell.Count == 0) return;
 
-            var spellCommand = GameLogic.CommandFactory.CreateCreatureSpell(CommandData.PlayerID, CommandData.CardUID, creatureSpell);
-            GameLogic.CommandHandler.Add(spellCommand);
+            //var spellCommand = GameLogic.CommandFactory.CreateCreatureSpell(CommandData.PlayerID, CommandData.CardUID, creatureSpell);
+            //GameLogic.CommandHandler.Add(spellCommand);
 
             //_gameLogic.Trigger.TriggerEvent("UpdateData", _data);
             //_gameLogic.Trigger.TriggerEvent("PlayCard", _data);

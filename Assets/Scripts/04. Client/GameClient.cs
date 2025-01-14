@@ -38,10 +38,10 @@ namespace Marsion
         public event Action OnTurnStarted;
         public event Action OnTurnEnded;
         public event Action OnManaChanged;
-        public event Action<Player, Card> OnCardDrawn;
-        public event Action<bool, Player, Card> OnCardPlayed;
-        public event Action<bool, Player, Card, int> OnCardSpawned;
-        public event Action<Sequencer.Sequence, Player, Card, Player, Card> OnAttackStarted;
+        public event Action<DefaultPlayer, ICard> OnCardDrawn;
+        public event Action<bool, DefaultPlayer, Card> OnCardPlayed;
+        public event Action<bool, DefaultPlayer, Card, int> OnCardSpawned;
+        public event Action<Sequencer.Sequence, DefaultPlayer, Card, DefaultPlayer, Card> OnAttackStarted;
         public event Action<List<string>> OnCardDied;
 
         public void Init()
@@ -113,7 +113,7 @@ namespace Marsion
             Send(GameMessageCode.ClientTryAttack, sdata, NetworkDelivery.Reliable);
         }
 
-        public void SendTrySpawnCard(Card card, int index)
+        public void SendTrySpawnCard(ICard card, int index)
         {
             Logger.Log<GameClient>("Try spawn", colorName: ColorCodes.Client);
 
@@ -301,9 +301,9 @@ namespace Marsion
 
             clip.OnPlay += () =>
             {
-                Player attackPlayer = Data.GetPlayer(sResultData.AttackPlayerID);
+                DefaultPlayer attackPlayer = Data.GetPlayer(sResultData.AttackPlayerID);
                 Card attacker = Data.GetFieldCard(attackPlayer.PlayerID, sResultData.AttackerUID);
-                Player defendPlayer = Data.GetPlayer(sResultData.DefendPlayerID);
+                DefaultPlayer defendPlayer = Data.GetPlayer(sResultData.DefendPlayerID);
                 Card defender = Data.GetFieldCard(defendPlayer.PlayerID, sResultData.DefenderUID);
 
                 OnAttackStarted?.Invoke(sequence, attackPlayer, attacker, defendPlayer, defender);
@@ -332,7 +332,7 @@ namespace Marsion
             return PlayerID == id;
         }
 
-        public bool IsMine(Player player)
+        public bool IsMine(DefaultPlayer player)
         {
             return IsMine(player.PlayerID);
         }

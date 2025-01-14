@@ -8,21 +8,21 @@ namespace Marsion
 
         void Init(IGameDataHandlerFactory dataHandlerFactory);
         
-        Player CurrentPlayer { get; }
+        DefaultPlayer CurrentPlayer { get; }
 
-        bool TryGetPlayer(ulong playerID, out Player player);
+        bool TryGetPlayer(ulong playerID, out DefaultPlayer player);
         ulong GetOpponentPlayerID(ulong playerID);
-        Card GetCardFromHand(ulong playerID, string cardUID);
-        Card GetCardFromField(ulong playerID, string cardUID);
+        ICard GetCardFromHand(ulong playerID, string cardUID);
+        ICard GetCardFromField(ulong playerID, string cardUID);
 
         void PayMana(ulong playerID, int amount);
-        void AddCardToHand(ulong playerID, Card card);
+        void AddCardToHand(ulong playerID, ICard card);
         void RemoveCardFromHand(ulong playerID, string cardUID);
-        void AddCardToField(ulong playerID, Card card, int index);
+        void AddCardToField(ulong playerID, ICard card, int index);
         void RemoveCardFromField(ulong playerID, string cardUID);
         void ShuffleDeck(ulong playerID);
-        void DrawCard(ulong playerID, out Card drawnCard);
-        void DrawCard(ulong playerID, out List<Card> drawnCards, int count = 1);
+        void DrawCard(ulong playerID, out ICard drawnCard);
+        void DrawCard(ulong playerID, out List<ICard> drawnCards, int count = 1);
         void AdvanceTurn();
         void ChangeCurrentPlayer();
     }

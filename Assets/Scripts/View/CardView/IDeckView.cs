@@ -2,6 +2,6 @@
 {
     public interface IDeckView
     {
-        void DrawCard(Player player, Card card);
+        void DrawCard(DefaultPlayer player, ICard card);
     }
 }

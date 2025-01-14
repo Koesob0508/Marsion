@@ -65,7 +65,7 @@ namespace Marsion.CardView
                 Logger.Log<CreatureView>("Card is null");
 
             Card = card;
-            Text_Attack.text = card.Attack.ToString();
+            Text_Attack.text = card.Power.ToString();
             Text_Health.text = card.Health.ToString();
         }
 
@@ -79,13 +79,13 @@ namespace Marsion.CardView
 
         public virtual void UpdateStatus()
         {
-            Text_Attack.text = Card.Attack.ToString();
+            Text_Attack.text = Card.Power.ToString();
             Text_Health.text = Card.Health.ToString();
         }
 
         public abstract void Spawn();
         public abstract void Die();
-        protected virtual void Attack(Sequencer.Sequence sequence, Player attackPlayer, Card attacker, Player defendPlayer, Card defender)
+        protected virtual void Attack(Sequencer.Sequence sequence, DefaultPlayer attackPlayer, Card attacker, DefaultPlayer defendPlayer, Card defender)
         {
             if (Card.UID != attacker.UID) return;
 

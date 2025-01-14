@@ -2,7 +2,7 @@
 {
     public interface IDamageable
     {
-        public int Attack { get; }
+        public int Power { get; }
         void TakeDamage(int amount);
     }
 }

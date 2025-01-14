@@ -11,7 +11,7 @@ namespace Marsion
         {
             _value = value;
         }
-        public override void Execute(IGameLogic logic, Card card)
+        public override void Execute(IGameLogic logic, ICard card)
         {
             logic.DrawCard(card.PlayerID, _value);
         }

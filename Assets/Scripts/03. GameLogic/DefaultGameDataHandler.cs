@@ -11,7 +11,7 @@ namespace Marsion
         public IGameLogic Logic { get; private set; }
         public IGameData GameData { get; private set; }
 
-        public Player CurrentPlayer => GameData.CurrentPlayer;
+        public DefaultPlayer CurrentPlayer => GameData.CurrentPlayer;
 
         public void Init(IGameDataHandlerFactory dataHandlerFactory)
         {
@@ -26,14 +26,14 @@ namespace Marsion
 
             foreach (var playerInfo in playerInfos)
             {
-                var player = new Player();
+                var player = new DefaultPlayer();
 
                 player.SetPlayerID(playerInfo.ClientID);
                 player.SetPlayerPortrait(playerInfo.Portrait);
                 player.SetMaxHealth(config.MaxHealth);
                 player.SetMaxMana(config.MaxMana);
 
-                var deck = new List<Card>();
+                var deck = new List<ICard>();
                 foreach (var soID in playerInfo.Deck)
                 {
                     var card = new Card();
@@ -67,7 +67,7 @@ namespace Marsion
             GameData.SetCurrentPlayer(firstPlayerID);
         }
 
-        public bool TryGetPlayer(ulong playerID, out Player player)
+        public bool TryGetPlayer(ulong playerID, out DefaultPlayer player)
         {
             player = GameData.GetPlayer(playerID);
 
@@ -92,7 +92,7 @@ namespace Marsion
             throw new Exception("Other player ID not found.");
         }
 
-        public Card GetCardFromHand(ulong playerID, string cardUID)
+        public ICard GetCardFromHand(ulong playerID, string cardUID)
         {
             if (!TryGetPlayer(playerID, out var player)) return null;
 
@@ -105,7 +105,7 @@ namespace Marsion
             return card;
         }
 
-        public Card GetCardFromField(ulong playerID, string cardUID)
+        public ICard GetCardFromField(ulong playerID, string cardUID)
         {
             if (!TryGetPlayer(playerID, out var player)) return null;
 
@@ -129,13 +129,13 @@ namespace Marsion
             player.PayMana(amount);
         }
 
-        public void AddCardToField(ulong playerID, Card card, int index)
+        public void AddCardToField(ulong playerID, ICard card, int index)
         {
             if (!TryGetPlayer(playerID, out var player)) return;
             player.Field.Insert(index, card);
         }
 
-        public void AddCardToHand(ulong playerID, Card card)
+        public void AddCardToHand(ulong playerID, ICard card)
         {
             if (!TryGetPlayer(playerID, out var player)) return;
             player.Hand.Add(card);
@@ -159,7 +159,7 @@ namespace Marsion
         {
             Logger.Log<DefaultGameDataHandler>("Shuffle deck", colorName: ColorCodes.Logic);
             if (!TryGetPlayer(playerID, out var player)) return;
-            List<Card> deck = player.Deck;
+            List<ICard> deck = player.Deck;
 
             Random rng = new Random();
             int n = deck.Count;
@@ -167,13 +167,13 @@ namespace Marsion
             {
                 n--;
                 int k = rng.Next(n + 1);
-                Card value = deck[k];
+                ICard value = deck[k];
                 deck[k] = deck[n];
                 deck[n] = value;
             }
         }
 
-        public void DrawCard(ulong playerID, out Card drawnCard)
+        public void DrawCard(ulong playerID, out ICard drawnCard)
         {
             Logger.Log<DefaultGameDataHandler>("Draw a card", colorName: ColorCodes.Logic);
             if (!TryGetPlayer(playerID, out var player))
@@ -182,7 +182,7 @@ namespace Marsion
                 return;
             }
 
-            Card card = null;
+            ICard card = null;
 
             if (player.Deck.Count > 0 && player.Hand.Count < 10)
             {
@@ -198,7 +198,7 @@ namespace Marsion
             drawnCard = card;
         }
 
-        public void DrawCard(ulong playerID, out List<Card> drawnCards, int count = 1)
+        public void DrawCard(ulong playerID, out List<ICard> drawnCards, int count = 1)
         {
             Logger.Log<DefaultGameDataHandler>("Draw cards", colorName: ColorCodes.Logic);
             if (!TryGetPlayer(playerID, out var player))
@@ -207,8 +207,8 @@ namespace Marsion
                 return;
             }
 
-            List<Card> outCards = new();
-            Card card = null;
+            List<ICard> outCards = new();
+            ICard card = null;
 
             for (int i = 0; i < count; i++)
             {
