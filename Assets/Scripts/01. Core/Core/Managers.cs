@@ -8,7 +8,6 @@ namespace Marsion
 
         private IResourceManager _resource;
         private IUIManager _ui;
-        private IDataManager _data;
         private INetworkManagerEx _network;
         private IServerManager _server;
         private IClientManager _client;
@@ -16,7 +15,6 @@ namespace Marsion
         public IResourceManager Resource => Instance._resource;
         public IUIManager UI => Instance._ui;
         public static CardManager Card { get; private set; }
-        public IDataManager Data => Instance._data;
         public INetworkManagerEx Network => Instance._network;
         public IServerManager Server => Instance._server;
         public IClientManager Client => Instance._client;
@@ -41,19 +39,17 @@ namespace Marsion
                 Instance._resource = factory.CreateResource(resourceLoader, addressableLoader);
 
                 Instance._ui = factory.CreateUI(Instance.Resource);
-                Instance._data = factory.CreateData(Instance.Resource);
 
                 var networkWrapper = factory.CreateNetworkWrapper();
                 Instance._network = factory.CreateNetworkEx(networkWrapper);
 
                 Card = new CardManager();
 
+                var serverFactory = factory.CreateServerFactory(Instance);
                 Instance._server = factory.CreateServer();
                 Instance._client = factory.CreateClient();
 
-                Instance._data.Init();
-
-                var serverFactory = factory.CreateServerFactory(Instance);
+                Instance._resource.Init();
                 Instance._server.Init(serverFactory);
                 Instance._client.Init();
             }

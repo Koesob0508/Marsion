@@ -26,7 +26,7 @@ namespace Marsion.CardView
         [SerializeField] protected CardType Type;
 
         public Vector3 OriginPosition { get; set; }
-        public Card Card { get; protected set; }
+        public ICard Card { get; protected set; }
         public MonoBehaviour MonoBehaviour => this;
         public CharacterViewFSM FSM { get; protected set; }
         public Transform Transform { get; protected set; }
@@ -45,7 +45,7 @@ namespace Marsion.CardView
 
         #endregion
 
-        public virtual void Init(Card card)
+        public virtual void Init(ICard card)
         {
             Transform = transform;
             Collider = GetComponent<Collider2D>();
@@ -85,7 +85,7 @@ namespace Marsion.CardView
 
         public abstract void Spawn();
         public abstract void Die();
-        protected virtual void Attack(Sequencer.Sequence sequence, DefaultPlayer attackPlayer, Card attacker, DefaultPlayer defendPlayer, Card defender)
+        protected virtual void Attack(Sequencer.Sequence sequence, IPlayer attackPlayer, ICard attacker, IPlayer defendPlayer, ICard defender)
         {
             if (Card.UID != attacker.UID) return;
 

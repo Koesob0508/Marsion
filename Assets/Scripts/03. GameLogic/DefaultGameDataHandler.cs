@@ -11,7 +11,7 @@ namespace Marsion
         public IGameLogic Logic { get; private set; }
         public IGameData GameData { get; private set; }
 
-        public DefaultPlayer CurrentPlayer => GameData.CurrentPlayer;
+        public IPlayer CurrentPlayer => GameData.CurrentPlayer;
 
         public void Init(IGameDataHandlerFactory dataHandlerFactory)
         {
@@ -20,7 +20,7 @@ namespace Marsion
             GameData = dataHandlerFactory.CreateGameData();
             GameData.Init(dataHandlerFactory.ProvideGameLogicConfig());
 
-            var cardSOs = Logic.Data.GetDictionary<CardSO>();
+            var cardSOs = Logic.Resource.GetDictionary<CardSO>();
             var config = dataHandlerFactory.ProvideGameLogicConfig();
             var playerInfos = dataHandlerFactory.ProvidePlayerInfos();
 
@@ -67,7 +67,7 @@ namespace Marsion
             GameData.SetCurrentPlayer(firstPlayerID);
         }
 
-        public bool TryGetPlayer(ulong playerID, out DefaultPlayer player)
+        public bool TryGetPlayer(ulong playerID, out IPlayer player)
         {
             player = GameData.GetPlayer(playerID);
 

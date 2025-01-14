@@ -29,15 +29,12 @@ namespace Marsion.Tests
             // IDataManager는 ResourceManager에 대한 의존
             var resourceManager = new ResourceManager(resourceLoader, addressableLoader);
 
-            // IManagers.Data에 대한 의존성 있음
-            var dataManager = new DataManager(resourceManager);
-
             // IManagers 연결 설정
             mockManagers
-                .Setup(m => m.Data)
-                .Returns(dataManager);
+                .Setup(m => m.Resource)
+                .Returns(resourceManager);
 
-            mockManagers.Object.Data.Init();
+            mockManagers.Object.Resource.Init();
         }
 
         [TearDown]

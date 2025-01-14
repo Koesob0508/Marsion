@@ -17,7 +17,7 @@ namespace Marsion
 
     public interface IGameLogic
     {
-        IDataManager Data { get; }
+        IResourceManager Resource { get; }
         IGameDataHandler DataHandler { get; }
         ITriggerHandler Trigger { get; }
         IGameData GameData { get; }

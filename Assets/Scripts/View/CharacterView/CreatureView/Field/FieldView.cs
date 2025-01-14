@@ -77,7 +77,7 @@ namespace Marsion.CardView
             Creatures.RemoveAt(EmptyCreatureIndex);
         }
 
-        private void SpawnCard(bool succeeded, DefaultPlayer player, Card card, int index)
+        private void SpawnCard(bool succeeded, IPlayer player, ICard card, int index)
         {
             if (Managers.Instance.Client.Game.IsMine(player) != IsMine) return;
 
@@ -126,7 +126,7 @@ namespace Marsion.CardView
             Managers.Instance.Resource.Destroy(creature.MonoBehaviour.gameObject);
         }
 
-        public ICharacterView GetCreature(Card card)
+        public ICharacterView GetCreature(ICard card)
         {
             return Creatures.Find(x => x.Card.UID == card.UID);
         }

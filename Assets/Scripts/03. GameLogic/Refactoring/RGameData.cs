@@ -4,11 +4,16 @@ namespace Marsion
 {
     public class RGameData : IGameData
     {
-        public Dictionary<ulong, DefaultPlayer> Players => throw new System.NotImplementedException();
+        public Dictionary<ulong, IPlayer> Players { get; private set; }
 
-        public DefaultPlayer CurrentPlayer { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public IPlayer CurrentPlayer { get; set; }
 
-        public int TurnCount => throw new System.NotImplementedException();
+        public int TurnCount { get; private set; }
+
+        public void Init(IGameLogicConfig config)
+        {
+            Players = new();
+        }
 
         public void AdvanceTurn()
         {
@@ -20,12 +25,17 @@ namespace Marsion
             throw new System.NotImplementedException();
         }
 
-        public DefaultPlayer GetPlayer(ulong PlayerID)
+        public ICard GetFieldCard(ulong playerID, string attackerUID)
         {
             throw new System.NotImplementedException();
         }
 
-        public void Init(IGameLogicConfig config)
+        public ICard GetHandCard(ulong playerID, string cardUID)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IPlayer GetPlayer(ulong PlayerID)
         {
             throw new System.NotImplementedException();
         }
@@ -35,7 +45,7 @@ namespace Marsion
             throw new System.NotImplementedException();
         }
 
-        public void SetPlayer(DefaultPlayer player)
+        public void SetPlayer(IPlayer player)
         {
             throw new System.NotImplementedException();
         }

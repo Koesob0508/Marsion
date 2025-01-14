@@ -14,5 +14,24 @@ namespace Marsion
         List<ICard> Hand { get; }
         List<ICard> Field { get; }
         List<ICard> Grave { get; }
+
+        // TODO : 아래 변수는 리팩토링
+        ICard PlayerCard { get; }
+        string Portrait { get; }
+
+        // TODO : 아래 함수들 리팩토링
+        void Init();
+        void SetPlayerID(ulong playerID);
+        void SetPlayerPortrait(string portraitID);
+        void SetDeck(List<ICard> deck);
+        bool TryGetPlayerCard(string uid, out ICard card);
+        bool TryGetHandCard(string uid, out ICard card);
+        bool TryGetFieldCard(string uid, out ICard card);
+        void SetMaxHealth(int amount);
+        void SetMaxMana(int amount);
+        void IncreaseMaxMana(int amount);
+        void RestoreMana(int amount);
+        void RestoreAllMana();
+        void PayMana(int amount);
     }
 }

@@ -14,7 +14,7 @@ namespace Marsion
 
     public class DefaultServerFactory : IServerManagerFactory
     {
-        private IManagers _managers;
+        private readonly IManagers _managers;
 
         public DefaultServerFactory(IManagers managers)
         {

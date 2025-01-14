@@ -4,7 +4,7 @@ namespace Marsion.CardView
 {
     public interface ICharacterView : IFSMHandler
     {
-        Card Card { get; }
+        ICard Card { get; }
         MonoBehaviour MonoBehaviour { get; }
         CharacterViewFSM FSM { get; }
         Transform Transform { get; }
@@ -13,7 +13,7 @@ namespace Marsion.CardView
         Order Order { get; }
         Pointer Pointer { get; }
 
-        void Init(Card card);
+        void Init(ICard card);
         void Clear();
         void Spawn();
         void Die();

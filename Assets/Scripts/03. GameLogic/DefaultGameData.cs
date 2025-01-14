@@ -10,8 +10,8 @@ namespace Marsion
     [Serializable]
     public class DefaultGameData : IGameData
     {
-        [JsonProperty] public Dictionary<ulong, DefaultPlayer> Players { get; private set; }
-        [JsonProperty] public DefaultPlayer CurrentPlayer { get; set; }
+        [JsonProperty] public Dictionary<ulong, IPlayer> Players { get; private set; }
+        [JsonProperty] public IPlayer CurrentPlayer { get; set; }
         [JsonProperty] public int TurnCount { get; private set; }
 
         public void Init(IGameLogicConfig config)
@@ -20,7 +20,7 @@ namespace Marsion
             TurnCount = 0;
         }
 
-        public void SetPlayer(DefaultPlayer player)
+        public void SetPlayer(IPlayer player)
         {
             Players[player.PlayerID] = player;
         }
@@ -30,7 +30,7 @@ namespace Marsion
             CurrentPlayer = GetPlayer(playerID);
         }
 
-        public DefaultPlayer GetPlayer(ulong playerID)
+        public IPlayer GetPlayer(ulong playerID)
         {
             if (Players[playerID] == null)
             {
@@ -44,9 +44,9 @@ namespace Marsion
             }
         }
 
-        public Card GetHandCard(ulong playerID, string cardUID)
+        public ICard GetHandCard(ulong playerID, string cardUID)
         {
-            if (GetPlayer(playerID).TryGetHandCard(cardUID, out Card card))
+            if (GetPlayer(playerID).TryGetHandCard(cardUID, out ICard card))
             {
                 return card;
             }
@@ -55,14 +55,14 @@ namespace Marsion
             return null;
         }
 
-        public Card GetFieldCard(ulong playerID, string cardUID)
+        public ICard GetFieldCard(ulong playerID, string cardUID)
         {
             if (GetPlayer(playerID).TryGetPlayerCard(cardUID, out var playerCard))
             {
                 return playerCard;
             }
 
-            if (GetPlayer(playerID).TryGetFieldCard(cardUID, out Card card))
+            if (GetPlayer(playerID).TryGetFieldCard(cardUID, out ICard card))
             {
                 return card;
             }

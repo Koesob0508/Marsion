@@ -9,7 +9,6 @@ namespace Marsion
         IAddressableLoader CreateAddressableLoader();
         IResourceManager CreateResource(IResourceLoader resourceLoader, IAddressableLoader addressableLoader);
         IUIManager CreateUI(IResourceManager resourceManager);
-        IDataManager CreateData(IResourceManager resourceManager);
         NetworkManager CreateNetwork();
         INetworkManagerWrapper CreateNetworkWrapper(NetworkManager networkManager);
         INetworkManagerWrapper CreateNetworkWrapper();
@@ -25,7 +24,6 @@ namespace Marsion
         public IAddressableLoader CreateAddressableLoader() => new DefaultAddressableLoader();
         public IResourceManager CreateResource(IResourceLoader resourceLoader, IAddressableLoader addressableLoader) => new ResourceManager(resourceLoader, addressableLoader);
         public IUIManager CreateUI(IResourceManager resourceManager) => new UIManager(resourceManager);
-        public IDataManager CreateData(IResourceManager resourceManager) => new DataManager(resourceManager);
         public NetworkManager CreateNetwork()
         {
             var existingManager = UnityEngine.Object.FindAnyObjectByType<NetworkManager>();

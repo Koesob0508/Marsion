@@ -7,7 +7,7 @@ namespace Marsion
 {
     public class DefaultGameLogic : IGameLogic
     {
-        public IDataManager Data { get; private set; }
+        public IResourceManager Resource { get; private set; }
         public ITriggerHandler Trigger { get; private set; }
         public IGameDataHandler DataHandler { get; private set; }
         public ICommandHandler CommandHandler { get; private set; }
@@ -28,7 +28,7 @@ namespace Marsion
         public void Init(IGameLogicFactory logicFactory)
         {
             // Managers 역할
-            Data = logicFactory.ProvideDataManager();
+            Resource = logicFactory.ProvideResourceManager();
             Trigger = logicFactory.CreateTriggerhandler();
             DataHandler = logicFactory.CreateGameDataHandler();
             var logicConfig = logicFactory.CreateGameLogicConfig();

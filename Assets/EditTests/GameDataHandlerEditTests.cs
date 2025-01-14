@@ -21,15 +21,14 @@ namespace Marsion.Tests
             var resourceLoader = new DefaultResourceLoader();
             var addressableLoader = new DefaultAddressableLoader();
             var resourceManager = new ResourceManager(resourceLoader, addressableLoader);
-            var dataManager = new DataManager(resourceManager);
 
-            dataManager.Init();
+            resourceManager.Init();
 
             // ILogic
             var mockLogic = new Mock<IGameLogic>();
             mockLogic
-                .Setup(logic => logic.Data)
-                .Returns(dataManager);
+                .Setup(logic => logic.Resource)
+                .Returns(resourceManager);
 
             var playerInfos = new List<PlayerInfo>();
 

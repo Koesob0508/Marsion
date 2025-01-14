@@ -50,7 +50,7 @@ namespace Marsion.CardView
             Cards.Clear();
         }
 
-        private void CardPlayed(bool succeeded, DefaultPlayer player, Card card)
+        private void CardPlayed(bool succeeded, IPlayer player, ICard card)
         {
             if(succeeded)
             {

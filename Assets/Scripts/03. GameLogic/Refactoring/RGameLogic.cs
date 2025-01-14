@@ -5,7 +5,7 @@ namespace Marsion
 {
     public class RGameLogic : IGameLogic
     {
-        public IDataManager Data => throw new NotImplementedException();
+        public IResourceManager Resource => throw new NotImplementedException();
 
         public IGameDataHandler DataHandler => throw new NotImplementedException();
 
@@ -16,6 +16,7 @@ namespace Marsion
         public ICommandHandler CommandHandler => throw new NotImplementedException();
 
         public ICommandFactory CommandFactory => throw new NotImplementedException();
+
 
         public event Action<IGameData> SendDataUpdated;
         public event Action SendGameStarted;

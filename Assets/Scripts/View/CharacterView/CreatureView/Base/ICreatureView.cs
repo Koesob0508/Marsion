@@ -4,6 +4,6 @@ namespace Marsion.CardView
 {
     public interface ICreatureView : ICharacterView
     {
-        void Init(Card card, IFieldView field);
+        void Init(ICard card, IFieldView field);
     }
 }
