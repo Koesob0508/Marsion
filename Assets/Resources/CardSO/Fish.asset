@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 12
   Name: Fish
+<<<<<<< Updated upstream
   ManaCost: 2
+=======
+  Mana: 2
+>>>>>>> Stashed changes
   Grade: 3
   FullArtPath: Sprites/Cards/fish
   BoardArtPath: Sprites/CardsBoard/fish_board
   AbilityExplain: 
   Attack: 2
   Health: 2
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes

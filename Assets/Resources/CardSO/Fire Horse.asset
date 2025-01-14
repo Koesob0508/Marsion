@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 11
   Name: Fire Horse
+<<<<<<< Updated upstream
   ManaCost: 5
+=======
+  Mana: 5
+>>>>>>> Stashed changes
   Grade: 3
   FullArtPath: Sprites/Cards/fire_horse
   BoardArtPath: Sprites/CardsBoard/fire_horse_board
   AbilityExplain: 
   Attack: 7
   Health: 4
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes

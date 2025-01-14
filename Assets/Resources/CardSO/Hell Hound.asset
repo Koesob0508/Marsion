@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 18
   Name: Hell Hound
+<<<<<<< Updated upstream
   ManaCost: 7
+=======
+  Mana: 6
+>>>>>>> Stashed changes
   Grade: 0
   FullArtPath: Sprites/Cards/hell_hound
   BoardArtPath: Sprites/CardsBoard/hell_hound_board
   AbilityExplain: 
   Attack: 8
   Health: 3
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes

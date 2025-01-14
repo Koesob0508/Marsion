@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 6
   Name: Eagle
+<<<<<<< Updated upstream
   ManaCost: 2
+=======
+  Mana: 3
+>>>>>>> Stashed changes
   Grade: 3
   FullArtPath: Sprites/Cards/eagle
   BoardArtPath: Sprites/CardsBoard/eagle_board
   AbilityExplain: 
   Attack: 3
   Health: 3
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes

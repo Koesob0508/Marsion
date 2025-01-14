@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 5
   Name: Crab
+<<<<<<< Updated upstream
   ManaCost: 1
+=======
+  Mana: 1
+>>>>>>> Stashed changes
   Grade: 0
   FullArtPath: Sprites/Cards/crab
   BoardArtPath: Sprites/CardsBoard/crab_board
   AbilityExplain: Hide
   Attack: 2
   Health: 2
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes

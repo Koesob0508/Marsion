@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 17
   Name: Hedgehog
+<<<<<<< Updated upstream
   ManaCost: 2
+=======
+  Mana: 2
+>>>>>>> Stashed changes
   Grade: 0
   FullArtPath: Sprites/Cards/hedgehog
   BoardArtPath: Sprites/CardsBoard/hedgehog_board
   AbilityExplain: 
   Attack: 4
   Health: 2
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes

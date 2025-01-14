@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 19
   Name: Imp
+<<<<<<< Updated upstream
   ManaCost: 1
+=======
+  Mana: 1
+>>>>>>> Stashed changes
   Grade: 0
   FullArtPath: Sprites/Cards/imp
   BoardArtPath: Sprites/CardsBoard/imp_board
   AbilityExplain: 
   Attack: 1
   Health: 1
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes

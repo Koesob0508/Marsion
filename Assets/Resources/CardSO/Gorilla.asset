@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 15
   Name: Gorilla
+<<<<<<< Updated upstream
   ManaCost: 3
+=======
+  Mana: 4
+>>>>>>> Stashed changes
   Grade: 0
   FullArtPath: Sprites/Cards/gorilla
   BoardArtPath: Sprites/CardsBoard/gorilla_board
   AbilityExplain: 
   Attack: 5
   Health: 7
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes

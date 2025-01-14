@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 9
   Name: Fire Element
+<<<<<<< Updated upstream
   ManaCost: 2
+=======
+  Mana: 1
+>>>>>>> Stashed changes
   Grade: 2
   FullArtPath: Sprites/Cards/fire_element
   BoardArtPath: Sprites/CardsBoard/fire_element_board
   AbilityExplain: 
   Attack: 3
   Health: 1
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes

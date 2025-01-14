@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 10
   Name: Fire Fox
+<<<<<<< Updated upstream
   ManaCost: 3
+=======
+  Mana: 2
+>>>>>>> Stashed changes
   Grade: 3
   FullArtPath: Sprites/Cards/fire_fox
   BoardArtPath: Sprites/CardsBoard/fire_fox_board
   AbilityExplain: 
   Attack: 4
   Health: 2
+<<<<<<< Updated upstream
   Abilities:
   - {fileID: 11400000, guid: 27b74ee8c88b5cb409b8d38837907484, type: 2}
+=======
+  Abilities: []
+>>>>>>> Stashed changes
