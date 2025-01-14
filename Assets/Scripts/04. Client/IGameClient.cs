@@ -8,7 +8,7 @@ namespace Marsion
 {
     public interface IGameClient
     {
-        DefaultGameData Data { get; }
+        IGameData Data { get; }
         ulong PlayerID { get; }
         ulong EnemyID { get; }
         IFieldView PlayerField { get; }
@@ -19,24 +19,24 @@ namespace Marsion
         event Action OnTurnStarted;
         event Action OnTurnEnded;
         event Action OnManaChanged;
-        event Action<DefaultPlayer, ICard> OnCardDrawn;
-        event Action<bool, DefaultPlayer, Card> OnCardPlayed;
-        event Action<bool, DefaultPlayer, Card, int> OnCardSpawned;
-        event Action<Sequencer.Sequence, DefaultPlayer, Card, DefaultPlayer, Card> OnAttackStarted;
+        event Action<IPlayer, ICard> OnCardDrawn;
+        event Action<bool, IPlayer, ICard> OnCardPlayed;
+        event Action<bool, IPlayer, ICard, int> OnCardSpawned;
+        event Action<Sequencer.Sequence, IPlayer, ICard, IPlayer, ICard> OnAttackStarted;
         event Action<List<string>> OnCardDied;
 
         void Init();
 
         void SendTurnEnd();
 
-        void SendTryAttack(Card attacker, Card defender);
+        void SendTryAttack(ICard attacker, ICard defender);
         void SendTrySpawnCard(ICard card, int index);
 
         bool IsMine(ulong id);
-        bool IsMine(DefaultPlayer player);
-        bool IsMine(Card card);
+        bool IsMine(IPlayer player);
+        bool IsMine(ICard card);
         bool IsMyTurn();
-        Card GetCard(CardType type, ulong playerID, string cardUID);
+        ICard GetCard(CardType type, ulong playerID, string cardUID);
         ICharacterView GetCharacter(ulong playerID, string cardUID);
     }
 }

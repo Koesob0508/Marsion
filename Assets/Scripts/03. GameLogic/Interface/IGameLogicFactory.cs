@@ -5,7 +5,7 @@ namespace Marsion
     public interface IGameLogicFactory
     {
         // Managers
-        IDataManager ProvideDataManager();
+        IResourceManager ProvideResourceManager();
 
         List<PlayerInfo> ProvidePlayerInfo();
         ITriggerHandler CreateTriggerhandler();
@@ -18,8 +18,8 @@ namespace Marsion
 
     public class DefaultGameLogicFactory : IGameLogicFactory
     {
-        private IManagers _managers;
-        private List<PlayerInfo> _playerInfos;
+        private readonly IManagers _managers;
+        private readonly List<PlayerInfo> _playerInfos;
 
         public DefaultGameLogicFactory(IManagers managers, List<PlayerInfo> playerInfos)
         {
@@ -27,7 +27,7 @@ namespace Marsion
             _playerInfos = playerInfos;
         }
 
-        public IDataManager ProvideDataManager() => _managers.Data;
+        public IResourceManager ProvideResourceManager() => _managers.Resource;
         public ITriggerHandler CreateTriggerhandler() => new TriggerHandler();
         public List<PlayerInfo> ProvidePlayerInfo() => _playerInfos;
         public IGameLogicConfig CreateGameLogicConfig() => new DefaultGameLogicConfig();

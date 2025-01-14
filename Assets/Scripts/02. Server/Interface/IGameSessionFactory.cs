@@ -5,7 +5,7 @@ namespace Marsion
     public interface IGameSessionFactory
     {
         INetworkManagerEx ProvideNetwork();
-        IDataManager ProvideData();
+        IResourceManager ProvideResource();
         Dictionary<ulong, ushort> ProvidePlayersClientIDs();
         IGameLogicFactory CreateGameLogicFactory();
         IGameLogic CreateGameLogic();
@@ -23,7 +23,7 @@ namespace Marsion
         }
 
         public INetworkManagerEx ProvideNetwork() => _managers.Network;
-        public IDataManager ProvideData() => _managers.Data; // 함수 네이밍이 좀
+        public IResourceManager ProvideResource() => _managers.Resource; // 함수 네이밍이 좀
         public Dictionary<ulong, ushort> ProvidePlayersClientIDs()
         {
             var clientPlayerIdMap = new Dictionary<ulong, ushort>();

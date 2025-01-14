@@ -14,7 +14,7 @@ namespace Marsion.CardView
         [SerializeField] bool IsEmpty;
         IFieldView Field;
 
-        public void Init(Card card, IFieldView field)
+        public void Init(ICard card, IFieldView field)
         {
             Field = field;
 
@@ -39,7 +39,7 @@ namespace Marsion.CardView
 
             Card = card;
 
-            Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(Card.SOID, out var cardSO);
+            Managers.Instance.Resource.GetDictionary<CardSO>().TryGetValue(Card.SOID, out var cardSO);
 
             Text_Attack.text = card.Power.ToString();
             Text_Health.text = card.Health.ToString();

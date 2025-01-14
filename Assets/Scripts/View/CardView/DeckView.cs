@@ -15,7 +15,7 @@ namespace Marsion.CardView
             Managers.Instance.Client.Game.OnCardDrawn += DrawCard;
         }
 
-        public void DrawCard(DefaultPlayer player, ICard card)
+        public void DrawCard(IPlayer player, ICard card)
         {
             if (Managers.Instance.Client.Game.IsMine(player))
             {

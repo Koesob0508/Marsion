@@ -30,7 +30,6 @@ namespace Marsion.Tests
             var mockAddressableLoader = new Mock<IAddressableLoader>();
             var mockResourceManager = new Mock<IResourceManager>();
             var mockUIManager = new Mock<IUIManager>();
-            var mockDataManager = new Mock<IDataManager>();
             var mockNetworkWrapper = new Mock<INetworkManagerWrapper>();
             var mockNetworkEx = new Mock<INetworkManagerEx>();
             var mockServer = new Mock<IServerManager>();
@@ -42,7 +41,6 @@ namespace Marsion.Tests
             mockFactory.Setup(f => f.CreateResource(It.IsAny<IResourceLoader>(), It.IsAny<IAddressableLoader>()))
                        .Returns(mockResourceManager.Object);
             mockFactory.Setup(f => f.CreateUI(It.IsAny<IResourceManager>())).Returns(mockUIManager.Object);
-            mockFactory.Setup(f => f.CreateData(It.IsAny<IResourceManager>())).Returns(mockDataManager.Object);
             mockFactory.Setup(f => f.CreateNetworkWrapper()).Returns(mockNetworkWrapper.Object);
             mockFactory.Setup(f => f.CreateNetworkEx(It.IsAny<INetworkManagerWrapper>())).Returns(mockNetworkEx.Object);
             mockFactory.Setup(f => f.CreateServer()).Returns(mockServer.Object);
@@ -53,7 +51,6 @@ namespace Marsion.Tests
 
             // Assert
             Assert.IsNotNull(Managers.Instance, "Managers.Instance should be initialized.");
-            Assert.IsNotNull(Managers.Instance.Data, "Managers.Data should be initialized.");
             Assert.IsNotNull(Managers.Instance.UI, "Managers.UI should be initialized.");
             Assert.IsNotNull(Managers.Instance.Resource, "Managers.Resource should be initialized.");
             Assert.IsNotNull(Managers.Instance.Network, "Managers.NetworkEx should be initialized.");

@@ -17,7 +17,7 @@ namespace Marsion.UI
 
         public void Setup(string soID)
         {
-            if (Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(soID, out var cardSO))
+            if (Managers.Instance.Resource.GetDictionary<CardSO>().TryGetValue(soID, out var cardSO))
             {
                 Text_Name.text = cardSO.Name;
                 Text_Mana.text = cardSO.ManaCost.ToString();

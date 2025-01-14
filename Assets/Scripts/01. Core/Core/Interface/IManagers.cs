@@ -8,7 +8,6 @@
         static Managers Instance { get; }
         IResourceManager Resource { get; }
         IUIManager UI { get; }
-        IDataManager Data { get; }
         INetworkManagerEx Network { get; }
     }
 }

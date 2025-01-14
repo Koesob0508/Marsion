@@ -21,7 +21,7 @@ namespace Marsion
 
         private Dictionary<ushort, Action<SerializedData>> Commands;
 
-        public DefaultGameData Data { get; private set; }
+        public IGameData Data { get; private set; }
         public ulong ServerID => Managers.Instance.Network.ServerID;
         public ulong PlayerID => Managers.Instance.Network.LocalID;
         public ulong EnemyID { get; private set; }
@@ -38,10 +38,10 @@ namespace Marsion
         public event Action OnTurnStarted;
         public event Action OnTurnEnded;
         public event Action OnManaChanged;
-        public event Action<DefaultPlayer, ICard> OnCardDrawn;
-        public event Action<bool, DefaultPlayer, Card> OnCardPlayed;
-        public event Action<bool, DefaultPlayer, Card, int> OnCardSpawned;
-        public event Action<Sequencer.Sequence, DefaultPlayer, Card, DefaultPlayer, Card> OnAttackStarted;
+        public event Action<IPlayer, ICard> OnCardDrawn;
+        public event Action<bool, IPlayer, ICard> OnCardPlayed;
+        public event Action<bool, IPlayer, ICard, int> OnCardSpawned;
+        public event Action<Sequencer.Sequence, IPlayer, ICard, IPlayer, ICard> OnAttackStarted;
         public event Action<List<string>> OnCardDied;
 
         public void Init()
@@ -100,7 +100,7 @@ namespace Marsion
             Send(GameMessageCode.ClientTurnEnd);
         }
 
-        public void SendTryAttack(Card attacker, Card defender)
+        public void SendTryAttack(ICard attacker, ICard defender)
         {
             Logger.Log<GameClient>("Send try attack", colorName: ColorCodes.Client);
 
@@ -301,10 +301,10 @@ namespace Marsion
 
             clip.OnPlay += () =>
             {
-                DefaultPlayer attackPlayer = Data.GetPlayer(sResultData.AttackPlayerID);
-                Card attacker = Data.GetFieldCard(attackPlayer.PlayerID, sResultData.AttackerUID);
-                DefaultPlayer defendPlayer = Data.GetPlayer(sResultData.DefendPlayerID);
-                Card defender = Data.GetFieldCard(defendPlayer.PlayerID, sResultData.DefenderUID);
+                IPlayer attackPlayer = Data.GetPlayer(sResultData.AttackPlayerID);
+                ICard attacker = Data.GetFieldCard(attackPlayer.PlayerID, sResultData.AttackerUID);
+                IPlayer defendPlayer = Data.GetPlayer(sResultData.DefendPlayerID);
+                ICard defender = Data.GetFieldCard(defendPlayer.PlayerID, sResultData.DefenderUID);
 
                 OnAttackStarted?.Invoke(sequence, attackPlayer, attacker, defendPlayer, defender);
             };
@@ -332,12 +332,12 @@ namespace Marsion
             return PlayerID == id;
         }
 
-        public bool IsMine(DefaultPlayer player)
+        public bool IsMine(IPlayer player)
         {
             return IsMine(player.PlayerID);
         }
 
-        public bool IsMine(Card card)
+        public bool IsMine(ICard card)
         {
             return IsMine(card.PlayerID);
         }
@@ -347,9 +347,9 @@ namespace Marsion
             return IsMine(Data.CurrentPlayer);
         }
 
-        public Card GetCard(CardType type, ulong playerID, string cardUID)
+        public ICard GetCard(CardType type, ulong playerID, string cardUID)
         {
-            Card result = null;
+            ICard result = null;
 
             switch (type)
             {

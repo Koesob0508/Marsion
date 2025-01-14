@@ -75,7 +75,7 @@ namespace Marsion.CardView
 
         public void Setup()
         {
-            Managers.Instance.Data.GetDictionary<CardSO>().TryGetValue(Card.SOID, out var cardSO);
+            Managers.Instance.Resource.GetDictionary<CardSO>().TryGetValue(Card.SOID, out var cardSO);
 
             Text_Name.text = cardSO.Name;
             Text_Mana.text = cardSO.ManaCost.ToString();

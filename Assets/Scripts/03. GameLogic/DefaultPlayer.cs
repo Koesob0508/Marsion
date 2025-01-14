@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Marsion
 {
     /// <summary>
-    /// 플레이어 클래스, 플레이어의 상태, 카드 위치 관리리
+    /// 플레이어 클래스, 플레이어의 상태, 카드 위치 관리
     /// </summary>
     [Serializable]
     public class DefaultPlayer : IPlayer
@@ -13,7 +13,7 @@ namespace Marsion
         [JsonProperty] public ulong PlayerID { get; private set; }
         public string HeroID { get; }
 
-        public Card PlayerCard;
+        public ICard PlayerCard { get; private set; }
         [JsonProperty] public string Portrait { get; private set; }
 
         public List<ICard> Deck { get; private set; }
@@ -43,7 +43,7 @@ namespace Marsion
 
         public void SetDeck(List<ICard> deck) { Deck = deck; }
 
-        public bool TryGetPlayerCard(string uid, out Card card)
+        public bool TryGetPlayerCard(string uid, out ICard card)
         {
             if(PlayerCard.UID == uid)
             {
@@ -59,9 +59,9 @@ namespace Marsion
             }
         }
 
-        public bool TryGetHandCard(string uid, out Card card)
+        public bool TryGetHandCard(string uid, out ICard card)
         {
-            foreach (Card handCard in Hand)
+            foreach (ICard handCard in Hand)
             {
                 if (handCard.UID == uid)
                 {
@@ -74,9 +74,9 @@ namespace Marsion
             return false;
         }
 
-        public bool TryGetFieldCard(string uid, out Card card)
+        public bool TryGetFieldCard(string uid, out ICard card)
         {
-            foreach (Card fieldCard in Field)
+            foreach (ICard fieldCard in Field)
             {
                 if (fieldCard.UID == uid)
                 {

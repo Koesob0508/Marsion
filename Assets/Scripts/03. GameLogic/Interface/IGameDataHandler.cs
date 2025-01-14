@@ -8,9 +8,9 @@ namespace Marsion
 
         void Init(IGameDataHandlerFactory dataHandlerFactory);
         
-        DefaultPlayer CurrentPlayer { get; }
+        IPlayer CurrentPlayer { get; }
 
-        bool TryGetPlayer(ulong playerID, out DefaultPlayer player);
+        bool TryGetPlayer(ulong playerID, out IPlayer player);
         ulong GetOpponentPlayerID(ulong playerID);
         ICard GetCardFromHand(ulong playerID, string cardUID);
         ICard GetCardFromField(ulong playerID, string cardUID);
