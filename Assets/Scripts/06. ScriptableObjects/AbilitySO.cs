@@ -19,16 +19,20 @@ namespace Marsion
         public int value;
         public EffectSO Effect;
 
-        public virtual void Init()
+        private IGameLogic Logic;
+        private EventData Data;
+
+        public void PrepareCast(IGameLogic gameLogic, EventData data)
         {
-            try
-            {
-                Effect.Init(value);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error initializing Effect: {ex.Message}");
-            }
+            Logic = gameLogic;
+            Data = data;
+
+            data.IntValue = value;
+        }
+
+        public void Execute()
+        {
+            Effect.Execute(Logic, Data);
         }
     }
 }

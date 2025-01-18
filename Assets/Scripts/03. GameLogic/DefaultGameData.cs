@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Marsion
 {
@@ -78,7 +79,9 @@ namespace Marsion
 
         public void ChangeCurrentPlayer()
         {
-            CurrentPlayer = CurrentPlayer == GetPlayer(0) ? GetPlayer(1) : GetPlayer(0);
+            List<ulong> playerIDs = Players.Keys.ToList();
+
+            CurrentPlayer = CurrentPlayer == GetPlayer(playerIDs[0]) ? GetPlayer(playerIDs[1]) : GetPlayer(playerIDs[0]);
         }
     }
 }

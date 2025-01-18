@@ -9,7 +9,7 @@ namespace Marsion
         private readonly ulong defenderID;
         private readonly string defenderUID;
 
-        public AttackCommand(IGameLogic logic, CommandData data, TriggerType trigger) : base(logic, data, trigger)
+        public AttackCommand(IGameLogic logic, EventData data, EventType trigger) : base(logic, data, trigger)
         {
             attackerID = data.PlayerID;
             attackerUID = data.CardUID;

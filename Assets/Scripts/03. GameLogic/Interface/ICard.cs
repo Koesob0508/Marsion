@@ -1,4 +1,6 @@
-﻿namespace Marsion
+﻿using System.Collections.Generic;
+
+namespace Marsion
 {
     public interface ICard
     {
@@ -9,6 +11,8 @@
         int Power { get; }
         int Health { get; }
         bool IsDead { get; }
+        int ManaCost { get; }
+        List<AbilitySO> Abilities { get; }
 
         // TODO 아래 함수 리팩토링
         void Init(ulong playerID);

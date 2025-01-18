@@ -3,6 +3,7 @@ using Marsion.Logic;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Marsion
 {
@@ -20,10 +21,9 @@ namespace Marsion
         [JsonProperty] public int MaxHealth { get; private set; }
         [JsonProperty] public int Health { get; private set; }
         [JsonProperty] public bool IsDead { get; private set; }
+        public List<AbilitySO> Abilities { get; private set; }
 
         private IGameLogic _logic;
-        private List<AbilitySO> CreatureSpells;
-        private List<AbilitySO> Abilities;
         public void Init(ulong playerID)
         {
             UID = Guid.NewGuid().ToString();
@@ -49,32 +49,12 @@ namespace Marsion
             ManaCost = cardSO.ManaCost;
             Power = cardSO.Attack;
             MaxHealth = cardSO.Health;
+            Abilities = cardSO.Abilities.ToList();
 
             Health = MaxHealth;
             IsDead = false;
 
             _logic = gameLogic;
-            CreatureSpells = new();
-            Abilities = new();
-
-            foreach (var ability in cardSO.Abilities)
-            {
-                if(ability.Type == AbilityType.Spell)
-                {
-                    CreatureSpells.Add(ability);
-                }
-                else
-                {
-                    Abilities.Add(ability);
-                }
-
-                ability.Init();
-            }
-        }
-
-        public List<AbilitySO> GetCreatureSpell()
-        {
-            return CreatureSpells;
         }
 
         public void SetPlayerID(ulong playerID) { PlayerID = playerID; }

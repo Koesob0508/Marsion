@@ -107,7 +107,7 @@ namespace Marsion.Tests
 
             string expectedUID = drawnCard1.UID;
 
-            var resultCard = dataHandler.GetCardFromHand(firstClientID, drawnCard1.UID);
+            dataHandler.TryGetCardFromHand(firstClientID, drawnCard1.UID, out var resultCard);
 
             Assert.AreEqual(expectedUID, resultCard.UID);
         }
@@ -120,7 +120,7 @@ namespace Marsion.Tests
 
             string expectedUID = drawnCard1.UID;
 
-            var playedCard = dataHandler.GetCardFromHand(firstClientID, drawnCard1.UID);
+            dataHandler.TryGetCardFromHand(firstClientID, drawnCard1.UID, out var  playedCard);
             dataHandler.RemoveCardFromHand(firstClientID, playedCard.UID);
             dataHandler.AddCardToField(firstClientID, playedCard, 0);
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Marsion
 {
-    public class CommandData
+    public class EventData
     {
         public bool Succeeded;
         public ulong PlayerID;
@@ -19,7 +19,7 @@ namespace Marsion
     {
         IResourceManager Resource { get; }
         IGameDataHandler DataHandler { get; }
-        ITriggerHandler Trigger { get; }
+        IEventHandler Event { get; }
         IGameData GameData { get; }
         ICommandHandler CommandHandler { get; }
         ICommandFactory CommandFactory { get; }
@@ -36,8 +36,8 @@ namespace Marsion
         event Action<List<string>> SendCardDied;
 
         void Init(IGameLogicFactory gameLogicFactory);
-        void SubscribeEvent(Action<string, CommandData> observerAlert);
-        void UnsubscribeEvent(Action<string, CommandData> observerAlert);
+        void SubscribeEvent(Action<string, EventData> observerAlert);
+        void UnsubscribeEvent(Action<string, EventData> observerAlert);
         void Clear();
         void StartGame();
         void EndGame();
@@ -45,6 +45,7 @@ namespace Marsion
 
         // Player Interaction
         void EndTurn();
+        void TryPlayCard(ulong playerID, string cardUID, int idex);
 
         // TODO : 이후 마법 카드가 나올 수도 있음
         void TrySpawnCard(ulong playerID, string cardUID, int index);

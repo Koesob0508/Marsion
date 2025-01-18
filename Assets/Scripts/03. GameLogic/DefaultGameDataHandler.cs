@@ -92,17 +92,23 @@ namespace Marsion
             throw new Exception("Other player ID not found.");
         }
 
-        public ICard GetCardFromHand(ulong playerID, string cardUID)
+        public bool TryGetCardFromHand(ulong playerID, string cardUID, out ICard outCard)
         {
-            if (!TryGetPlayer(playerID, out var player)) return null;
+            if (!TryGetPlayer(playerID, out var player))
+            {
+                outCard = null;
+                return false;
+            }
 
             if (!player.TryGetHandCard(cardUID, out var card))
             {
                 Logger.Log<IGameDataHandler>("Card UID not found.", colorName: ColorCodes.Logic);
-                return null;
+                outCard = null;
+                return false;
             }
 
-            return card;
+            outCard = card;
+            return true;
         }
 
         public ICard GetCardFromField(ulong playerID, string cardUID)
@@ -151,7 +157,7 @@ namespace Marsion
         public void RemoveCardFromHand(ulong playerID, string cardUID)
         {
             if (!TryGetPlayer(playerID, out var player)) return;
-            var card = GetCardFromHand(playerID, cardUID);
+            TryGetCardFromHand(playerID, cardUID, out var card);
             player.Hand.Remove(card);
         }
 
@@ -200,7 +206,7 @@ namespace Marsion
 
         public void DrawCard(ulong playerID, out List<ICard> drawnCards, int count = 1)
         {
-            Logger.Log<DefaultGameDataHandler>("Draw cards", colorName: ColorCodes.Logic);
+            Logger.Log<DefaultGameDataHandler>("Try Draw cards", colorName: ColorCodes.Logic);
             if (!TryGetPlayer(playerID, out var player))
             {
                 drawnCards = null;

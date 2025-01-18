@@ -10,7 +10,7 @@ namespace Marsion.Tests
     {
         ICommandFactory commandFactory;
         ICommandHandler commandHandler;
-        ITriggerHandler triggerHandler;
+        IEventHandler triggerHandler;
         /// <summary>
         ///     CommandFactory
         ///     CommandHandler
@@ -21,17 +21,17 @@ namespace Marsion.Tests
         {
             var mockLogic = new Mock<IGameLogic>();
             var mockDataHandler = new Mock<IGameDataHandler>();
-            var gameEventHandler = new TriggerHandler();
+            var gameEventHandler = new EventHandler();
             mockLogic
                 .Setup(l => l.DataHandler)
                 .Returns(mockDataHandler.Object);
             mockLogic
-                .Setup(l => l.Trigger)
+                .Setup(l => l.Event)
                 .Returns(gameEventHandler);
 
             commandFactory = new DefaultCommandFactory(mockLogic.Object);
             commandHandler = new CommandHandler(mockLogic.Object);
-            triggerHandler = new TriggerHandler();
+            triggerHandler = new EventHandler();
         }
 
         [TearDown]
@@ -40,16 +40,6 @@ namespace Marsion.Tests
             commandFactory = null;
             commandHandler = null;
             triggerHandler = null;
-        }
-
-        [Test]
-        public void Create_Test()
-        {
-            var attackCommand = commandFactory.CreateAttack(32, "addd", 21, "fdsa");
-            var spawnCommand = commandFactory.CreatePlayCreature(32, "asdf", 0);
-
-            Assert.IsNotNull(spawnCommand);
-            Assert.IsNotNull(attackCommand);
         }
 
         [Test]
@@ -71,17 +61,17 @@ namespace Marsion.Tests
         {
             var mockLogic = new Mock<IGameLogic>();
             mockLogic
-                .Setup(l => l.Trigger)
+                .Setup(l => l.Event)
                 .Returns(triggerHandler);
             var mockCommand = new Mock<ICommand>();
             mockCommand
                 .Setup(c => c.Execute())
                 .Callback(() =>
                 {
-                    triggerHandler.Trigger(TriggerType.PlayCreature);
+                    triggerHandler.Trigger(EventType.PlayCard);
                 });
 
-            triggerHandler.Register(TriggerType.PlayCreature, (data) =>
+            triggerHandler.Register(EventType.PlayCard, (data) =>
             {
                 Debug.Log("Play Creature");
             });

@@ -5,15 +5,21 @@ namespace Marsion
 {
     public abstract class BaseCommand : ICommand
     {
-        public IGameLogic GameLogic { get; }
-        public CommandData CommandData { get; }
-        public TriggerType TriggerType { get; }
+        public IGameLogic Logic { get; }
+        public EventData EventData { get; protected set; }
+        public EventType EventType { get; protected set; }
 
-        public BaseCommand(IGameLogic logic, CommandData data, TriggerType trigger)
+        public BaseCommand(IGameLogic logic, EventData data = null)
         {
-            GameLogic = logic;
-            CommandData = data;
-            TriggerType = trigger;
+            Logic = logic;
+            EventData = data;
+        }
+
+        public BaseCommand(IGameLogic logic, EventData data, EventType @event)
+        {
+            Logic = logic;
+            EventData = data;
+            EventType = @event;
         }
 
         public void Execute()
@@ -21,15 +27,15 @@ namespace Marsion
             Logger.Log<BaseCommand>($"Execution Start", colorName: ColorCodes.Gray);
             Implement();
             Logger.Log<BaseCommand>($"Execution End", colorName: ColorCodes.Gray);
-            CheckTrigger();
+            TriggerEvent();
         }
 
         protected abstract void Implement();
 
-        private void CheckTrigger()
+        protected virtual void TriggerEvent()
         {
-            Logger.Log<TriggerHandler>($"Trigger : {TriggerType}", colorName: ColorCodes.DeepPink);
-            GameLogic.Trigger.Trigger(TriggerType);
+            if (EventType == EventType.None) return;
+            Logic.Event.Trigger(EventType, EventData);
         }
     }
 }

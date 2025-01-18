@@ -8,7 +8,7 @@ namespace Marsion
         IResourceManager ProvideResourceManager();
 
         List<PlayerInfo> ProvidePlayerInfo();
-        ITriggerHandler CreateTriggerhandler();
+        IEventHandler CreateEventHandler();
         IGameLogicConfig CreateGameLogicConfig();
         IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogic gameLogic, IGameLogicConfig logicConfig);
         IGameDataHandler CreateGameDataHandler();
@@ -28,7 +28,7 @@ namespace Marsion
         }
 
         public IResourceManager ProvideResourceManager() => _managers.Resource;
-        public ITriggerHandler CreateTriggerhandler() => new TriggerHandler();
+        public IEventHandler CreateEventHandler() => new EventHandler();
         public List<PlayerInfo> ProvidePlayerInfo() => _playerInfos;
         public IGameLogicConfig CreateGameLogicConfig() => new DefaultGameLogicConfig();
         public IGameDataHandlerFactory CreateGameDataHandlerFactory(IGameLogic gameLogic, IGameLogicConfig logicConfig) => new DefaultGameDataHandlerFactory(gameLogic, logicConfig, _playerInfos);

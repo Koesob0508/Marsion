@@ -99,12 +99,6 @@ namespace Marsion.Tests
             var targetCardUID = currentPlayer.Hand[0].UID;
 
             Assert.IsTrue(currentPlayer.Hand.Count == 4, $"");
-
-            var playCreatureCommand = gameLogic.CommandFactory.CreatePlayCreature(currentPlayer.PlayerID, targetCardUID, 0);
-            gameLogic.CommandHandler.Add(playCreatureCommand);
-
-            Assert.IsNotNull(gameLogic.DataHandler.GetCardFromField(currentPlayer.PlayerID, targetCardUID));
-            Assert.IsTrue(currentPlayer.Hand.Count == 4, $"{currentPlayer.Hand.Count}");
         }
     }
 }

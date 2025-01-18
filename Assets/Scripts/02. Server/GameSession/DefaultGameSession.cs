@@ -16,7 +16,7 @@ namespace Marsion
 
         private Dictionary<ulong, ushort> _ClientPlayerIdMap;
         private Dictionary<ushort, Action<ulong, SerializedData>> Messages;
-        private Dictionary<string, Action<CommandData>> Events;
+        private Dictionary<string, Action<EventData>> Events;
 
         public void Init(IGameSessionFactory sessionFactory)
         {
@@ -89,12 +89,12 @@ namespace Marsion
             }
         }
 
-        private void RegisterEvent(string eventName, Action<CommandData> listener)
+        private void RegisterEvent(string eventName, Action<EventData> listener)
         {
             Events.Add(eventName, listener);
         }
 
-        private void OnReceivedSendRequest(string eventName, CommandData cdata)
+        private void OnReceivedSendRequest(string eventName, EventData cdata)
         {
             if(Events.TryGetValue(eventName, out var sendRequest))
             {
@@ -150,7 +150,7 @@ namespace Marsion
 
         #region Send Utility (Not use queue, logic process queue already)
 
-        private void SendUpdateData(CommandData cdata)
+        private void SendUpdateData(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send updated data", colorName: ColorCodes.Server);
 
@@ -160,14 +160,14 @@ namespace Marsion
             SendToAll(GameMessageCode.ServerUpdateData, sdata, NetworkDelivery.ReliableFragmentedSequenced);
         }
 
-        private void SendStartGame(CommandData cdata)
+        private void SendStartGame(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send start game", colorName: ColorCodes.Server);
 
             SendToAll(GameMessageCode.ServerStartGame);
         }
 
-        private void SendEndGame(CommandData cdata)
+        private void SendEndGame(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send end game", colorName: ColorCodes.Server);
 
@@ -177,28 +177,28 @@ namespace Marsion
             SendToAll(GameMessageCode.ServerEndGame, sdata);
         }
 
-        private void SendChangeMana(CommandData cdata)
+        private void SendChangeMana(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send change mana", colorName: ColorCodes.Server);
 
             SendToAll(GameMessageCode.ServerChangeMana);
         }
 
-        private void SendStartTurn(CommandData cdata)
+        private void SendStartTurn(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send start turn", colorName: ColorCodes.Server);
 
             SendToAll(GameMessageCode.ServerStartTurn);
         }
 
-        private void SendEndTurn(CommandData cdata)
+        private void SendEndTurn(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send end turn", colorName: ColorCodes.Server);
 
             SendToAll(GameMessageCode.ServerEndTurn);
         }
 
-        private void SendDrawCard(CommandData cdata)
+        private void SendDrawCard(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send draw card", colorName: ColorCodes.Server);
 
@@ -209,7 +209,7 @@ namespace Marsion
             SendToAll(GameMessageCode.ServerDrawCard, sdata, NetworkDelivery.Reliable);
         }
 
-        private void SendPlayCard(CommandData cdata)
+        private void SendPlayCard(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send play card result", colorName: ColorCodes.Server);
 
@@ -221,7 +221,7 @@ namespace Marsion
             SendToAll(GameMessageCode.ServerPlayCardResult, sdata, NetworkDelivery.ReliableSequenced);
         }
 
-        private void SendFailedPlay(CommandData cdata)
+        private void SendFailedPlay(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send failed play card", colorName: ColorCodes.Server);
 
@@ -234,7 +234,7 @@ namespace Marsion
             SendToAll(GameMessageCode.ServerSpawnCardResult, sdata, NetworkDelivery.ReliableSequenced);
         }
 
-        private void SendSpawnCard(CommandData cdata)
+        private void SendSpawnCard(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send spawn card result", colorName: ColorCodes.Server);
 
@@ -247,7 +247,7 @@ namespace Marsion
             SendToAll(GameMessageCode.ServerSpawnCardResult, sdata, NetworkDelivery.ReliableSequenced);
         }
 
-        private void SendAttackCard(CommandData cdata)
+        private void SendAttackCard(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send attack card result", colorName: ColorCodes.Server);
 
@@ -262,7 +262,7 @@ namespace Marsion
 
         }
 
-        private void SendDieCards(CommandData cdata)
+        private void SendDieCards(EventData cdata)
         {
             Logger.Log<DefaultGameSession>($"Send dead cards", colorName: ColorCodes.Server);
 

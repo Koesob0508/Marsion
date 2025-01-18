@@ -8,7 +8,7 @@ namespace Marsion
     public class DefaultGameLogic : IGameLogic
     {
         public IResourceManager Resource { get; private set; }
-        public ITriggerHandler Trigger { get; private set; }
+        public IEventHandler Event { get; private set; }
         public IGameDataHandler DataHandler { get; private set; }
         public ICommandHandler CommandHandler { get; private set; }
         public ICommandFactory CommandFactory { get; private set; }
@@ -29,7 +29,7 @@ namespace Marsion
         {
             // Managers 역할
             Resource = logicFactory.ProvideResourceManager();
-            Trigger = logicFactory.CreateTriggerhandler();
+            Event = logicFactory.CreateEventHandler();
             DataHandler = logicFactory.CreateGameDataHandler();
             var logicConfig = logicFactory.CreateGameLogicConfig();
             CommandHandler = logicFactory.CreateCommandHandler(this);
@@ -38,12 +38,12 @@ namespace Marsion
             DataHandler.Init(logicFactory.CreateGameDataHandlerFactory(this, logicConfig));
         }
 
-        public void SubscribeEvent(Action<string, CommandData> observerAlert)
+        public void SubscribeEvent(Action<string, EventData> observerAlert)
         {
             // TriggerHandler.SubscribeEvent(observerAlert);
         }
 
-        public void UnsubscribeEvent(Action<string, CommandData> observerAlert)
+        public void UnsubscribeEvent(Action<string, EventData> observerAlert)
         {
             // TriggerHandler.UnsubscribeEvent(observerAlert);
         }
@@ -52,14 +52,8 @@ namespace Marsion
         {
             Logger.Log<DefaultGameLogic>($"Start Game", colorName: ColorCodes.Logic);
 
-            // TODO : 멀리건 추가
-            DataHandler.DrawCard(DataHandler.CurrentPlayer.PlayerID, out var _, count : 3);
-            DataHandler.DrawCard(DataHandler.GetOpponentPlayerID(DataHandler.CurrentPlayer.PlayerID), out var _, count : 4);
-
-            SendDataUpdated?.Invoke(GameData);
-            SendGameStarted?.Invoke();
-
-            StartTurn();
+            /// TODO : 멀리건 추가.
+            CommandHandler.Add(CommandFactory.CreateStartGame());
         }
 
         public void EndGame()
@@ -71,39 +65,42 @@ namespace Marsion
         {
             Logger.Log<DefaultGameLogic>($"Start Turn", colorName: ColorCodes.Logic);
 
-            DataHandler.AdvanceTurn();
-
-            if (DataHandler.CurrentPlayer.MaxMana < 10)
-            {
-                DataHandler.CurrentPlayer.IncreaseMaxMana(1);
-            }
-
-            DataHandler.CurrentPlayer.RestoreAllMana();
-
-            DataHandler.DrawCard(DataHandler.CurrentPlayer.PlayerID, out var card);
-
-            //TriggerHandler.TriggerEvent("UpdateData");
-            //TriggerHandler.TriggerEvent("ChangeMana");
-            //SendTurnStarted?.Invoke();
-            //SendCardDrawn?.Invoke(DataHandler.CurrentPlayer.PlayerID, card.UID);
+            CommandHandler.Add(CommandFactory.CreateStartTurn());
         }
 
         public void EndTurn()
         {
-            //Logger.Log<DefaultGameLogic>($"End turn", colorName: ColorCodes.Logic);
+            Logger.Log<DefaultGameLogic>($"End turn", colorName: ColorCodes.Logic);
 
-            //DataHandler.ChangeCurrentPlayer();
+            CommandHandler.Add(CommandFactory.CreateEndTurn());
+        }
 
-            //SendDataUpdated?.Invoke(GameData);
-            //SendTurnEnded?.Invoke();
+        public void TryPlayCard(ulong playerID, string cardUID, int index)
+        {
+            Logger.Log<DefaultGameLogic>($"Try play card", colorName: ColorCodes.Logic);
 
-            //StartTurn();
+            DataHandler.TryGetPlayer(playerID, out var player);
+            if (DataHandler.TryGetCardFromHand(playerID, cardUID, out var card))
+            {
+                if (player.Mana >= card.ManaCost)
+                {
+                    CommandHandler.Add(CommandFactory.CreatePlayCard(playerID, cardUID, index));
+                }
+                else
+                {
+                    Logger.Log<IGameLogic>($"마나 부족", colorName: ColorCodes.Logic);
+                    // 마나 부족
+                }
+            }
+            else
+            {
+                Logger.Log<IGameLogic>($"해당 카드 없음", colorName: ColorCodes.Logic);
+                // 실패 메시지
+            }
         }
 
         public void TrySpawnCard(ulong playerID, string cardUID, int index)
         {
-            //Logger.Log<IGameLogic>("Try spawn card", colorName: ColorCodes.Logic);
-
             //var player = DataHandler.GetPlayer(playerID);
             //var card = DataHandler.GetCardFromHand(playerID, cardUID);
 
@@ -172,7 +169,7 @@ namespace Marsion
 
                 foreach (Card card in player.Field)
                 {
-                    if(card.Health <= 0)
+                    if (card.Health <= 0)
                     {
                         card.Die();
                         result.Add(card.UID);
@@ -200,9 +197,9 @@ namespace Marsion
                 }
             }
 
-            foreach(var card in deadCards)
+            foreach (var card in deadCards)
             {
-                foreach(var playerID in DataHandler.GameData.Players.Keys)
+                foreach (var playerID in DataHandler.GameData.Players.Keys)
                 {
                     if (!DataHandler.TryGetPlayer(playerID, out var player)) return;
 

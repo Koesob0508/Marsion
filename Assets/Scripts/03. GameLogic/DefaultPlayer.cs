@@ -117,5 +117,11 @@ namespace Marsion
                 Mana = 0;
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is DefaultPlayer player &&
+                   PlayerID == player.PlayerID;
+        }
     }
 }
