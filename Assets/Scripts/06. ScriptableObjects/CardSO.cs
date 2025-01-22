@@ -24,7 +24,9 @@ namespace Marsion
         public string AbilityExplain;
         public int Attack;
         public int Health;
-        public AbilitySO[] Abilities = new AbilitySO[0];
+        public BaseAbility[] CompositionAbilities = new BaseAbility[0];
+        public BaseAbility[] DecompositionAbilities = new BaseAbility[0];
+        public BaseAbility[] TriggerAbilities = new BaseAbility[0];
 
         public void SetID(string value) { id = value; }
     }

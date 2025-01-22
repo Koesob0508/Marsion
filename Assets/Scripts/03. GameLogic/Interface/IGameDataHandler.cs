@@ -13,7 +13,7 @@ namespace Marsion
         bool TryGetPlayer(ulong playerID, out IPlayer player);
         ulong GetOpponentPlayerID(ulong playerID);
         bool TryGetCardFromHand(ulong playerID, string cardUID, out ICard card);
-        ICard GetCardFromField(ulong playerID, string cardUID);
+        bool TryGetCardFromField(ulong playerID, string cardUID, out ICard card);
 
         void PayMana(ulong playerID, int amount);
         void AddCardToHand(ulong playerID, ICard card);

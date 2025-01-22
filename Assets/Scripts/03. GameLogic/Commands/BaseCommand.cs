@@ -5,37 +5,26 @@ namespace Marsion
 {
     public abstract class BaseCommand : ICommand
     {
-        public IGameLogic Logic { get; }
-        public EventData EventData { get; protected set; }
-        public EventType EventType { get; protected set; }
-
-        public BaseCommand(IGameLogic logic, EventData data = null)
+        public IGameLogic Logic { get; private set; }
+        public BaseCommand(IGameLogic logic)
         {
             Logic = logic;
-            EventData = data;
-        }
-
-        public BaseCommand(IGameLogic logic, EventData data, EventType @event)
-        {
-            Logic = logic;
-            EventData = data;
-            EventType = @event;
         }
 
         public void Execute()
         {
             Logger.Log<BaseCommand>($"Execution Start", colorName: ColorCodes.Gray);
-            Implement();
+            var eventData = Implement();
             Logger.Log<BaseCommand>($"Execution End", colorName: ColorCodes.Gray);
-            TriggerEvent();
+            TriggerEvent(eventData);
         }
 
-        protected abstract void Implement();
+        protected abstract EventData Implement();
 
-        protected virtual void TriggerEvent()
+        protected virtual void TriggerEvent(EventData data)
         {
-            if (EventType == EventType.None) return;
-            Logic.Event.Trigger(EventType, EventData);
+            if (data.Type == EventType.None) return;
+            Logic.Event.Trigger(data);
         }
     }
 }

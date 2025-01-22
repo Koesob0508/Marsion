@@ -8,20 +8,22 @@ namespace Marsion
         StartGame,
         StartTurn,
         EndTurn,
-        Spawn,
         PayMana,
         PlayCard,
-        CastSpell,
-        SpawnCardFromHand,
+        CompositionSpell,
+        DecompositionSpell,
+        SpawnCreatureFromHand,
+        AfterSpawn,
         Attack,
         DrawCard,
         BuffAttack,
+        Kill,
     }
 
     public interface IEventHandler
     {
         void Register(EventType type, Action<EventData> listener);
         void Unregister(EventType type, Action<EventData> listener);
-        void Trigger(EventType type, EventData eventData = null);
+        void Trigger(EventData eventData);
     }
 }

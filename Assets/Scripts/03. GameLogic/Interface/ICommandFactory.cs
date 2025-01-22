@@ -6,15 +6,17 @@ namespace Marsion
     public interface ICommandFactory
     {
         ICommand CreateStartGame();
-        ICommand CreateDraw(ulong playerID, int count);
-        ICommand CreateStartTurn();
-        ICommand CreateEndTurn();
-        ICommand CreatePlayCard(ulong playerID, string cardUID, int index);
-        ICommand CreatePayMana(ulong playerID, int amount);
-        ICommand CreateAddSpell(ulong playerID, string cardUID);
-        ICommand CreateCastSpell(AbilitySO ability, EventData eventData);
-        ICommand CreateSpawnCardFromHand(ulong playerID, string cardUID, int index);
-        ICommand CreateAttack(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID);
+        ICommand CreateCheckDead();
+        ICommand CreateDraw(ulong commanderID, ulong targetID, int count);
+        ICommand CreateStartTurn(ulong commanderID);
+        ICommand CreateEndTurn(ulong commanderID);
+        ICommand CreatePlayCreature(ulong commanderID, string commanderCardUID, int index);
+        ICommand CreatePayMana(ulong commanderID, int amount);
+        ICommand CreateCastSpell(ulong commanderID, string commanderCardUID, BaseAbility ability, AbilityType type);
+        ICommand CreateSpawnFromHand(ulong commanderID, string commanderCardUID, int index);
+        ICommand CreateAfterSpawn(ulong commanderID, string commanderCardUID);
+        ICommand CreateKillCreature(ulong commanderID, string commanderCardUID, ulong targetPlayerID, string targetCardUID);
+        ICommand CreateAttackCreature(ulong commanderID, string commanderCardUID, ulong targetPlayerID, string targetCardUID);
     }
 
     public class DefaultCommandFactory : ICommandFactory
@@ -31,59 +33,61 @@ namespace Marsion
             return new StartGameCommand(_gameLogic);
         }
 
-        public ICommand CreateDraw(ulong playerID, int count)
+        public ICommand CreateCheckDead()
         {
-            return new DrawCommand(_gameLogic, playerID, count);
+            return new CheckDeadCommand(_gameLogic);
         }
 
-        public ICommand CreateStartTurn()
+        public ICommand CreateDraw(ulong commanderID, ulong targetID, int count)
         {
-            return new StartTurnCommand(_gameLogic);
+
+            return new DrawCommand(_gameLogic, commanderID, targetID, count);
         }
 
-        public ICommand CreateEndTurn()
+        public ICommand CreateStartTurn(ulong commanderID)
         {
-            return new EndTurnCommand(_gameLogic);
-        }
-        public ICommand CreatePlayCard(ulong playerID, string cardUID, int index)
-        {
-            return new PlayCardCommand(_gameLogic, playerID, cardUID, index);
+
+            return new StartTurnCommand(_gameLogic, commanderID);
         }
 
-        public ICommand CreatePayMana(ulong playerID, int amount)
+        public ICommand CreateEndTurn(ulong commanderID)
         {
-            var data = new EventData();
-            data.PlayerID = playerID;
-            data.IntValue = amount;
-
-            return new PayManaCommand(_gameLogic, data, EventType.PayMana);
+            return new EndTurnCommand(_gameLogic, commanderID);
+        }
+        public ICommand CreatePlayCreature(ulong commanderID, string commanderCardUID, int index)
+        {
+            return new PlayCreatureCommand(_gameLogic, commanderID, commanderCardUID, index);
         }
 
-        public ICommand CreateAddSpell(ulong playerID, string cardUID)
+        public ICommand CreatePayMana(ulong commanderID, int amount)
         {
-            return new AddSpellCommand(_gameLogic, playerID, cardUID);
+            return new PayManaCommand(_gameLogic, commanderID, amount);
         }
 
-        public ICommand CreateCastSpell(AbilitySO ability, EventData eventData)
+        public ICommand CreateCastSpell(ulong commanderID, string commanderCardUID, BaseAbility ability, AbilityType type)
         {
-            return new CastSpellCommand(_gameLogic, ability, eventData);
+            return new CastSpellCommand(_gameLogic, commanderID, commanderCardUID, ability, type);
         }
 
         // 손에서 낼 때, 덱에서 소환할 때랑 아예 새로운 카드가 소환되는건 다르게 구현해야할듯
-        public ICommand CreateSpawnCardFromHand(ulong playerID, string cardUID, int index)
+        public ICommand CreateSpawnFromHand(ulong commanderID, string commanderCardUID, int index)
         {
-            return new SpawnCardFromHandCommand(_gameLogic, playerID, cardUID, index);
+            return new SpawnCardFromHandCommand(_gameLogic, commanderID, commanderCardUID, index);
         }
 
-        public ICommand CreateAttack(ulong attackerID, string attackerUID, ulong defenderID, string defenderUID)
+        public ICommand CreateAfterSpawn(ulong commanderID, string commanderCardUID)
         {
-            var data = new EventData();
-            data.PlayerID = attackerID;
-            data.CardUID = attackerUID;
-            data.TargetPlayerID = defenderID;
-            data.TargetCardUID = defenderUID;
+            return new AfterSpawnCommand(_gameLogic, commanderID, commanderCardUID);
+        }
 
-            return new AttackCommand(_gameLogic, data, EventType.Attack);
+        public ICommand CreateKillCreature(ulong commanderID, string commanderCardUID, ulong targetPlayerID, string targetCardUID)
+        {
+            return new KillCommand(_gameLogic, commanderID, commanderCardUID, targetPlayerID, targetCardUID);
+        }
+
+        public ICommand CreateAttackCreature(ulong commanderID, string commanderCardUID, ulong targetPlayerID, string targetCardUID)
+        {
+            return new AttackCommand(_gameLogic, commanderID, commanderCardUID, targetPlayerID, targetCardUID);
         }
     }
 }

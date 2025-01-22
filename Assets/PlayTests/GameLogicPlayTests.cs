@@ -134,8 +134,8 @@ namespace Marsion.Tests
             // OnDataUpdated로 GameData랑 비교해야함.
             logic.SendDataUpdated += (data) =>
             {
-                currentPlayerID = data.CurrentPlayer.PlayerID;
-                playCardUID = data.GetPlayer(data.CurrentPlayer.PlayerID).Hand[0].UID;
+                currentPlayerID = data.CurrentPlayer.ID;
+                playCardUID = data.GetPlayer(data.CurrentPlayer.ID).Hand[0].UID;
             };
 
             logic.SendCardDrawn += (playerID, cardUID) =>

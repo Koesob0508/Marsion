@@ -12,16 +12,18 @@ namespace Marsion
     /// </summary>
     public class Card : ICard, IDamageable
     {
-        [JsonProperty] public string UID { get; private set; }
-        [JsonProperty] public ulong PlayerID { get; private set; }
-        [JsonProperty] public string SOID { get; private set; }
-        [JsonProperty] public string Name { get; private set; }
-        [JsonProperty] public int ManaCost { get; private set; }
-        [JsonProperty] public int Power { get; private set; }
-        [JsonProperty] public int MaxHealth { get; private set; }
-        [JsonProperty] public int Health { get; private set; }
-        [JsonProperty] public bool IsDead { get; private set; }
-        public List<AbilitySO> Abilities { get; private set; }
+        public string UID { get; private set; }
+        public ulong PlayerID { get; private set; }
+        public string SOID { get; private set; }
+        public string Name { get; private set; }
+        public int ManaCost { get; private set; }
+        public int Power { get; private set; }
+        public int MaxHealth { get; private set; }
+        public int Health { get; private set; }
+        public bool IsDead { get; private set; }
+        public List<BaseAbility> CompositionAbilities { get; private set; }
+        public List<BaseAbility> DecompositionAbilities { get; private set; }
+        public List<BaseAbility> TriggerAbilities { get; private set; }
 
         private IGameLogic _logic;
         public void Init(ulong playerID)
@@ -49,7 +51,9 @@ namespace Marsion
             ManaCost = cardSO.ManaCost;
             Power = cardSO.Attack;
             MaxHealth = cardSO.Health;
-            Abilities = cardSO.Abilities.ToList();
+            CompositionAbilities = cardSO.CompositionAbilities.ToList();
+            DecompositionAbilities = cardSO.DecompositionAbilities.ToList();
+            TriggerAbilities = cardSO.TriggerAbilities.ToList();
 
             Health = MaxHealth;
             IsDead = false;
@@ -57,22 +61,58 @@ namespace Marsion
             _logic = gameLogic;
         }
 
-        public void SetPlayerID(ulong playerID) { PlayerID = playerID; }
         public void SetMaxHealth(int amount) { MaxHealth = amount; }
 
-        public void SetHealth(int amount)
+        public void Kill()
         {
-            Health = amount;
+            IsDead = true;
+            _logic.CommandHandler.Add(_logic.CommandFactory.CreateCheckDead());
         }
 
-        public void TakeDamage(int amount)
+        public void CastCompositionAbility()
         {
-            Health -= amount;
+            foreach(var ability in CompositionAbilities)
+            {
+                _logic.CommandHandler.Add(_logic.CommandFactory.CreateCastSpell(PlayerID, UID, ability, AbilityType.Composition));
+            }
+        }
+
+        public void RegisterDecompositionAbility(BaseAbility ability)
+        {
+            DecompositionAbilities.Add(ability);
+        }
+
+        public void CastDecompositionAbility()
+        {
+            foreach(var ability in DecompositionAbilities)
+            {
+                _logic.CommandHandler.Add(_logic.CommandFactory.CreateCastSpell(PlayerID, UID, ability, AbilityType.Decomposition));
+            }
+        }
+
+        public void RegisterAllTriggerAbility()
+        {
+
+        }
+
+        public void RegisterTriggerAbility(BaseAbility ability)
+        {
+
+        }
+
+        public void CastTriggerAbility()
+        {
+
         }
 
         public void Die()
         {
             IsDead = true;
+        }
+
+        public void TakeDamage(int amount)
+        {
+            Health -= amount;
         }
 
         public override bool Equals(object obj)

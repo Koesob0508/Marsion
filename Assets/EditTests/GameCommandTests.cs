@@ -55,30 +55,5 @@ namespace Marsion.Tests
 
             Assert.Pass();
         }
-
-        [Test]
-        public void PlayCreature_Test()
-        {
-            var mockLogic = new Mock<IGameLogic>();
-            mockLogic
-                .Setup(l => l.Event)
-                .Returns(triggerHandler);
-            var mockCommand = new Mock<ICommand>();
-            mockCommand
-                .Setup(c => c.Execute())
-                .Callback(() =>
-                {
-                    triggerHandler.Trigger(EventType.PlayCard);
-                });
-
-            triggerHandler.Register(EventType.PlayCard, (data) =>
-            {
-                Debug.Log("Play Creature");
-            });
-
-            commandHandler.Add(mockCommand.Object);
-
-            LogAssert.Expect(LogType.Log, "Play Creature");
-        }
     }
 }

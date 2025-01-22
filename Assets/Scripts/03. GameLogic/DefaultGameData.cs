@@ -12,18 +12,20 @@ namespace Marsion
     public class DefaultGameData : IGameData
     {
         [JsonProperty] public Dictionary<ulong, IPlayer> Players { get; private set; }
+        public List<ICard> FieldCards { get; private set; }
         [JsonProperty] public IPlayer CurrentPlayer { get; set; }
         [JsonProperty] public int TurnCount { get; private set; }
 
         public void Init(IGameLogicConfig config)
         {
             Players = new();
+            FieldCards = new();
             TurnCount = 0;
         }
 
         public void SetPlayer(IPlayer player)
         {
-            Players[player.PlayerID] = player;
+            Players[player.ID] = player;
         }
 
         public void SetCurrentPlayer(ulong playerID)
@@ -70,6 +72,16 @@ namespace Marsion
 
             Logger.LogWarning<DefaultGameData>("Get field card result is null.");
             return null;
+        }
+
+        public void AddCardToField(ICard card)
+        {
+            FieldCards.Add(card);
+        }
+
+        public void RemoveCardFromField(ICard card)
+        {
+            FieldCards.Remove(card);
         }
 
         public void AdvanceTurn()

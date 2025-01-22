@@ -3,18 +3,6 @@ using System.Collections.Generic;
 
 namespace Marsion
 {
-    public class EventData
-    {
-        public bool Succeeded;
-        public ulong PlayerID;
-        public string CardUID;
-        public ulong TargetPlayerID;
-        public string TargetCardUID;
-        public int IntValue;
-
-        public List<string> CardUIDs;
-    }
-
     public interface IGameLogic
     {
         IResourceManager Resource { get; }
@@ -36,8 +24,6 @@ namespace Marsion
         event Action<List<string>> SendCardDied;
 
         void Init(IGameLogicFactory gameLogicFactory);
-        void SubscribeEvent(Action<string, EventData> observerAlert);
-        void UnsubscribeEvent(Action<string, EventData> observerAlert);
         void Clear();
         void StartGame();
         void EndGame();

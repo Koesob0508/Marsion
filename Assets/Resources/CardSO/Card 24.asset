@@ -21,5 +21,8 @@ MonoBehaviour:
   AbilityExplain: 
   Attack: 0
   Health: 0
-  Abilities:
-  - {fileID: 11400000, guid: 2c7f53288c32d2a42a74ce86cfe39a68, type: 2}
+  CompositionAbilities:
+  - {fileID: 11400000, guid: 486f7e642dd8ae5489816668abf1f83e, type: 2}
+  DecompositionAbilities:
+  - {fileID: 11400000, guid: 486f7e642dd8ae5489816668abf1f83e, type: 2}
+  TriggerAbilities: []

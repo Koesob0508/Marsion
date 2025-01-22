@@ -10,7 +10,7 @@ namespace Marsion
     [Serializable]
     public class DefaultPlayer : IPlayer
     {
-        [JsonProperty] public ulong PlayerID { get; private set; }
+        [JsonProperty] public ulong ID { get; private set; }
         public string HeroID { get; }
 
         public ICard PlayerCard { get; private set; }
@@ -34,10 +34,10 @@ namespace Marsion
             Field = new();
 
             PlayerCard.SetMaxHealth(MaxHealth);
-            PlayerCard.Init(PlayerID);
+            PlayerCard.Init(ID);
         }
 
-        public void SetPlayerID(ulong playerID) { PlayerID = playerID; }
+        public void SetPlayerID(ulong playerID) { ID = playerID; }
 
         public void SetPlayerPortrait(string portraitID) { Portrait = portraitID; }
 
@@ -121,7 +121,7 @@ namespace Marsion
         public override bool Equals(object obj)
         {
             return obj is DefaultPlayer player &&
-                   PlayerID == player.PlayerID;
+                   ID == player.ID;
         }
     }
 }

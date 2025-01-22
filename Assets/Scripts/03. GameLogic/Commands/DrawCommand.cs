@@ -2,25 +2,37 @@
 {
     public class DrawCommand : BaseCommand
     {
-        private ulong playerID;
-        private int count;
+        #region Command Data
+        private readonly ulong _commanderID;
+        private readonly ulong _targetID;
+        private readonly int _count;
+        #endregion
 
-        public DrawCommand(IGameLogic logic, ulong targetPlayerID, int count) : base(logic)
+        public DrawCommand(IGameLogic logic, ulong commanderID, ulong targetID, int count) : base(logic)
         {
-            playerID = targetPlayerID;
-            this.count = count;
-            EventData = new();
-            EventType = EventType.DrawCard;
+            _commanderID = commanderID;
+            _targetID = targetID;
+            _count = count;
         }
-        protected override void Implement()
-        {
-            Logic.DataHandler.DrawCard(playerID, out var drawnCards, count: count);
 
-            EventData.CardUIDs = new();
-            foreach(var card in drawnCards)
+        protected override EventData Implement()
+        {
+            Logic.DataHandler.DrawCard(_targetID, out var _, count: _count);
+
+            return new EventData()
             {
-                EventData.CardUIDs.Add(card.UID);
-            }
+                Type = EventType.DrawCard,
+
+                Commander = new PlayerAndCard()
+                {
+                    PlayerID = _commanderID,
+                },
+
+                Target = new PlayerAndCard()
+                {
+                    PlayerID = _targetID,
+                }
+            };
         }
     }
 }

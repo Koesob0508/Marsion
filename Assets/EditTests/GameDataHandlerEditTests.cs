@@ -96,7 +96,7 @@ namespace Marsion.Tests
         public void Init_Should_SetPlayer_Properly()
         {
             Assert.IsNotNull(dataHandler.GameData.Players[secondClientID]);
-            Assert.IsTrue(dataHandler.GameData.Players[secondClientID].PlayerID == secondClientID);
+            Assert.IsTrue(dataHandler.GameData.Players[secondClientID].ID == secondClientID);
         }
         
         [Test]
@@ -124,7 +124,7 @@ namespace Marsion.Tests
             dataHandler.RemoveCardFromHand(firstClientID, playedCard.UID);
             dataHandler.AddCardToField(firstClientID, playedCard, 0);
 
-            var resultCard = dataHandler.GetCardFromField(firstClientID, playedCard.UID);
+            dataHandler.TryGetCardFromField(firstClientID, playedCard.UID, out var resultCard);
 
             Assert.IsNotNull(resultCard);
             Assert.AreEqual(expectedUID, resultCard.UID);

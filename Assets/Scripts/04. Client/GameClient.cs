@@ -158,14 +158,14 @@ namespace Marsion
 
                 foreach (var playerID in Data.Players.Values)
                 {
-                    if (PlayerID == playerID.PlayerID)
+                    if (PlayerID == playerID.ID)
                     {
                         PlayerHero.Init(playerID.PlayerCard);
                         PlayerHero.Spawn();
                     }
                     else
                     {
-                        EnemyID = playerID.PlayerID;
+                        EnemyID = playerID.ID;
                         EnemyHero.Init(playerID.PlayerCard);
                         EnemyHero.Spawn();
                     }
@@ -302,9 +302,9 @@ namespace Marsion
             clip.OnPlay += () =>
             {
                 IPlayer attackPlayer = Data.GetPlayer(sResultData.AttackPlayerID);
-                ICard attacker = Data.GetFieldCard(attackPlayer.PlayerID, sResultData.AttackerUID);
+                ICard attacker = Data.GetFieldCard(attackPlayer.ID, sResultData.AttackerUID);
                 IPlayer defendPlayer = Data.GetPlayer(sResultData.DefendPlayerID);
-                ICard defender = Data.GetFieldCard(defendPlayer.PlayerID, sResultData.DefenderUID);
+                ICard defender = Data.GetFieldCard(defendPlayer.ID, sResultData.DefenderUID);
 
                 OnAttackStarted?.Invoke(sequence, attackPlayer, attacker, defendPlayer, defender);
             };
@@ -334,7 +334,7 @@ namespace Marsion
 
         public bool IsMine(IPlayer player)
         {
-            return IsMine(player.PlayerID);
+            return IsMine(player.ID);
         }
 
         public bool IsMine(ICard card)

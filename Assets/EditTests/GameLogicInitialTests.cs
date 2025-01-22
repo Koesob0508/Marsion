@@ -76,7 +76,7 @@ namespace Marsion.Tests
             gameLogic.Init(logicFactory);
 
             var commandFactory = logicFactory.CreateCommandFactory(gameLogic);
-            var attackCommand = commandFactory.CreateAttack(13, "asdf", 14, "fdas");
+            var attackCommand = commandFactory.CreateAttackCreature(13, "asdf", 14, "fdas");
 
             Assert.IsNotNull(commandFactory);
             Assert.IsNotNull(attackCommand);

@@ -111,22 +111,26 @@ namespace Marsion
             return true;
         }
 
-        public ICard GetCardFromField(ulong playerID, string cardUID)
+        public bool TryGetCardFromField(ulong playerID, string cardUID, out ICard outCard)
         {
-            if (!TryGetPlayer(playerID, out var player)) return null;
-
-            if (player.TryGetPlayerCard(cardUID, out var playerCard))
+            if (!TryGetPlayer(playerID, out var player))
             {
-                return playerCard;
+                outCard = null;
+                return false;
             }
 
-            if (player.TryGetFieldCard(cardUID, out var card))
+            if (player.TryGetPlayerCard(cardUID, out outCard))
             {
-                return card;
+                return true;
+            }
+
+            if (player.TryGetFieldCard(cardUID, out outCard))
+            {
+                return true;
             }
 
             Logger.Log<IGameDataHandler>("Card UID not found.", colorName: ColorCodes.Logic);
-            return null;
+            return false;
         }
 
         public void PayMana(ulong playerID, int amount)
@@ -135,30 +139,31 @@ namespace Marsion
             player.PayMana(amount);
         }
 
-        public void AddCardToField(ulong playerID, ICard card, int index)
-        {
-            if (!TryGetPlayer(playerID, out var player)) return;
-            player.Field.Insert(index, card);
-        }
-
         public void AddCardToHand(ulong playerID, ICard card)
         {
             if (!TryGetPlayer(playerID, out var player)) return;
             player.Hand.Add(card);
         }
-
-        public void RemoveCardFromField(ulong playerID, string cardUID)
-        {
-            if (!TryGetPlayer(playerID, out var player)) return;
-            var card = GetCardFromField(playerID, cardUID);
-            player.Field.Remove(card);
-        }
-
         public void RemoveCardFromHand(ulong playerID, string cardUID)
         {
             if (!TryGetPlayer(playerID, out var player)) return;
             TryGetCardFromHand(playerID, cardUID, out var card);
             player.Hand.Remove(card);
+        }
+
+        public void AddCardToField(ulong playerID, ICard card, int index)
+        {
+            if (!TryGetPlayer(playerID, out var player)) return;
+            player.Field.Insert(index, card);
+            GameData.AddCardToField(card);
+        }
+
+        public void RemoveCardFromField(ulong playerID, string cardUID)
+        {
+            if (!TryGetPlayer(playerID, out var player)) return;
+            TryGetCardFromField(playerID, cardUID, out var card);
+            player.Field.Remove(card);
+            GameData.RemoveCardFromField(card);
         }
 
         public void ShuffleDeck(ulong playerID)

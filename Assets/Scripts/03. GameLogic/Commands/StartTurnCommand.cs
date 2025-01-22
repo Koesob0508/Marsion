@@ -2,12 +2,16 @@
 {
     public class StartTurnCommand : BaseCommand
     {
-        public StartTurnCommand(IGameLogic logic) : base(logic)
+        #region CommandData
+        private readonly ulong _commanderID;
+        #endregion
+
+        public StartTurnCommand(IGameLogic logic, ulong commanderID) : base(logic)
         {
-            EventType = EventType.StartTurn;
+            _commanderID = commanderID;
         }
 
-        protected override void Implement()
+        protected override EventData Implement()
         {
             var dataHandler = Logic.DataHandler;
 
@@ -19,8 +23,17 @@
             }
 
             dataHandler.CurrentPlayer.RestoreAllMana();
+            var currentPlayerID = dataHandler.CurrentPlayer.ID;
+            Logic.CommandHandler.Add(Logic.CommandFactory.CreateDraw(currentPlayerID, currentPlayerID, 1));
 
-            Logic.CommandHandler.Add(Logic.CommandFactory.CreateDraw(dataHandler.CurrentPlayer.PlayerID, 1));
+            return new EventData
+            {
+                Type = EventType.StartTurn,
+                Commander = new PlayerAndCard
+                {
+                    PlayerID = currentPlayerID,
+                }
+            };
         }
     }
 }

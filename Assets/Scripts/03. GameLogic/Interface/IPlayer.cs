@@ -4,7 +4,7 @@ namespace Marsion
 {
     public interface IPlayer
     {
-        ulong PlayerID { get; }
+        ulong ID { get; }
         string HeroID { get; }
         int Health { get; }
         int MaxHealth { get; }

@@ -9,7 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aa2d6025d7cfe5419ef540b7b926453, type: 3}
-  m_Name: BuffAttack
+  m_Script: {fileID: 11500000, guid: 88ec4045a77c72c4b8e00277aec2ea44, type: 3}
+  m_Name: DrawAbility
   m_EditorClassIdentifier: 
-  TriggerType: 6
+  id: 998
+  Effect: {fileID: 11400000, guid: 6e8c3ed042a20e54fbeec0d9620b880d, type: 2}
+  Amount: 1

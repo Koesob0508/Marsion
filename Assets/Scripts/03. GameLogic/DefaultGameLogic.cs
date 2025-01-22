@@ -35,17 +35,8 @@ namespace Marsion
             CommandHandler = logicFactory.CreateCommandHandler(this);
             CommandFactory = logicFactory.CreateCommandFactory(this);
 
+            // Init에 너무 많은 과정이 들어가 있음. Start Game으로 넘겨도 좋지 않을까 싶네
             DataHandler.Init(logicFactory.CreateGameDataHandlerFactory(this, logicConfig));
-        }
-
-        public void SubscribeEvent(Action<string, EventData> observerAlert)
-        {
-            // TriggerHandler.SubscribeEvent(observerAlert);
-        }
-
-        public void UnsubscribeEvent(Action<string, EventData> observerAlert)
-        {
-            // TriggerHandler.UnsubscribeEvent(observerAlert);
         }
 
         public void StartGame()
@@ -65,14 +56,14 @@ namespace Marsion
         {
             Logger.Log<DefaultGameLogic>($"Start Turn", colorName: ColorCodes.Logic);
 
-            CommandHandler.Add(CommandFactory.CreateStartTurn());
+            CommandHandler.Add(CommandFactory.CreateStartTurn(DataHandler.CurrentPlayer.ID));
         }
 
         public void EndTurn()
         {
             Logger.Log<DefaultGameLogic>($"End turn", colorName: ColorCodes.Logic);
 
-            CommandHandler.Add(CommandFactory.CreateEndTurn());
+            CommandHandler.Add(CommandFactory.CreateEndTurn(DataHandler.CurrentPlayer.ID));
         }
 
         public void TryPlayCard(ulong playerID, string cardUID, int index)
@@ -84,7 +75,7 @@ namespace Marsion
             {
                 if (player.Mana >= card.ManaCost)
                 {
-                    CommandHandler.Add(CommandFactory.CreatePlayCard(playerID, cardUID, index));
+                    CommandHandler.Add(CommandFactory.CreatePlayCreature(playerID, cardUID, index));
                 }
                 else
                 {

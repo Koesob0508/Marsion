@@ -93,7 +93,7 @@ namespace Marsion.CardView
 
             startAttackClip.OnPlay += () =>
             {
-                FSM.AttackState.Target = Managers.Instance.Client.Game.GetCharacter(defendPlayer.PlayerID, defender.UID).MonoBehaviour.gameObject;
+                FSM.AttackState.Target = Managers.Instance.Client.Game.GetCharacter(defendPlayer.ID, defender.UID).MonoBehaviour.gameObject;
                 FSM.AttackState.OnComplete += () =>
                 {
                     startAttackClip.Complete();

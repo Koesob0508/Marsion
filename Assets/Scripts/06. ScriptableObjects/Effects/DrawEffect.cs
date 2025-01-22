@@ -3,11 +3,11 @@
 namespace Marsion
 {
     [CreateAssetMenu(fileName = "DrawEffect", menuName = "Marsion/Effect/DrawEffect")]
-    public class DrawEffect : EffectSO
+    public class DrawEffect : BaseEffect
     {
-        public override void Execute(IGameLogic logic, EventData data)
+        public override void Execute(IGameLogic logic)
         {
-            logic.CommandHandler.Add(logic.CommandFactory.CreateDraw(data.PlayerID, data.IntValue));
+            //logic.CommandHandler.Add(logic.CommandFactory.CreateDraw(drawData.SenderID, drawData.TargetPlayerID, drawData.Count));
         }
     }
 }

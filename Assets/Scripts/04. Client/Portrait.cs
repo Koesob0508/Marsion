@@ -20,7 +20,7 @@ namespace Marsion.Client
             foreach(var player in Managers.Instance.Client.Game.Data.Players.Values)
             {
                 // Player
-                if(player.PlayerID == Managers.Instance.Client.Game.PlayerID)
+                if(player.ID == Managers.Instance.Client.Game.PlayerID)
                 {
                     Player_Sprite.sprite = Managers.Instance.Resource.GetDictionary<PortraitSO>()[player.Portrait].Sprite;
                 }

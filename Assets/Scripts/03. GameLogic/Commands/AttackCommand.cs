@@ -4,20 +4,24 @@ namespace Marsion
 {
     public class AttackCommand : BaseCommand
     {
-        private readonly ulong attackerID;
-        private readonly string attackerUID;
-        private readonly ulong defenderID;
-        private readonly string defenderUID;
+        #region Command Data
 
-        public AttackCommand(IGameLogic logic, EventData data, EventType trigger) : base(logic, data, trigger)
+        private readonly ulong _commanderID;
+        private readonly string _commanderCardUID;
+        private readonly ulong _targetPlayerID;
+        private readonly string _targetCardUID;
+
+        #endregion
+
+        public AttackCommand(IGameLogic logic, ulong commanderID, string commanderCardUID, ulong targetPlayerID, string targetCardUID) : base(logic)
         {
-            attackerID = data.PlayerID;
-            attackerUID = data.CardUID;
-            defenderID = data.TargetPlayerID;
-            defenderUID = data.TargetCardUID;
+            _commanderID = commanderID;
+            _commanderCardUID= commanderCardUID;
+            _targetPlayerID = targetPlayerID;
+            _targetCardUID = targetCardUID;
         }
 
-        protected override void Implement()
+        protected override EventData Implement()
         {
             //var attacker = GameLogic.DataHandler.GetCardFromField(attackerID, attackerUID);
             //var defender = GameLogic.DataHandler.GetCardFromField(defenderID, defenderUID);
@@ -28,6 +32,21 @@ namespace Marsion
             //defender.TakeDamage(attacker.Power);
 
             //Logger.Log<DefaultGameLogic>($"{attacker.Name} attacked {defender.Name}", colorName: ColorCodes.Logic);
+
+            return new EventData
+            {
+                Type = EventType.Attack,
+                Commander = new PlayerAndCard
+                {
+                    PlayerID = _commanderID,
+                    CardUID = _commanderCardUID
+                },
+                Target = new PlayerAndCard
+                {
+                    PlayerID = _targetPlayerID,
+                    CardUID = _targetCardUID
+                }
+            };
         }
     }
 }

@@ -2,32 +2,47 @@
 {
     public class SpawnCardFromHandCommand : BaseCommand
     {
-        private ulong playerID;
-        private string cardUID;
-        private int index;
+        #region Command Data
 
-        public SpawnCardFromHandCommand(IGameLogic logic, ulong playerID, string cardUID, int index) : base(logic)
+        private readonly ulong _commanderID;
+        private readonly string _commanderCardUID;
+        private readonly int _index;
+
+        #endregion
+
+        public SpawnCardFromHandCommand(IGameLogic logic, ulong commanderID, string commanderCardUID, int index) : base(logic)
         {
-            this.playerID = playerID;
-            this.cardUID = cardUID;
-            this.index = index;
-
-            EventType = EventType.SpawnCardFromHand;
+            _commanderID = commanderID;
+            _commanderCardUID= commanderCardUID;
+            _index = index;
         }
 
-        protected override void Implement()
+        protected override EventData Implement()
         {
-            Logger.Log<IGameLogic>($"Player {playerID} spawn card {cardUID} from hand.", colorName: ColorCodes.Logic);
+            Logger.Log<IGameLogic>($"Player {_commanderID} spawn card {_commanderCardUID} from hand.", colorName: ColorCodes.Logic);
 
-            if(Logic.DataHandler.TryGetCardFromHand(playerID, cardUID, out var card))
+            if(Logic.DataHandler.TryGetCardFromHand(_commanderID, _commanderCardUID, out var card))
             {
-                Logic.DataHandler.RemoveCardFromHand(playerID, cardUID);
-                Logic.DataHandler.AddCardToField(playerID, card, index);
+                Logic.DataHandler.RemoveCardFromHand(_commanderID, _commanderCardUID);
+                Logic.DataHandler.AddCardToField(_commanderID, card, _index);
+
+                // 전투의 함성 발동
+                card.CastCompositionAbility();
             }
             else
             {
-                Logger.Log<IGameLogic>($"Try spawn card from hand. But the player {playerID} did not have card {cardUID} in hand.", colorName: ColorCodes.Logic);
+                Logger.Log<IGameLogic>($"Try spawn card from hand. But the player {_commanderID} did not have card {_commanderCardUID} in hand.", colorName: ColorCodes.Logic);
             }
+
+            return new EventData
+            {
+                Type = EventType.SpawnCreatureFromHand,
+                Commander = new PlayerAndCard
+                {
+                    PlayerID = _commanderID,
+                    CardUID = _commanderCardUID
+                }
+            };
         }
     }
 }
