@@ -38,7 +38,7 @@ namespace Marsion.CardView
                 curveEnd = transform.position - CurveEnd;
                 height = new Vector3(0f, -Height, 0f) + transform.position;
             }
-                
+
             // 시작점과 끝점을 나타내는 스피어를 그립니다.
             Gizmos.DrawSphere(curveStart, 0.03f);
             Gizmos.DrawSphere(curveEnd, 0.03f);

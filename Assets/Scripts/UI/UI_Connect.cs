@@ -8,7 +8,6 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 using TMPro;
-using Marsion.UI;
 using System.Collections;
 using UnityEngine.UI;
 
@@ -117,11 +116,11 @@ namespace Marsion
             content_StartDraft.SetActive(true);
         }
 
-        private async Task<string> StartHostWithRelay(int maxConnecitions=2)
+        private async Task<string> StartHostWithRelay(int maxConnecitions = 2)
         {
             await UnityServices.InitializeAsync();
 
-            if(!AuthenticationService.Instance.IsSignedIn)
+            if (!AuthenticationService.Instance.IsSignedIn)
             {
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
             }
@@ -129,7 +128,9 @@ namespace Marsion
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnecitions);
             var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(allocation, "dtls"));
+            RelayServerData serverData;
+            serverData = AllocationUtils.ToRelayServerData(allocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(serverData);
 
             return NetworkManager.Singleton.StartHost() ? joinCode : null;
         }
@@ -148,7 +149,9 @@ namespace Marsion
             // Join allocation
             var joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode: joinCode);
             // Configure transport
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
+            RelayServerData serverData;
+            serverData = AllocationUtils.ToRelayServerData(joinAllocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(serverData);
             // Start client
             return !string.IsNullOrEmpty(joinCode) && NetworkManager.Singleton.StartClient();
         }
